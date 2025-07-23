@@ -4,12 +4,3 @@ export enum UserTaskStatus {
   DONE = 'DONE',
 }
 
-export class CreateUserTaskDto {
-  user_subject_id: number;
-  task_id: number;
-  status: UserTaskStatus;
-}
-
-export class UpdateUserTaskDto {
-  status?: UserTaskStatus;
-} 

@@ -14,6 +14,14 @@ import { UserCourse } from './database/entities/user_course.entity';
 import { UserSubject } from './database/entities/user_subject.entity';
 import { UserTask } from './database/entities/user_task.entity';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
+import { ApiModule } from './api/api.module';
+import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
+import { allExceptionFilter } from './helper/exceptions_filter/http_exception.helper';
+import { JwtModule } from '@nestjs/jwt';
+
+import * as dotenv from 'dotenv';
+import { TransfromResponse } from './helper/Interceptors/transfrom.interceptor';
+dotenv.config();
 
 @Module({
   imports: [
@@ -39,8 +47,18 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
       },
       inject: [ConfigService],
     }),
+    ApiModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService,
+    {
+      provide: APP_FILTER,
+      useClass: allExceptionFilter
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: TransfromResponse,
+    },
+  ],
 })
 export class AppModule { }

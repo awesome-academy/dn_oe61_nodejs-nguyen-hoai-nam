@@ -4,14 +4,3 @@ export enum UserSubjectStatus {
   COMPLETED = 'COMPLETED',
 }
 
-export class CreateUserSubjectDto {
-  user_id: number;
-  course_subject_id: number;
-  subject_progress: number;
-  status: UserSubjectStatus;
-}
-
-export class UpdateUserSubjectDto {
-  subject_progress?: number;
-  status?: UserSubjectStatus;
-} 
