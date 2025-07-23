@@ -5,6 +5,7 @@ import { SupervisorCourse } from './supervisor_course.entity';
 import { UserCourse } from './user_course.entity';
 import { UserSubject } from './user_subject.entity';
 import { Role, UserStatus } from '../dto/user.dto';
+import { DefaultLength } from 'src/helper/constants/emtities.constant';
 
 @Entity()
 export class User {
@@ -13,7 +14,7 @@ export class User {
 
   @Column({
     type: 'varchar',
-    length: 255,
+    length: DefaultLength,
     unique: true,
     nullable: false,
   })
@@ -28,7 +29,7 @@ export class User {
 
   @Column({
     type: 'varchar',
-    length: 255,
+    length: DefaultLength,
     nullable: false,
   })
   password: string;

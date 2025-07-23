@@ -10,6 +10,7 @@ import { JwtService } from '@nestjs/jwt';
 import { payLoadDataType } from 'src/helper/interface/pay_load.interface';
 import { CreateUserDto } from 'src/validation/class_validation/user.validation';
 import { Role } from 'src/database/dto/user.dto';
+import { AuthErrors } from 'src/helper/constants/error.constant';
 
 @Injectable()
 export class AuthService {
@@ -21,19 +22,18 @@ export class AuthService {
     ) { }
 
     async login(userInput: AuthDto): Promise<ApiResponse> {
-        const email = userInput?.email?.trim();
-        const passwordInput = userInput?.password?.trim();
+        const {email,password} = userInput;
 
         const user = await this.databaseValidation.checkEmailExists(this.userRepo, email);
 
         if (!user) {
-            throw new UnauthorizedException('Email không hợp lệ');
+            throw new UnauthorizedException(AuthErrors.INVALID_CREDENTIALS);
         }
 
-        const comparePassword = await this.comparePassword(passwordInput, user.password);
+        const comparePassword = await this.comparePassword(password, user.password);
 
         if (!comparePassword) {
-            throw new UnauthorizedException("Mật khẩu không hợp lệ")
+            throw new UnauthorizedException(AuthErrors.INVALID_CREDENTIALS)
         }
 
         const payLoad = {
@@ -46,10 +46,11 @@ export class AuthService {
         const accessToken = await this.generateToken(payLoad);
 
         if (!accessToken) {
-            throw new UnauthorizedException("Đăng nhập thất bại");
+            throw new UnauthorizedException(AuthErrors.LOGIN_FAILED);
         }
 
         return {
+            success: true,
             message: "Đăng nhập thành công",
             data: {
                 user: {
@@ -63,30 +64,33 @@ export class AuthService {
     }
 
     async register(userInput: CreateUserDto): Promise<ApiResponse> {
-        const emailInput = userInput?.email?.trim();
-        const userNameInput = userInput?.user_name?.trim();
-        const passwordInput = userInput?.password?.trim();
+        const {email,password,userName} = userInput;
 
         const existingUser = await this.databaseValidation.checkEmailExists(this.userRepo, userInput.email.trim());
         if (existingUser) {
-            throw new BadRequestException('Email đã được sử dụng');
+            throw new BadRequestException(AuthErrors.INVALID_CREDENTIALS);
         }
 
-        const hashedPassword = await this.hashPassword(passwordInput, 10);
+        const hashedPassword = await this.hashPassword(password, 10);
         if (!hashedPassword) {
-            throw new UnauthorizedException("Mật khẩu không hợp lệ")
+            throw new UnauthorizedException(AuthErrors.INVALID_CREDENTIALS)
         }
 
         const newUser = this.userRepo.create({
-            email: emailInput,
-            userName: userNameInput,
+            email: email,
+            userName: userName,
             password: hashedPassword,
             role: Role.TRAINEE,
         });
 
-        await this.userRepo.save(newUser);
+        const result = await this.userRepo.save(newUser);
+
+        if (!result) {
+            throw new UnauthorizedException(AuthErrors.REGISTER_FAILED)
+        }
 
         return {
+            success: true,
             message: 'Đăng ký thành công',
             data: {
                 id: newUser.userId,

@@ -6,11 +6,12 @@ import {
     Min,
     MaxLength,
 } from 'class-validator';
+import { DefaultLength } from 'src/helper/constants/emtities.constant';
 
 export class CreateSubjectDto {
     @IsString({ message: 'Tên môn học phải là chuỗi' })
     @IsNotEmpty({ message: 'Tên môn học không được để trống' })
-    @MaxLength(255, { message: 'Tên môn học không được vượt quá 255 ký tự' })
+    @MaxLength(DefaultLength, { message: `Tên môn học không được vượt quá ${DefaultLength} ký tự` })
     name: string;
 
     @IsString({ message: 'Mô tả phải là chuỗi' })
@@ -19,17 +20,17 @@ export class CreateSubjectDto {
 
     @IsInt({ message: 'Thời lượng học phải là số nguyên' })
     @Min(0, { message: 'Thời lượng học phải lớn hơn hoặc bằng 0' })
-    study_duration: number;
+    studyDuration: number;
 
     @IsInt({ message: 'creator_id phải là số nguyên' })
     @IsNotEmpty({ message: 'creator_id không được để trống' })
-    creator_id: number;
+    creatorId: number;
 }
 
 export class UpdateSubjectDto {
     @IsOptional()
     @IsString({ message: 'Tên môn học phải là chuỗi' })
-    @MaxLength(255, { message: 'Tên môn học không được vượt quá 255 ký tự' })
+    @MaxLength(DefaultLength, { message: `Tên môn học không được vượt quá ${DefaultLength} ký tự` })
     name?: string;
 
     @IsOptional()
@@ -39,5 +40,5 @@ export class UpdateSubjectDto {
     @IsOptional()
     @IsInt({ message: 'Thời lượng học phải là số nguyên' })
     @Min(0, { message: 'Thời lượng học phải lớn hơn hoặc bằng 0' })
-    study_duration?: number;
+    studyDuration?: number;
 }

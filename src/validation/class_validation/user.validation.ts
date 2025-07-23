@@ -9,7 +9,7 @@ export class CreateUserDto {
     @IsString({ message: 'User name phải là chuỗi' })
     @IsNotEmpty({ message: 'User name không được để trống' })
     @MaxLength(100, { message: 'User name không được vượt quá 100 ký tự' })
-    user_name: string;
+    userName: string;
 
     @IsString({ message: 'Password phải là chuỗi' })
     @IsNotEmpty({ message: 'Password không được để trống' })
@@ -25,7 +25,7 @@ export class UpdateUserDto {
     @IsString({ message: 'User name phải là chuỗi' })
     @IsOptional()
     @MaxLength(100, { message: 'User name không được vượt quá 100 ký tự' })
-    user_name?: string;
+    userName?: string;
 
     @IsString({ message: 'Password phải là chuỗi' })
     @IsOptional()

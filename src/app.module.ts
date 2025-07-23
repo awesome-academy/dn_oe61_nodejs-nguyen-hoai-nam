@@ -16,11 +16,10 @@ import { UserTask } from './database/entities/user_task.entity';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { ApiModule } from './api/api.module';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
-import { allExceptionFilter } from './helper/exceptions_filter/http_exception.helper';
-import { JwtModule } from '@nestjs/jwt';
+import { AllExceptionFilter } from './helper/exceptions_filter/http_exception.helper';
+import { TransfromResponse } from './helper/Interceptors/transfrom.interceptor';
 
 import * as dotenv from 'dotenv';
-import { TransfromResponse } from './helper/Interceptors/transfrom.interceptor';
 dotenv.config();
 
 @Module({
@@ -53,7 +52,7 @@ dotenv.config();
   providers: [AppService,
     {
       provide: APP_FILTER,
-      useClass: allExceptionFilter
+      useClass: AllExceptionFilter
     },
     {
       provide: APP_INTERCEPTOR,

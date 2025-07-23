@@ -9,11 +9,11 @@ import {
   export class SubjectDto {
     @IsInt({ message: 'course_id phải là số nguyên' })
     @IsNotEmpty({ message: 'course_id không được để trống' })
-    course_id: number;
+    courseId: number;
   
     @IsInt({ message: 'subject_id phải là số nguyên' })
     @IsNotEmpty({ message: 'subject_id không được để trống' })
-    subject_id: number;
+    subjectId: number;
   
     @IsEnum(CourseSubjectStatus, { message: 'status không hợp lệ' })
     @IsNotEmpty({ message: 'status không được để trống' })

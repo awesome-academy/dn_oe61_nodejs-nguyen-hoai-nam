@@ -9,11 +9,11 @@ import { UserTaskStatus } from '../../database/dto/user_task.dto'
 export class UserTaskDto {
     @IsInt({ message: 'user_subject_id phải là số nguyên' })
     @IsNotEmpty({ message: 'user_subject_id không được để trống' })
-    user_subject_id?: number;
+    userSubjectId?: number;
 
     @IsInt({ message: 'task_id phải là số nguyên' })
     @IsNotEmpty({ message: 'task_id không được để trống' })
-    task_id?: number;
+    taskId?: number;
 
     @IsEnum(UserTaskStatus, { message: 'Status không hợp lệ' })
     @IsNotEmpty({ message: 'Status không được để trống' })

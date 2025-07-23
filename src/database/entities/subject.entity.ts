@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColum
 import { User } from './user.entity';
 import { Task } from './task.entity';
 import { CourseSubject } from './course_subject.entity';
+import { DefaultLength } from 'src/helper/constants/emtities.constant';
 
 @Entity()
 export class Subject {
@@ -10,7 +11,7 @@ export class Subject {
 
   @Column({
     type: 'varchar',
-    length: 255,
+    length: DefaultLength,
     nullable: false,
   })
   name: string;

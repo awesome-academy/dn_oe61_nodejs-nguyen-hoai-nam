@@ -9,13 +9,13 @@ export class AuthController {
 
     @Post('login')
     async login (@Body() userInput: AuthDto) {
-        const result = this.authService.login(userInput);
+        const result = await this.authService.login(userInput);
         return result;
     }
 
     @Post('register')
     async register (@Body() userInput: CreateUserDto) {
-        const result = this.authService.register(userInput);
+        const result = await this.authService.register(userInput);
         return result;
     }
 }
