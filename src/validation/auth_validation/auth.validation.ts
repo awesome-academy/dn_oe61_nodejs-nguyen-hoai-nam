@@ -1,4 +1,4 @@
-import { IsString, IsEmail, IsNotEmpty, MinLength} from 'class-validator';
+import { IsString, IsEmail, IsNotEmpty, MinLength } from 'class-validator';
 import { i18nValidationMessage } from '../../helper/decorators/i18n-validation.decorator';
 
 export class AuthDto {

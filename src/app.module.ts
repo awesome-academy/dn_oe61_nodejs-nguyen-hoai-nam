@@ -15,7 +15,7 @@ import { UserSubject } from './database/entities/user_subject.entity';
 import { UserTask } from './database/entities/user_task.entity';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { ApiModule } from './api/api.module';
-import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { AllExceptionFilter } from './helper/exceptions_filter/http_exception.helper';
 import { TransfromResponse } from './helper/Interceptors/transfrom.interceptor';
 import { 
@@ -30,6 +30,7 @@ import { I18nUtils } from './helper/utils/i18n-utils';
 import * as path from 'path';
 
 import * as dotenv from 'dotenv';
+import { AuthGuard } from './middleware/guard.middleware';
 dotenv.config();
 
 @Module({
@@ -64,7 +65,7 @@ dotenv.config();
           entities: [User, Course, Subject, Task, CourseSubject, SupervisorCourse, UserCourse, UserSubject, UserTask],
           namingStrategy: new SnakeNamingStrategy(),
           synchronize: false,
-          logging: true,
+          logging: false,
         };
       },
       inject: [ConfigService],
@@ -83,6 +84,10 @@ dotenv.config();
       provide: APP_INTERCEPTOR,
       useClass: TransfromResponse,
     },
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard
+    }
   ],
   exports: [I18nUtils],
 })

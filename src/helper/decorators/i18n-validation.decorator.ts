@@ -1,7 +1,4 @@
-import {
-  ValidationOptions,
-  ValidationArguments,
-} from 'class-validator';
+import { ValidationOptions, ValidationArguments } from 'class-validator';
 import { I18nService } from 'nestjs-i18n';
 
 let i18nService: I18nService;
@@ -10,11 +7,16 @@ export function setI18nService(service: I18nService) {
   i18nService = service;
 }
 
-function getI18nMessage(key: string, args: any[] = []): string {
+function getI18nMessageSync(key: string, args: Record<string, any> = {}): string {
   if (!i18nService) {
     return `I18nService not available. Key: ${key}`;
   }
-  return i18nService.translate(key, { args });
+
+  const translation = (i18nService as any).translateSync
+    ? (i18nService as any).translateSync(key, { args })
+    : key;
+
+  return translation;
 }
 
 export function i18nValidationMessage(
@@ -24,8 +26,8 @@ export function i18nValidationMessage(
   return {
     ...validationOptions,
     message: (args: ValidationArguments) => {
-      const argsArray = Object.values(args.constraints || []);
-      return getI18nMessage(key, argsArray);
+      const constraints = args.constraints?.[0] || {};
+      return getI18nMessageSync(key, constraints);
     },
   };
-} 
+}

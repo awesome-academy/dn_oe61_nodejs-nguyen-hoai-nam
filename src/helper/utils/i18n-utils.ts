@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { I18nService } from 'nestjs-i18n';
+import { langConstant } from '../constants/lang.constant';
 
 @Injectable()
 export class I18nUtils {
@@ -7,7 +8,7 @@ export class I18nUtils {
 
   translate(key: string, args: any = {}, lang?: string): string {
     return this.i18nService.translate(key, {
-      lang: lang || 'vi',
+      lang: lang || langConstant.VN,
       args,
     });
   }

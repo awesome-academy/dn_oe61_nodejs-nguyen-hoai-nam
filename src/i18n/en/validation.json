@@ -24,7 +24,14 @@
     "invalid_credentials": "Invalid email or password",
     "login_success": "Login successful",
     "register_success": "Registration successful",
-    "email_exists": "Email already exists"
+    "email_exists": "Email already exists",
+    "token_missing": "Token is not provided",
+    "token_invalid": "Token is invalid",
+    "token_expired": "Token has expired",
+    "access_denied": "You do not have permission to access this resource"
+  },
+  "server": {
+    "internal_server_error": "Internal server error"
   },
   "course": {
     "name": {
@@ -159,4 +166,4 @@
       "isNotEmpty": "Status cannot be empty"
     }
   }
-} 
+}
