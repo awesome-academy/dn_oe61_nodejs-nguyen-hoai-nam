@@ -4,19 +4,20 @@ import {
     IsInt,
     IsOptional,
 } from 'class-validator';
+import { i18nValidationMessage } from 'src/helper/decorators/i18n-validation.decorator';
 
 export class CreateTaskDto {
-    @IsString({ message: 'file_url phải là chuỗi' })
-    @IsNotEmpty({ message: 'file_url không được để trống' })
+    @IsString(i18nValidationMessage('validation.task.fileUrl.isString'))
+    @IsNotEmpty(i18nValidationMessage('validation.task.fileUrl.isNotEmpty'))
     fileUrl: string;
 
-    @IsInt({ message: 'subject_id phải là số nguyên' })
-    @IsNotEmpty({ message: 'subject_id không được để trống' })
+    @IsInt(i18nValidationMessage('validation.task.subjectId.isInt'))
+    @IsNotEmpty(i18nValidationMessage('validation.task.subjectId.isNotEmpty'))
     subjectId: number;
 }
 
 export class UpdateTaskDto {
     @IsOptional()
-    @IsString({ message: 'file_url phải là chuỗi' })
+    @IsString(i18nValidationMessage('validation.task.fileUrl.isString'))
     fileUrl?: string;
 }

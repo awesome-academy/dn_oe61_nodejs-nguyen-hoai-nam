@@ -9,50 +9,51 @@ import {
 } from 'class-validator';
 import { CourseStatus } from '../../database/dto/course.dto';
 import { DefaultLength } from 'src/helper/constants/emtities.constant';
+import { i18nValidationMessage } from 'src/helper/decorators/i18n-validation.decorator';
 
 export class CreateCourseDto {
-  @IsString({ message: 'Tên khóa học phải là chuỗi' })
-  @IsNotEmpty({ message: 'Tên khóa học không được để trống' })
-  @MaxLength(DefaultLength, { message: `Tên khóa học không được vượt quá ${DefaultLength} ký tự` })
+  @IsString(i18nValidationMessage('validation.course.name.isString'))
+  @IsNotEmpty(i18nValidationMessage('validation.course.name.isNotEmpty'))
+  @MaxLength(DefaultLength, i18nValidationMessage('validation.course.name.maxLength'))
   name: string;
 
-  @IsString({ message: 'Mô tả phải là chuỗi' })
-  @IsNotEmpty({ message: 'Mô tả không được để trống' })
+  @IsString(i18nValidationMessage('validation.course.description.isString'))
+  @IsNotEmpty(i18nValidationMessage('validation.course.description.isNotEmpty'))
   description: string;
 
-  @IsEnum(CourseStatus, { message: 'Trạng thái khóa học không hợp lệ' })
+  @IsEnum(CourseStatus, i18nValidationMessage('validation.course.status.isEnum'))
   status: CourseStatus;
 
-  @IsDateString({}, { message: 'Ngày bắt đầu phải đúng định dạng ISO' })
+  @IsDateString({}, i18nValidationMessage('validation.course.start.isDateString'))
   start: string;
 
-  @IsDateString({}, { message: 'Ngày kết thúc phải đúng định dạng ISO' })
+  @IsDateString({}, i18nValidationMessage('validation.course.end.isDateString'))
   end: string;
 
-  @IsInt({ message: 'creator_id phải là số nguyên' })
-  @IsNotEmpty({ message: 'creator_id không được để trống' })
+  @IsInt(i18nValidationMessage('validation.course.creatorId.isInt'))
+  @IsNotEmpty(i18nValidationMessage('validation.course.creatorId.isNotEmpty'))
   creatorId: number;
 }
 
 export class UpdateCourseDto {
   @IsOptional()
-  @IsString({ message: 'Tên khóa học phải là chuỗi' })
-  @MaxLength(DefaultLength, { message: `Tên khóa học không được vượt quá ${DefaultLength} ký tự` })
+  @IsString(i18nValidationMessage('validation.course.name.isString'))
+  @MaxLength(DefaultLength, i18nValidationMessage('validation.course.name.maxLength'))
   name?: string;
 
   @IsOptional()
-  @IsString({ message: 'Mô tả phải là chuỗi' })
+  @IsString(i18nValidationMessage('validation.course.description.isString'))
   description?: string;
 
   @IsOptional()
-  @IsEnum(CourseStatus, { message: 'Trạng thái khóa học không hợp lệ' })
+  @IsEnum(CourseStatus, i18nValidationMessage('validation.course.status.isEnum'))
   status?: CourseStatus;
 
   @IsOptional()
-  @IsDateString({}, { message: 'Ngày bắt đầu phải đúng định dạng ISO' })
+  @IsDateString({}, i18nValidationMessage('validation.course.start.isDateString'))
   start?: string;
 
   @IsOptional()
-  @IsDateString({}, { message: 'Ngày kết thúc phải đúng định dạng ISO' })
+  @IsDateString({}, i18nValidationMessage('validation.course.end.isDateString'))
   end?: string;
 }

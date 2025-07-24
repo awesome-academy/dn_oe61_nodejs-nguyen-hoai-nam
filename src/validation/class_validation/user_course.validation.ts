@@ -8,42 +8,43 @@ import {
     IsOptional,
 } from 'class-validator';
 import { UserCourseStatus } from '../../database/dto/user_course.dto';
+import { i18nValidationMessage } from 'src/helper/decorators/i18n-validation.decorator';
 
 export class CreateUserCourseDto {
-    @IsInt({ message: 'course_id phải là số nguyên' })
-    @IsNotEmpty({ message: 'course_id không được để trống' })
+    @IsInt(i18nValidationMessage('validation.user_course.courseId.isInt'))
+    @IsNotEmpty(i18nValidationMessage('validation.user_course.courseId.isNotEmpty'))
     courseId: number;
 
-    @IsInt({ message: 'user_id phải là số nguyên' })
-    @IsNotEmpty({ message: 'user_id không được để trống' })
+    @IsInt(i18nValidationMessage('validation.user_course.userId.isInt'))
+    @IsNotEmpty(i18nValidationMessage('validation.user_course.userId.isNotEmpty'))
     userId: number;
 
-    @IsDateString({}, { message: 'registration_date phải là định dạng ngày hợp lệ' })
-    @IsNotEmpty({ message: 'registration_date không được để trống' })
+    @IsDateString({}, i18nValidationMessage('validation.user_course.registrationDate.isDateString'))
+    @IsNotEmpty(i18nValidationMessage('validation.user_course.registrationDate.isNotEmpty'))
     registrationDate: string;
 
-    @IsInt({ message: 'course_progress phải là số nguyên' })
-    @Min(0, { message: 'course_progress phải lớn hơn hoặc bằng 0' })
-    @Max(100, { message: 'course_progress phải nhỏ hơn hoặc bằng 100' })
+    @IsInt(i18nValidationMessage('validation.user_course.courseProgress.isInt'))
+    @Min(0, i18nValidationMessage('validation.user_course.courseProgress.min'))
+    @Max(100, i18nValidationMessage('validation.user_course.courseProgress.max'))
     courseProgress: number;
 
-    @IsEnum(UserCourseStatus, { message: 'status không hợp lệ' })
-    @IsNotEmpty({ message: 'status không được để trống' })
+    @IsEnum(UserCourseStatus, i18nValidationMessage('validation.user_course.status.isEnum'))
+    @IsNotEmpty(i18nValidationMessage('validation.user_course.status.isNotEmpty'))
     status: UserCourseStatus;
 }
 
 export class UpdateUserCourseDto {
     @IsOptional()
-    @IsDateString({}, { message: 'registration_date phải là định dạng ngày hợp lệ' })
+    @IsDateString({}, i18nValidationMessage('validation.user_course.registrationDate.isDateString'))
     registrationDate?: string;
-  
+
     @IsOptional()
-    @IsInt({ message: 'course_progress phải là số nguyên' })
-    @Min(0, { message: 'course_progress phải lớn hơn hoặc bằng 0' })
-    @Max(100, { message: 'course_progress phải nhỏ hơn hoặc bằng 100' })
+    @IsInt(i18nValidationMessage('validation.user_course.courseProgress.isInt'))
+    @Min(0, i18nValidationMessage('validation.user_course.courseProgress.min'))
+    @Max(100, i18nValidationMessage('validation.user_course.courseProgress.max'))
     courseProgress?: number;
-  
+
     @IsOptional()
-    @IsEnum(UserCourseStatus, { message: 'status không hợp lệ' })
+    @IsEnum(UserCourseStatus, i18nValidationMessage('validation.user_course.status.isEnum'))
     status?: UserCourseStatus;
-  }
+}

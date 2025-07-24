@@ -1,42 +1,43 @@
 import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString, MinLength, MaxLength, } from 'class-validator';
 import { Role, UserStatus } from '../../database/dto/user.dto';
+import { i18nValidationMessage } from '../../helper/decorators/i18n-validation.decorator';
 
 export class CreateUserDto {
-    @IsEmail({}, { message: 'Email không hợp lệ' })
-    @IsNotEmpty({ message: 'Email không được để trống' })
+    @IsEmail({}, i18nValidationMessage('validation.email.isEmail'))
+    @IsNotEmpty(i18nValidationMessage('validation.email.isNotEmpty'))
     email: string;
 
-    @IsString({ message: 'User name phải là chuỗi' })
-    @IsNotEmpty({ message: 'User name không được để trống' })
-    @MaxLength(100, { message: 'User name không được vượt quá 100 ký tự' })
+    @IsString(i18nValidationMessage('validation.userName.isString'))
+    @IsNotEmpty(i18nValidationMessage('validation.userName.isNotEmpty'))
+    @MaxLength(100, i18nValidationMessage('validation.userName.maxLength'))
     userName: string;
 
-    @IsString({ message: 'Password phải là chuỗi' })
-    @IsNotEmpty({ message: 'Password không được để trống' })
-    @MinLength(6, { message: 'Password phải có ít nhất 6 ký tự' })
+    @IsString(i18nValidationMessage('validation.password.isString'))
+    @IsNotEmpty(i18nValidationMessage('validation.password.isNotEmpty'))
+    @MinLength(6, i18nValidationMessage('validation.password.minLength'))
     password: string;
 }
 
 export class UpdateUserDto {
-    @IsEmail({}, { message: 'Email không hợp lệ' })
+    @IsEmail({}, i18nValidationMessage('validation.email.isEmail'))
     @IsOptional()
     email?: string;
 
-    @IsString({ message: 'User name phải là chuỗi' })
+    @IsString(i18nValidationMessage('validation.userName.isString'))
     @IsOptional()
-    @MaxLength(100, { message: 'User name không được vượt quá 100 ký tự' })
+    @MaxLength(100, i18nValidationMessage('validation.userName.maxLength'))
     userName?: string;
 
-    @IsString({ message: 'Password phải là chuỗi' })
+    @IsString(i18nValidationMessage('validation.password.isString'))
     @IsOptional()
-    @MinLength(6, { message: 'Password phải có ít nhất 6 ký tự' })
+    @MinLength(6, i18nValidationMessage('validation.password.minLength'))
     password?: string;
 
-    @IsEnum(Role, { message: 'Role không hợp lệ' })
+    @IsEnum(Role, i18nValidationMessage('validation.role.isEnum'))
     @IsOptional()
     role?: Role;
 
-    @IsEnum(UserStatus, { message: 'Status không hợp lệ' })
+    @IsEnum(UserStatus, i18nValidationMessage('validation.status.isEnum'))
     @IsOptional()
     status?: UserStatus;
 }

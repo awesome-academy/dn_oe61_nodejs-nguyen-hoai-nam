@@ -12,8 +12,13 @@ export const StatusCodes = {
 
 export const MsgCode = {
     SUCCESS: ["success", "SUCCESS"],
-    NOTFOUND: ["not found", "NOT FOUND"],
+    NOTFOUND: ["not_found", "NOT_FOUND"],
     ERROR: ["error", "ERROR"],
+    BAD_REQUEST: ["bad_request", "BAD_REQUEST"],
+    UNAUTHORIZED: ["unauthorized", "UNAUTHORIZED"],
+    FORBIDDEN: ["forbidden", "FORBIDDEN"],
+    CONFLICT: ["conflict", "CONFLICT"], 
+    VALIDATION_ERROR: ["validation_error", "VALIDATION_ERROR"],
 } as const;
 
 

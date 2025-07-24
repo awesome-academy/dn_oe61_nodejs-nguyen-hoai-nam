@@ -7,34 +7,35 @@ import {
     IsOptional,
 } from 'class-validator';
 import { UserSubjectStatus } from '../../database/dto/user_subject.dto';
+import { i18nValidationMessage } from 'src/helper/decorators/i18n-validation.decorator';
 
 export class CreateUserSubjectDto {
-    @IsInt({ message: 'user_id phải là số nguyên' })
-    @IsNotEmpty({ message: 'user_id không được để trống' })
+    @IsInt(i18nValidationMessage('validation.user_subject.userId.isInt'))
+    @IsNotEmpty(i18nValidationMessage('validation.user_subject.userId.isNotEmpty'))
     userId: number;
 
-    @IsInt({ message: 'course_subject_id phải là số nguyên' })
-    @IsNotEmpty({ message: 'course_subject_id không được để trống' })
+    @IsInt(i18nValidationMessage('validation.user_subject.courseSubjectId.isInt'))
+    @IsNotEmpty(i18nValidationMessage('validation.user_subject.courseSubjectId.isNotEmpty'))
     courseSubjectId: number;
 
-    @IsInt({ message: 'subject_progress phải là số nguyên' })
-    @Min(0, { message: 'subject_progress phải lớn hơn hoặc bằng 0' })
-    @Max(100, { message: 'subject_progress phải nhỏ hơn hoặc bằng 100' })
+    @IsInt(i18nValidationMessage('validation.user_subject.subjectProgress.isInt'))
+    @Min(0, i18nValidationMessage('validation.user_subject.subjectProgress.min'))
+    @Max(100, i18nValidationMessage('validation.user_subject.subjectProgress.max'))
     subjectProgress: number;
 
-    @IsEnum(UserSubjectStatus, { message: 'status không hợp lệ' })
-    @IsNotEmpty({ message: 'status không được để trống' })
+    @IsEnum(UserSubjectStatus, i18nValidationMessage('validation.user_subject.status.isEnum'))
+    @IsNotEmpty(i18nValidationMessage('validation.user_subject.status.isNotEmpty'))
     status: UserSubjectStatus;
 }
 
 export class UpdateUserSubjectDto {
     @IsOptional()
-    @IsInt({ message: 'subject_progress phải là số nguyên' })
-    @Min(0, { message: 'subject_progress phải lớn hơn hoặc bằng 0' })
-    @Max(100, { message: 'subject_progress phải nhỏ hơn hoặc bằng 100' })
+    @IsInt(i18nValidationMessage('validation.user_subject.subjectProgress.isInt'))
+    @Min(0, i18nValidationMessage('validation.user_subject.subjectProgress.min'))
+    @Max(100, i18nValidationMessage('validation.user_subject.subjectProgress.max'))
     subjectProgress?: number;
-  
+
     @IsOptional()
-    @IsEnum(UserSubjectStatus, { message: 'status không hợp lệ' })
+    @IsEnum(UserSubjectStatus, i18nValidationMessage('validation.user_subject.status.isEnum'))
     status?: UserSubjectStatus;
-  }
+}

@@ -1,0 +1,162 @@
+{
+  "email": {
+    "isEmail": "Email không hợp lệ",
+    "isNotEmpty": "Email không được để trống"
+  },
+  "password": {
+    "isString": "Password không hợp lệ",
+    "isNotEmpty": "Password không được để trống",
+    "minLength": "Mật khẩu phải lớn hơn {0} ký tự",
+    "isStrongPassword": "Mật khẩu phải chứa ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt"
+  },
+  "userName": {
+    "isString": "User name phải là chuỗi",
+    "isNotEmpty": "User name không được để trống",
+    "maxLength": "User name không được vượt quá {0} ký tự"
+  },
+  "role": {
+    "isEnum": "Role không hợp lệ"
+  },
+  "status": {
+    "isEnum": "Status không hợp lệ"
+  },
+  "auth": {
+    "invalid_credentials": "Email hoặc mật khẩu không đúng",
+    "login_success": "Đăng nhập thành công",
+    "register_success": "Đăng ký thành công",
+    "email_exists": "Email đã tồn tại"
+  },
+  "course": {
+    "name": {
+      "isString": "Tên khóa học phải là chuỗi",
+      "isNotEmpty": "Tên khóa học không được để trống",
+      "maxLength": "Tên khóa học không được vượt quá {0} ký tự"
+    },
+    "description": {
+      "isString": "Mô tả phải là chuỗi",
+      "isNotEmpty": "Mô tả không được để trống"
+    },
+    "status": {
+      "isEnum": "Trạng thái khóa học không hợp lệ"
+    },
+    "start": {
+      "isDateString": "Ngày bắt đầu phải đúng định dạng ISO"
+    },
+    "end": {
+      "isDateString": "Ngày kết thúc phải đúng định dạng ISO"
+    },
+    "creatorId": {
+      "isInt": "creator_id phải là số nguyên",
+      "isNotEmpty": "creator_id không được để trống"
+    }
+  },
+  "course_subject": {
+    "courseId": {
+      "isInt": "course_id phải là số nguyên",
+      "isNotEmpty": "course_id không được để trống"
+    },
+    "subjectId": {
+      "isInt": "subject_id phải là số nguyên",
+      "isNotEmpty": "subject_id không được để trống"
+    },
+    "status": {
+      "isEnum": "Trạng thái không hợp lệ",
+      "isNotEmpty": "Trạng thái không được để trống"
+    }
+  },
+  "subject": {
+    "name": {
+      "isString": "Tên môn học phải là chuỗi",
+      "isNotEmpty": "Tên môn học không được để trống",
+      "maxLength": "Tên môn học không được vượt quá {0} ký tự"
+    },
+    "description": {
+      "isString": "Mô tả phải là chuỗi",
+      "isNotEmpty": "Mô tả không được để trống"
+    },
+    "studyDuration": {
+      "isInt": "Thời lượng học phải là số nguyên",
+      "min": "Thời lượng học phải lớn hơn hoặc bằng {0}"
+    },
+    "creatorId": {
+      "isInt": "creator_id phải là số nguyên",
+      "isNotEmpty": "creator_id không được để trống"
+    }
+  },
+  "supervisor_course": {
+    "courseId": {
+      "isInt": "course_id phải là số nguyên",
+      "isNotEmpty": "course_id không được để trống"
+    },
+    "supervisorId": {
+      "isInt": "supervisor_id phải là số nguyên",
+      "isNotEmpty": "supervisor_id không được để trống"
+    }
+  },
+  "task": {
+    "fileUrl": {
+      "isString": "file_url phải là chuỗi",
+      "isNotEmpty": "file_url không được để trống"
+    },
+    "subjectId": {
+      "isInt": "subject_id phải là số nguyên",
+      "isNotEmpty": "subject_id không được để trống"
+    }
+  },
+  "user_course": {
+    "courseId": {
+      "isInt": "course_id phải là số nguyên",
+      "isNotEmpty": "course_id không được để trống"
+    },
+    "userId": {
+      "isInt": "user_id phải là số nguyên",
+      "isNotEmpty": "user_id không được để trống"
+    },
+    "registrationDate": {
+      "isDateString": "registration_date phải là định dạng ngày hợp lệ",
+      "isNotEmpty": "registration_date không được để trống"
+    },
+    "courseProgress": {
+      "isInt": "course_progress phải là số nguyên",
+      "min": "course_progress phải lớn hơn hoặc bằng {0}",
+      "max": "course_progress phải nhỏ hơn hoặc bằng {0}"
+    },
+    "status": {
+      "isEnum": "Trạng thái không hợp lệ",
+      "isNotEmpty": "Trạng thái không được để trống"
+    }
+  },
+  "user_subject": {
+    "userId": {
+      "isInt": "user_id phải là số nguyên",
+      "isNotEmpty": "user_id không được để trống"
+    },
+    "courseSubjectId": {
+      "isInt": "course_subject_id phải là số nguyên",
+      "isNotEmpty": "course_subject_id không được để trống"
+    },
+    "subjectProgress": {
+      "isInt": "subject_progress phải là số nguyên",
+      "min": "subject_progress phải lớn hơn hoặc bằng {0}",
+      "max": "subject_progress phải nhỏ hơn hoặc bằng {0}"
+    },
+    "status": {
+      "isEnum": "Trạng thái không hợp lệ",
+      "isNotEmpty": "Trạng thái không được để trống"
+    }
+  },
+  "user_task": {
+    "userSubjectId": {
+      "isInt": "user_subject_id phải là số nguyên",
+      "isNotEmpty": "user_subject_id không được để trống"
+    },
+    "taskId": {
+      "isInt": "task_id phải là số nguyên",
+      "isNotEmpty": "task_id không được để trống"
+    },
+    "status": {
+      "isEnum": "Trạng thái không hợp lệ",
+      "isNotEmpty": "Trạng thái không được để trống"
+    }
+  }
+} 
