@@ -5,6 +5,8 @@ import { CreateUserDto } from 'src/validation/class_validation/user.validation';
 import { I18nService } from 'nestjs-i18n';
 import { Language } from 'src/helper/decorators/language.decorator';
 import { Public } from 'src/helper/decorators/metadata.decorator';
+import { AuthRoles } from 'src/helper/decorators/auth_roles.decorator';
+import { Role } from 'src/database/dto/user.dto';
 
 @Controller('auth')
 export class AuthController {
