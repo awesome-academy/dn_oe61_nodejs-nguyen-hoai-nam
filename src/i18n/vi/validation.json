@@ -24,7 +24,14 @@
     "invalid_credentials": "Email hoặc mật khẩu không đúng",
     "login_success": "Đăng nhập thành công",
     "register_success": "Đăng ký thành công",
-    "email_exists": "Email đã tồn tại"
+    "email_exists": "Email đã tồn tại",
+    "token_missing": "Token không được cung cấp",
+    "token_invalid": "Token không hợp lệ",
+    "token_expired": "Token đã hết hạn",
+    "access_denied": "Bạn không đủ quyền truy cập"
+  },
+  "server": {
+    "internal_server_error": "Lỗi máy chủ nội bộ"
   },
   "course": {
     "name": {
@@ -159,4 +166,4 @@
       "isNotEmpty": "Trạng thái không được để trống"
     }
   }
-} 
+}

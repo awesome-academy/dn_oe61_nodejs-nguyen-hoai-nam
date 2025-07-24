@@ -3,30 +3,47 @@ import { AppModule } from './app.module';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { I18nService } from 'nestjs-i18n';
 import { setI18nService } from './helper/decorators/i18n-validation.decorator';
+import { Language } from './helper/decorators/language.decorator';
+import { asyncLocalStorage } from './middleware/language.middleware';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  
   const i18n = app.get(I18nService) as I18nService<Record<string, unknown>>;
   setI18nService(i18n);
-  
+
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
       whitelist: true,
       stopAtFirstError: true,
-      exceptionFactory: (errors) => {
+      exceptionFactory: async (errors) => {
+        const store = asyncLocalStorage.getStore();
+        const lang = store?.get('lang') || 'vi';
+        const messages = await Promise.all(
+          errors.map(async (err) => {
+            const field = err.property;
+            const rawMessages = Object.values(err.constraints || {});
+            const translatedMessages = await Promise.all(
+              rawMessages.map(async (msg) => {
+                try {
+                  return await i18n.translate(msg, { lang });
+                } catch {
+                  return msg;
+                }
+              }),
+            );
+            return { field, message: translatedMessages.join(', ') };
+          }),
+        );
         throw new BadRequestException({
           code: 400,
           success: false,
-          message: errors.map(err => ({
-            field: err.property,
-            message: Object.values(err.constraints || {}).join(', ')
-          }))
+          message: messages,
         });
       },
     }),
   );
+
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
