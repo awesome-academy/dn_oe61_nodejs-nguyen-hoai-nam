@@ -1,13 +1,14 @@
 import { IsString, IsEmail, IsNotEmpty, MinLength} from 'class-validator';
+import { i18nValidationMessage } from '../../helper/decorators/i18n-validation.decorator';
 
 export class AuthDto {
-    @IsString({message:"Email không hợp lệ"})
-    @IsEmail({},{ message: 'Email không hợp lệ' })
-    @IsNotEmpty({message: "Email không được để trống"})
+    @IsString(i18nValidationMessage('validation.email.isString'))
+    @IsEmail({}, i18nValidationMessage('validation.email.isEmail'))
+    @IsNotEmpty(i18nValidationMessage('validation.email.isNotEmpty'))
     email: string;
 
-    @IsString({message:"Password không hợp lệ"})
-    @IsNotEmpty({message: "Password không được để trống"})
-    @MinLength(6,{message: "Mật khẩu phải lớn hơn 6 ký tự"})
+    @IsString(i18nValidationMessage('validation.password.isString'))
+    @IsNotEmpty(i18nValidationMessage('validation.password.isNotEmpty'))
+    @MinLength(6, i18nValidationMessage('validation.password.minLength'))
     password: string;
 }

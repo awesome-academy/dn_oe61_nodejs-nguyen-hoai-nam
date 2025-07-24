@@ -1,0 +1,162 @@
+{
+  "email": {
+    "isEmail": "Email is invalid",
+    "isNotEmpty": "Email cannot be empty"
+  },
+  "password": {
+    "isString": "Password must be a string",
+    "isNotEmpty": "Password cannot be empty",
+    "minLength": "Password must be at least {0} characters",
+    "isStrongPassword": "Password must be at least 8 characters and include uppercase, lowercase, number and special character"
+  },
+  "userName": {
+    "isString": "User name must be a string",
+    "isNotEmpty": "User name cannot be empty",
+    "maxLength": "User name cannot exceed {0} characters"
+  },
+  "role": {
+    "isEnum": "Invalid role"
+  },
+  "status": {
+    "isEnum": "Invalid status"
+  },
+  "auth": {
+    "invalid_credentials": "Invalid email or password",
+    "login_success": "Login successful",
+    "register_success": "Registration successful",
+    "email_exists": "Email already exists"
+  },
+  "course": {
+    "name": {
+      "isString": "Course name must be a string",
+      "isNotEmpty": "Course name cannot be empty",
+      "maxLength": "Course name cannot exceed {0} characters"
+    },
+    "description": {
+      "isString": "Description must be a string",
+      "isNotEmpty": "Description cannot be empty"
+    },
+    "status": {
+      "isEnum": "Invalid course status"
+    },
+    "start": {
+      "isDateString": "Start date must be a valid ISO string"
+    },
+    "end": {
+      "isDateString": "End date must be a valid ISO string"
+    },
+    "creatorId": {
+      "isInt": "creator_id must be an integer",
+      "isNotEmpty": "creator_id cannot be empty"
+    }
+  },
+  "course_subject": {
+    "courseId": {
+      "isInt": "course_id must be an integer",
+      "isNotEmpty": "course_id cannot be empty"
+    },
+    "subjectId": {
+      "isInt": "subject_id must be an integer",
+      "isNotEmpty": "subject_id cannot be empty"
+    },
+    "status": {
+      "isEnum": "Invalid status",
+      "isNotEmpty": "Status cannot be empty"
+    }
+  },
+  "subject": {
+    "name": {
+      "isString": "Subject name must be a string",
+      "isNotEmpty": "Subject name cannot be empty",
+      "maxLength": "Subject name cannot exceed {0} characters"
+    },
+    "description": {
+      "isString": "Description must be a string",
+      "isNotEmpty": "Description cannot be empty"
+    },
+    "studyDuration": {
+      "isInt": "Study duration must be an integer",
+      "min": "Study duration must be greater than or equal to {0}"
+    },
+    "creatorId": {
+      "isInt": "creator_id must be an integer",
+      "isNotEmpty": "creator_id cannot be empty"
+    }
+  },
+  "supervisor_course": {
+    "courseId": {
+      "isInt": "course_id must be an integer",
+      "isNotEmpty": "course_id cannot be empty"
+    },
+    "supervisorId": {
+      "isInt": "supervisor_id must be an integer",
+      "isNotEmpty": "supervisor_id cannot be empty"
+    }
+  },
+  "task": {
+    "fileUrl": {
+      "isString": "file_url must be a string",
+      "isNotEmpty": "file_url cannot be empty"
+    },
+    "subjectId": {
+      "isInt": "subject_id must be an integer",
+      "isNotEmpty": "subject_id cannot be empty"
+    }
+  },
+  "user_course": {
+    "courseId": {
+      "isInt": "course_id must be an integer",
+      "isNotEmpty": "course_id cannot be empty"
+    },
+    "userId": {
+      "isInt": "user_id must be an integer",
+      "isNotEmpty": "user_id cannot be empty"
+    },
+    "registrationDate": {
+      "isDateString": "registration_date must be a valid date format",
+      "isNotEmpty": "registration_date cannot be empty"
+    },
+    "courseProgress": {
+      "isInt": "course_progress must be an integer",
+      "min": "course_progress must be greater than or equal to {0}",
+      "max": "course_progress must be less than or equal to {0}"
+    },
+    "status": {
+      "isEnum": "Invalid status",
+      "isNotEmpty": "Status cannot be empty"
+    }
+  },
+  "user_subject": {
+    "userId": {
+      "isInt": "user_id must be an integer",
+      "isNotEmpty": "user_id cannot be empty"
+    },
+    "courseSubjectId": {
+      "isInt": "course_subject_id must be an integer",
+      "isNotEmpty": "course_subject_id cannot be empty"
+    },
+    "subjectProgress": {
+      "isInt": "subject_progress must be an integer",
+      "min": "subject_progress must be greater than or equal to {0}",
+      "max": "subject_progress must be less than or equal to {0}"
+    },
+    "status": {
+      "isEnum": "Invalid status",
+      "isNotEmpty": "Status cannot be empty"
+    }
+  },
+  "user_task": {
+    "userSubjectId": {
+      "isInt": "user_subject_id must be an integer",
+      "isNotEmpty": "user_subject_id cannot be empty"
+    },
+    "taskId": {
+      "isInt": "task_id must be an integer",
+      "isNotEmpty": "task_id cannot be empty"
+    },
+    "status": {
+      "isEnum": "Invalid status",
+      "isNotEmpty": "Status cannot be empty"
+    }
+  }
+} 

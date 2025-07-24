@@ -3,23 +3,24 @@ import {
     IsNotEmpty,
     IsOptional,
 } from 'class-validator';
+import { i18nValidationMessage } from 'src/helper/decorators/i18n-validation.decorator';
 
 export class CreateSupervisorCourseDto {
-    @IsInt({ message: 'course_id phải là số nguyên' })
-    @IsNotEmpty({ message: 'course_id không được để trống' })
+    @IsInt(i18nValidationMessage('validation.supervisor_course.courseId.isInt'))
+    @IsNotEmpty(i18nValidationMessage('validation.supervisor_course.courseId.isNotEmpty'))
     courseId: number;
 
-    @IsInt({ message: 'supervisor_id phải là số nguyên' })
-    @IsNotEmpty({ message: 'supervisor_id không được để trống' })
+    @IsInt(i18nValidationMessage('validation.supervisor_course.supervisorId.isInt'))
+    @IsNotEmpty(i18nValidationMessage('validation.supervisor_course.supervisorId.isNotEmpty'))
     supervisorId: number;
 }
 
 export class UpdateSupervisorCourseDto {
     @IsOptional()
-    @IsInt({ message: 'course_id phải là số nguyên' })
+    @IsInt(i18nValidationMessage('validation.supervisor_course.courseId.isInt'))
     courseId?: number;
 
     @IsOptional()
-    @IsInt({ message: 'supervisor_id phải là số nguyên' })
+    @IsInt(i18nValidationMessage('validation.supervisor_course.supervisorId.isInt'))
     supervisorId?: number;
 }

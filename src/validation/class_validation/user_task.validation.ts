@@ -1,21 +1,21 @@
 import {
     IsEnum,
     IsNotEmpty,
-    IsOptional,
     IsInt,
 } from 'class-validator';
-import { UserTaskStatus } from '../../database/dto/user_task.dto'
+import { UserTaskStatus } from '../../database/dto/user_task.dto';
+import { i18nValidationMessage } from 'src/helper/decorators/i18n-validation.decorator';
 
 export class UserTaskDto {
-    @IsInt({ message: 'user_subject_id phải là số nguyên' })
-    @IsNotEmpty({ message: 'user_subject_id không được để trống' })
+    @IsInt(i18nValidationMessage('validation.user_task.userSubjectId.isInt'))
+    @IsNotEmpty(i18nValidationMessage('validation.user_task.userSubjectId.isNotEmpty'))
     userSubjectId?: number;
 
-    @IsInt({ message: 'task_id phải là số nguyên' })
-    @IsNotEmpty({ message: 'task_id không được để trống' })
+    @IsInt(i18nValidationMessage('validation.user_task.taskId.isInt'))
+    @IsNotEmpty(i18nValidationMessage('validation.user_task.taskId.isNotEmpty'))
     taskId?: number;
 
-    @IsEnum(UserTaskStatus, { message: 'Status không hợp lệ' })
-    @IsNotEmpty({ message: 'Status không được để trống' })
+    @IsEnum(UserTaskStatus, i18nValidationMessage('validation.user_task.status.isEnum'))
+    @IsNotEmpty(i18nValidationMessage('validation.user_task.status.isNotEmpty'))
     status: UserTaskStatus;
 }

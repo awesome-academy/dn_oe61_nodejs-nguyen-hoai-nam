@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
@@ -18,6 +18,16 @@ import { ApiModule } from './api/api.module';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { AllExceptionFilter } from './helper/exceptions_filter/http_exception.helper';
 import { TransfromResponse } from './helper/Interceptors/transfrom.interceptor';
+import { 
+  I18nModule, 
+  I18nJsonLoader,
+  QueryResolver,
+  HeaderResolver,
+  CookieResolver
+} from 'nestjs-i18n';
+import { LanguageMiddleware } from './middleware/language.middleware';
+import { I18nUtils } from './helper/utils/i18n-utils';
+import * as path from 'path';
 
 import * as dotenv from 'dotenv';
 dotenv.config();
@@ -27,6 +37,19 @@ dotenv.config();
     ConfigModule.forRoot({
       isGlobal: true,
       load: [databaseConfig],
+    }),
+    I18nModule.forRoot({
+      fallbackLanguage: 'vi',
+      loader: I18nJsonLoader,
+      loaderOptions: {
+        path: path.join(__dirname, 'i18n'),
+        watch: true,
+      },
+      resolvers: [
+        new QueryResolver(['lang']),
+        new HeaderResolver(['accept-language']),
+        new CookieResolver(['lang'])
+      ],
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -49,7 +72,9 @@ dotenv.config();
     ApiModule,
   ],
   controllers: [AppController],
-  providers: [AppService,
+  providers: [
+    AppService,
+    I18nUtils,
     {
       provide: APP_FILTER,
       useClass: AllExceptionFilter
@@ -59,5 +84,10 @@ dotenv.config();
       useClass: TransfromResponse,
     },
   ],
+  exports: [I18nUtils],
 })
-export class AppModule { }
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LanguageMiddleware).forRoutes('*');
+  }
+}
