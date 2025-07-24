@@ -4,6 +4,7 @@ import { CourseSubject } from './course_subject.entity';
 import { SupervisorCourse } from './supervisor_course.entity';
 import { UserCourse } from './user_course.entity';
 import { CourseStatus } from '../dto/course.dto';
+import { DefaultLength } from 'src/helper/constants/emtities.constant';
 
 @Entity()
 export class Course {
@@ -12,7 +13,7 @@ export class Course {
 
   @Column({
     type: 'varchar',
-    length: 255,
+    length: DefaultLength,
     nullable: false,
   })
   name: string;
