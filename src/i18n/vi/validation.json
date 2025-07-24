@@ -28,10 +28,24 @@
     "token_missing": "Token không được cung cấp",
     "token_invalid": "Token không hợp lệ",
     "token_expired": "Token đã hết hạn",
-    "access_denied": "Bạn không đủ quyền truy cập"
+    "access_denied": "Bạn không đủ quyền truy cập",
+    "user_notfound": "Không tìm thấy người dùng",
+    "user_success": "Lấy thông tin người dùng thành công"
+  },
+  "crud": {
+    "create_success": "Thêm mới thành công",
+    "create_faild": "Thêm mới không thành công",
+    "update_success": "Cập nhật thành công",
+    "update_faild": "Cập nhật không thành công",
+    "delete_success": "Cập nhật không thành công",
+    "delete_faild": "Cập nhật không thành công"
   },
   "server": {
     "internal_server_error": "Lỗi máy chủ nội bộ"
+  },
+  "response_api": {
+    "success": "Thành công",
+    "unsuccessful": "Không thành công"
   },
   "course": {
     "name": {

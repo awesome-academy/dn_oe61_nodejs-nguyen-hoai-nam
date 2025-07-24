@@ -17,7 +17,7 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { ApiModule } from './api/api.module';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { AllExceptionFilter } from './helper/exceptions_filter/http_exception.helper';
-import { TransfromResponse } from './helper/Interceptors/transfrom.interceptor';
+import { TransformResponse } from './helper/Interceptors/transfrom.interceptor';
 import { 
   I18nModule, 
   I18nJsonLoader,
@@ -82,7 +82,7 @@ dotenv.config();
     },
     {
       provide: APP_INTERCEPTOR,
-      useClass: TransfromResponse,
+      useClass: TransformResponse,
     },
     {
       provide: APP_GUARD,

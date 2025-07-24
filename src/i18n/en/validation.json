@@ -28,10 +28,24 @@
     "token_missing": "Token is not provided",
     "token_invalid": "Token is invalid",
     "token_expired": "Token has expired",
-    "access_denied": "You do not have permission to access this resource"
+    "access_denied": "You do not have permission to access this resource",
+    "user_notfound": "User not found",
+    "user_success": "User information retrieved successfully"
+  },
+  "crud": {
+    "create_success": "Create successful",
+    "create_faild": "Create failed",
+    "update_success": "Update successful",
+    "update_faild": "Update failed",
+    "delete_success": "Delete successful",
+    "delete_faild": "Delete failed"
   },
   "server": {
     "internal_server_error": "Internal server error"
+  },
+  "response_api": {
+    "success": "Success",
+    "unsuccessful": "Unsuccessful"
   },
   "course": {
     "name": {
