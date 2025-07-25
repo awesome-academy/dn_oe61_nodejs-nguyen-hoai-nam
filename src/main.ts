@@ -6,9 +6,14 @@ import { setI18nService } from './helper/decorators/i18n-validation.decorator';
 import { Language } from './helper/decorators/language.decorator';
 import { asyncLocalStorage } from './middleware/language.middleware';
 import { LanguageRequest } from './helper/constants/lang.constant';
+import * as path from 'path';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  const expressApp = app.getHttpAdapter().getInstance();
+  expressApp.set('views', path.join(__dirname, '..', 'src', 'templates', 'email'));
+  expressApp.set('view engine', 'pug');
   const i18n = app.get(I18nService) as I18nService<Record<string, unknown>>;
   setI18nService(i18n);
 
@@ -21,7 +26,6 @@ async function bootstrap() {
         const lang = LanguageRequest();
         const messages = await Promise.all(
           errors.map(async (err) => {
-            const field = err.property;
             const rawMessages = Object.values(err.constraints || {});
             const translatedMessages = await Promise.all(
               rawMessages.map(async (msg) => {
@@ -32,7 +36,7 @@ async function bootstrap() {
                 }
               }),
             );
-            return { field, message: translatedMessages.join(', ') };
+            return translatedMessages.join(', ') ;
           }),
         );
         throw new BadRequestException({

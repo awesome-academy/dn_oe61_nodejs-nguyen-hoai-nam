@@ -18,8 +18,8 @@ import { ApiModule } from './api/api.module';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { AllExceptionFilter } from './helper/exceptions_filter/http_exception.helper';
 import { TransformResponse } from './helper/Interceptors/transfrom.interceptor';
-import { 
-  I18nModule, 
+import {
+  I18nModule,
   I18nJsonLoader,
   QueryResolver,
   HeaderResolver,
@@ -28,9 +28,13 @@ import {
 import { LanguageMiddleware } from './middleware/language.middleware';
 import { I18nUtils } from './helper/utils/i18n-utils';
 import * as path from 'path';
-
+import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
 import * as dotenv from 'dotenv';
 import { AuthGuard } from './middleware/guard.middleware';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { JwtModule } from '@nestjs/jwt';
+import { BlacklistedToken } from './database/entities/blacklisted_token.entity';
+import { ScheduleModule } from '@nestjs/schedule';
 dotenv.config();
 
 @Module({
@@ -62,7 +66,7 @@ dotenv.config();
 
         return {
           ...dbConfig,
-          entities: [User, Course, Subject, Task, CourseSubject, SupervisorCourse, UserCourse, UserSubject, UserTask],
+          entities: [User, Course, Subject, Task, CourseSubject, SupervisorCourse, UserCourse, UserSubject, UserTask, BlacklistedToken],
           namingStrategy: new SnakeNamingStrategy(),
           synchronize: false,
           logging: false,
@@ -71,6 +75,37 @@ dotenv.config();
       inject: [ConfigService],
     }),
     ApiModule,
+    MailerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        transport: {
+          host: configService.get<string>('MAIL_HOST'),
+          port: configService.get<number>('MAIL_PORT'),
+          secure: false,
+          auth: {
+            user: configService.get<string>('MAIL_USER'),
+            pass: configService.get<string>('MAIL_PASSWORD')
+          },
+        },
+        defaults: {
+          from: `"No Reply" <${configService.get<string>('MAIL_FROM')}>`,
+        },
+        template: {
+          dir: path.join(__dirname, 'templates/email'),
+          adapter: new PugAdapter(),
+          options: {
+            strict: true,
+          },
+        },
+      }),
+    }),
+    JwtModule.register({
+      global: true,
+      secret: process.env.JWT_SECRET,
+      signOptions: { expiresIn: '7d' },
+    }),
+    ScheduleModule.forRoot()
   ],
   controllers: [AppController],
   providers: [
@@ -87,7 +122,7 @@ dotenv.config();
     {
       provide: APP_GUARD,
       useClass: AuthGuard
-    }
+    },
   ],
   exports: [I18nUtils],
 })

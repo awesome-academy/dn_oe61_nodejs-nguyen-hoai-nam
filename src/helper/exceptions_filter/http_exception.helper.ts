@@ -20,7 +20,7 @@ export class AllExceptionFilter implements ExceptionFilter {
     if (responseData && typeof responseData === 'object') {
       let rawMessage =
         (responseData as any).message ||
-        (responseData as any).error ||
+        (responseData as any).error || (responseData) ||
         'validation.server.internal_server_error';
 
       if (Array.isArray(rawMessage)) {

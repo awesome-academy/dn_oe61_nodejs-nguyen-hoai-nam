@@ -1,6 +1,7 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Request } from 'express';
+import { Role } from 'src/database/dto/user.dto';
 import { User } from 'src/database/entities/user.entity';
 import { ApiResponse } from 'src/helper/interface/api.interface';
 import { I18nUtils } from 'src/helper/utils/i18n-utils';
@@ -41,8 +42,7 @@ export class UserService {
         }
     }
 
-    async editProfileUser(userData: UpdateUserDto, req: Request, lang: string): Promise<ApiResponse> {
-        const userId = (req.user as User).userId || undefined;
+    async editProfileUser(userData: UpdateUserDto, userId: number, lang: string): Promise<ApiResponse> {
 
         if (!userId) {
             throw new NotFoundException(this.i18nUtils.translate('validation.auth.user_notfound', {}, lang))
@@ -65,6 +65,46 @@ export class UserService {
         return {
             success: true,
             message: this.i18nUtils.translate('validation.crud.update_success'),
+        }
+    }
+
+    async viewProfile(userId: number, userRole: string, lang: string): Promise<ApiResponse> {
+        const getUser = await this.getUser(userId, userRole, lang);
+
+        if (!getUser) {
+            throw new NotFoundException(this.i18nUtils.translate('validation.auth.user_notfound', {}, lang))
+        }
+
+        const user = {
+            userId: getUser.userId,
+            userName: getUser.userName,
+            email: getUser.email,
+            role: getUser.role,
+        } as User;
+
+        return {
+            success: true,
+            data: user
+        }
+
+    }
+
+    private async getUser(userId: number, userRole: string, lang: string) {
+        try {
+
+            const query = this.userRepo.createQueryBuilder('user')
+                .where('user.userId = :userId', { userId });
+
+            if (userRole === Role.SUPERVISOR) {
+                query.andWhere('user.role = :role', { role: Role.TRAINEE });
+            } else if (userRole !== Role.ADMIN) {
+                query.andWhere('1 = 0');
+            }
+
+            const getUser: User | null = await query.getOne();
+            return getUser;
+        } catch (error) {
+            throw new InternalServerErrorException(this.i18nUtils.translate('validation.server.internal_server_error', {}, lang));
         }
     }
 }

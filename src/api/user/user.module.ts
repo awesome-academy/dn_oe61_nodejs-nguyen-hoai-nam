@@ -4,9 +4,10 @@ import { UserService } from './user.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/database/entities/user.entity';
 import { I18nUtils } from 'src/helper/utils/i18n-utils';
+import { SupervisorModule } from './supervisor/supervisor.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User])],
+  imports: [TypeOrmModule.forFeature([User]), SupervisorModule],
   controllers: [UserController],
   providers: [UserService, I18nUtils]
 })

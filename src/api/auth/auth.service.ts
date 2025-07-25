@@ -124,12 +124,12 @@ export class AuthService {
     }
   }
 
-  private async comparePassword(passwordInput: string, userPassword: string) {
+  async comparePassword(passwordInput: string, userPassword: string) {
     const result = await bcrypt.compare(passwordInput, userPassword);
     return result;
   }
 
-  private async hashPassword(passwordInput: string, saltOrRounds: number) {
+  async hashPassword(passwordInput: string, saltOrRounds: number) {
     const result = await bcrypt.hash(passwordInput, saltOrRounds);
     return result;
   }

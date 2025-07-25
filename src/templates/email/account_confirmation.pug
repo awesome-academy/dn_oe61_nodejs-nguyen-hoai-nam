@@ -1,0 +1,64 @@
+doctype html
+html
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    style.
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 20px;
+        color: #333;
+      }
+
+      .email-container {
+        max-width: 600px;
+        margin: 0 auto;
+        background-color: #ffffff;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        color: #007bff;
+        margin-bottom: 20px;
+      }
+
+      p {
+        font-size: 16px;
+        margin: 16px 0;
+      }
+
+      .button {
+        display: inline-block;
+        background-color: #007bff;
+        color: #ffffff !important;
+        padding: 12px 20px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-weight: bold;
+        transition: background-color 0.3s ease;
+      }
+
+      .button:hover {
+        background-color: #0056b3;
+      }
+
+      .footer {
+        margin-top: 30px;
+        font-size: 14px;
+        color: #999;
+        text-align: center;
+      }
+  body
+    .email-container
+      h1 Xin chào #{userName},
+      p Tài khoản của bạn đã được tạo bởi quản trị viên hệ thống với vai trò là Supervisor.
+      p Để bắt đầu sử dụng hệ thống, vui lòng nhấp vào nút bên dưới để kích hoạt và thiết lập mật khẩu cho tài khoản của bạn.
+      p
+        a.button(href=confirmationUrl) Kích hoạt tài khoản
+      p Nếu bạn không mong đợi email này, vui lòng bỏ qua nó.
+      .footer
+        p © #{new Date().getFullYear()} Sun-asterisk. All rights reserved.

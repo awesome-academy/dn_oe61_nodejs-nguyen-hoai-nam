@@ -1,0 +1,54 @@
+doctype html
+html
+  head
+    meta(charset="UTF-8")
+    style.
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        color: #333;
+        padding: 20px;
+        line-height: 1.6;
+      }
+      .container {
+        background: #fff;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        max-width: 600px;
+        margin: auto;
+      }
+      .title {
+        color: #007bff;
+        margin-bottom: 10px;
+      }
+      .info {
+        background: #f0f8ff;
+        padding: 15px;
+        border-radius: 5px;
+        margin: 20px 0;
+      }
+      .btn {
+        display: inline-block;
+        padding: 10px 15px;
+        background-color: #28a745;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        margin-top: 20px;
+      }
+  body
+    .container
+      h1.title Chào mừng #{userName}!
+      p Tài khoản của bạn đã được kích hoạt thành công.
+
+      .info
+        ul
+          li
+            strong Email:
+            |  #{email}
+
+      p Vui lòng đổi mật khẩu ngay sau khi đăng nhập lần đầu tiên để đảm bảo an toàn.
+      if linkUpdatePass
+        a.btn(href=linkUpdatePass) Đổi mật khẩu ngay
+      p Nếu bạn không yêu cầu tài khoản này, vui lòng bỏ qua email này.
