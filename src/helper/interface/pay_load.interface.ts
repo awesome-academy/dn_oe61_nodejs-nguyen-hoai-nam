@@ -1,5 +1,5 @@
 export interface payLoadDataType  {
-    id?: number,
+    userId?: number,
     userName?: string,
     email?: string,
     role?: string

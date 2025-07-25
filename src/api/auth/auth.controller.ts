@@ -1,12 +1,12 @@
-import { Body, Controller, Post, UnauthorizedException } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req } from '@nestjs/common';
+import { Request } from 'express';
 import { AuthDto } from 'src/validation/auth_validation/auth.validation';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from 'src/validation/class_validation/user.validation';
-import { I18nService } from 'nestjs-i18n';
 import { Language } from 'src/helper/decorators/language.decorator';
 import { Public } from 'src/helper/decorators/metadata.decorator';
-import { AuthRoles } from 'src/helper/decorators/auth_roles.decorator';
-import { Role } from 'src/database/dto/user.dto';
+import { User } from 'src/database/entities/user.entity';
+import { UserDecorator } from 'src/helper/decorators/user.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -25,6 +25,12 @@ export class AuthController {
     @Post('register')
     async register(@Body() userInput: CreateUserDto, @Language() lang: string) {
         const result = await this.authService.register(userInput,lang);
+        return result;
+    }
+
+    @Get('me')
+    async getProfile(@UserDecorator() user: User, @Language() lang: string) {
+        const result = await this.authService.getProfile(user,lang);
         return result;
     }
 }

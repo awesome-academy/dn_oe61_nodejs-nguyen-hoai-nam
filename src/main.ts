@@ -5,6 +5,7 @@ import { I18nService } from 'nestjs-i18n';
 import { setI18nService } from './helper/decorators/i18n-validation.decorator';
 import { Language } from './helper/decorators/language.decorator';
 import { asyncLocalStorage } from './middleware/language.middleware';
+import { LanguageRequest } from './helper/constants/lang.constant';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -17,8 +18,7 @@ async function bootstrap() {
       whitelist: true,
       stopAtFirstError: true,
       exceptionFactory: async (errors) => {
-        const store = asyncLocalStorage.getStore();
-        const lang = store?.get('lang') || 'vi';
+        const lang = LanguageRequest();
         const messages = await Promise.all(
           errors.map(async (err) => {
             const field = err.property;
