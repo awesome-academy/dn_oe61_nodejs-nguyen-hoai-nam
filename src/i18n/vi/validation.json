@@ -20,6 +20,9 @@
   "status": {
     "isEnum": "Status không hợp lệ"
   },
+  "token": {
+    "isString": "Token phải là chuỗi"
+  },
   "auth": {
     "invalid_credentials": "Email hoặc mật khẩu không đúng",
     "login_success": "Đăng nhập thành công",
@@ -30,15 +33,20 @@
     "token_expired": "Token đã hết hạn",
     "access_denied": "Bạn không đủ quyền truy cập",
     "user_notfound": "Không tìm thấy người dùng",
-    "user_success": "Lấy thông tin người dùng thành công"
+    "user_success": "Lấy thông tin người dùng thành công",
+    "already_verified": "Tài khoản này đã được xác nhận",
+    "verify_account": "Vui lòng xác nhận tài khoản của bạn",
+    "account_verified_success": "Tài khoản đã được kích hoạt thành công!"
   },
   "crud": {
     "create_success": "Thêm mới thành công",
     "create_faild": "Thêm mới không thành công",
     "update_success": "Cập nhật thành công",
     "update_faild": "Cập nhật không thành công",
-    "delete_success": "Cập nhật không thành công",
-    "delete_faild": "Cập nhật không thành công"
+    "delete_success": "Xóa thành công",
+    "delete_faild": "Xóa không thành công",
+    "no_changes": "Không có thay đổi nào được thực hiện",
+    "change_password_success": "Thay đổi mật khẩu thành công"
   },
   "server": {
     "internal_server_error": "Lỗi máy chủ nội bộ"

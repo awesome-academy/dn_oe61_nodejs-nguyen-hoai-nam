@@ -18,6 +18,14 @@ export class CreateUserDto {
     @MinLength(6, i18nValidationMessage('validation.password.minLength'))
     @IsStrongPassword()
     password: string;
+
+    @IsEnum(Role, i18nValidationMessage('validation.role.isEnum'))
+    @IsOptional()
+    role?: Role;
+
+    @IsEnum(UserStatus, i18nValidationMessage('validation.status.isEnum'))
+    @IsOptional()
+    status?: UserStatus;
 }
 
 export class UpdateUserDto {

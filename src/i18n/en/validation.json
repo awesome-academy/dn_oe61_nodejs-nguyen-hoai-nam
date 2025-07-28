@@ -20,6 +20,9 @@
   "status": {
     "isEnum": "Invalid status"
   },
+  "token": {
+    "isString": "Token must be a string"
+  },
   "auth": {
     "invalid_credentials": "Invalid email or password",
     "login_success": "Login successful",
@@ -30,7 +33,10 @@
     "token_expired": "Token has expired",
     "access_denied": "You do not have permission to access this resource",
     "user_notfound": "User not found",
-    "user_success": "User information retrieved successfully"
+    "user_success": "User information retrieved successfully",
+    "already_verified": "This account has already been verified",
+    "verify_account": "Please verify your account",
+    "account_verified_success": "Your account has been successfully activated!"
   },
   "crud": {
     "create_success": "Create successful",
@@ -38,7 +44,9 @@
     "update_success": "Update successful",
     "update_faild": "Update failed",
     "delete_success": "Delete successful",
-    "delete_faild": "Delete failed"
+    "delete_faild": "Delete failed",
+    "no_changes": "No changes were made",
+    "change_password_success": "Password changed successfully"
   },
   "server": {
     "internal_server_error": "Internal server error"

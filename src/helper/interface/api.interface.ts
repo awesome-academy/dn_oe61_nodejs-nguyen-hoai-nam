@@ -4,4 +4,5 @@ export interface ApiResponse<T = any> {
     msgCode?: string;
     message?: string;
     data?: T;
+    already_verified?: boolean
   }
