@@ -2,6 +2,7 @@ import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString, MinLength, MaxLength
 import { Role, UserStatus } from '../../database/dto/user.dto';
 import { i18nValidationMessage } from '../../helper/decorators/i18n-validation.decorator';
 import { IsStrongPassword } from 'src/helper/decorators/i18n-validators';
+import { Type } from 'class-transformer';
 
 export class CreateUserDto {
     @IsEmail({}, i18nValidationMessage('validation.email.isEmail'))
@@ -51,4 +52,10 @@ export class UpdateUserDto {
     @IsEnum(UserStatus, i18nValidationMessage('validation.status.isEnum'))
     @IsOptional()
     status?: UserStatus;
+}
+
+export class userIdDto {
+    @IsNotEmpty(i18nValidationMessage('validation.userId.isNotEmpty'))
+    @Type(() => Number)
+    userId: number
 }

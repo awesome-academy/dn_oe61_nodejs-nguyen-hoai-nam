@@ -1,4 +1,7 @@
 {
+  "userId": {
+    "isNotEmpty": "userId không được để trống"
+  },
   "email": {
     "isEmail": "Email không hợp lệ",
     "isNotEmpty": "Email không được để trống"
@@ -45,8 +48,11 @@
     "update_faild": "Cập nhật không thành công",
     "delete_success": "Xóa thành công",
     "delete_faild": "Xóa không thành công",
+    "delete_not_allowed": "Bạn không được phép xóa mục này",
     "no_changes": "Không có thay đổi nào được thực hiện",
-    "change_password_success": "Thay đổi mật khẩu thành công"
+    "change_password_success": "Thay đổi mật khẩu thành công",
+    "missing_required_fields": "Thiếu thông tin cần thiết",
+    "get_detail_success": "Lấy thông tin chi tiết thành công."
   },
   "server": {
     "internal_server_error": "Lỗi máy chủ nội bộ"
