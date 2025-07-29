@@ -3,7 +3,9 @@ export const tableName = {
     course: 'course',
     subject: 'subject',
     supervisorCourse: 'supervisor_course',
-    supervisor: 'supervisor'
+    supervisor: 'supervisor',
+    user_subject: 'user_subject',
+    user_course: 'user_course'
 }
 
 export const courseEntities = {
@@ -38,7 +40,24 @@ export const supervisorCourseEntities = {
     supervisorCourseId: 'supervisorCourseId',
     course: 'course',
     supervisor: 'supervisor'
-
 };
+
+export const userSubject = {
+    ID: 'userSubjectId',
+    USER: 'user',
+    COURSE_SUBJECT: 'courseSubject',
+    PROGRESS: 'subjectProgress',
+    STATUS: 'status',
+};
+
+export const userCourse = {
+    ID: 'userCourseId',
+    COURSE: 'course',
+    USER: 'user',
+    REGISTRATION_DATE: 'registrationDate',
+    COURSE_PROGRESS: 'courseProgress',
+    STATUS: 'status',
+};
+
 
 

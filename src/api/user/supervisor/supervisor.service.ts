@@ -263,16 +263,16 @@ export class SupervisorService {
         const supervisor: User | null = await this.userRepo.findOneBy({ userId });
 
         if (!supervisor || supervisor.role !== Role.SUPERVISOR) {
-            throw new NotFoundException(this.i18nUtils.translate('validation.crud.delete_not_allowed', {}, lang))
+            throw new NotFoundException(this.i18nUtils.translate('validation.crud.delete_not_allowed', {}, lang));
         }
 
-        await this.databaseValidation.checkUserByCreator(this.courseRepo, tableName.course, courseEntities.creator, userId, lang);
-        await this.databaseValidation.checkUserBySubject(this.subjectRepo, tableName.subject, subjectEntities.creator, userId, lang);
-        await this.databaseValidation.checkSupervisorByCourse(this.supervisorCourse, tableName.supervisorCourse, supervisorCourseEntities.supervisor, userId, lang);
+        await this.databaseValidation.checkUserRelationExists(this.courseRepo, tableName.course, courseEntities.creator, userId, lang);
+        await this.databaseValidation.checkUserRelationExists(this.subjectRepo, tableName.subject, subjectEntities.creator, userId, lang);
+        await this.databaseValidation.checkUserRelationExists(this.supervisorCourse, tableName.supervisorCourse, supervisorCourseEntities.supervisor, userId, lang);
 
         const deleteResult = await this.userRepo.delete(userId);
         if (deleteResult.affected === 0) {
-            throw new BadRequestException(this.i18nUtils.translate('validation.crud.delete_faild', {}, lang))
+            throw new BadRequestException(this.i18nUtils.translate('validation.crud.delete_faild', {}, lang));
         }
 
         return {
