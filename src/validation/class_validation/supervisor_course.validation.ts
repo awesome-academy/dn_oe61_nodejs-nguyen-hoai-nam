@@ -24,3 +24,9 @@ export class UpdateSupervisorCourseDto {
     @IsInt(i18nValidationMessage('validation.supervisor_course.supervisorId.isInt'))
     supervisorId?: number;
 }
+
+export class AssignSupervisorDto {
+    @IsInt(i18nValidationMessage('validation.supervisor_course.supervisorId.isInt'))
+    @IsNotEmpty(i18nValidationMessage('validation.supervisor_course.supervisorId.isNotEmpty'))
+    supervisorId: number;
+}
