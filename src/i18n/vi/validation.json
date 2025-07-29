@@ -62,6 +62,7 @@
     "unsuccessful": "Không thành công"
   },
   "course": {
+    "not_found":"Không tìm thấy khoá học",
     "name": {
       "isString": "Tên khóa học phải là chuỗi",
       "isNotEmpty": "Tên khóa học không được để trống",

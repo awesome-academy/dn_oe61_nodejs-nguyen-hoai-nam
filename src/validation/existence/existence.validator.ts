@@ -26,4 +26,15 @@ export class DatabaseValidation {
         }
     }
 
+    async checkCourseRelationExists<T extends ObjectLiteral>(repo: Repository<T>, alias: string, courseRelation: string, courseId: number, lang: string): Promise<void> {
+        const result = await repo.createQueryBuilder(alias)
+            .innerJoinAndSelect(`${alias}.${courseRelation}`, courseRelation)
+            .where(`${courseRelation}.courseId = :courseId`, { courseId })
+            .getMany();
+
+        if (result.length > 0) {
+            throw new BadRequestException(this.i18nUtils.translate('validation.crud.delete_not_allowed', {}, lang));
+        }
+    }
+
 }

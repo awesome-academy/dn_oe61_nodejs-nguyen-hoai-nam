@@ -10,6 +10,7 @@ import {
 import { CourseStatus } from '../../database/dto/course.dto';
 import { DefaultLength } from 'src/helper/constants/emtities.constant';
 import { i18nValidationMessage } from 'src/helper/decorators/i18n-validation.decorator';
+import { Type } from 'class-transformer';
 
 export class CreateCourseDto {
   @IsString(i18nValidationMessage('validation.course.name.isString'))
@@ -29,10 +30,6 @@ export class CreateCourseDto {
 
   @IsDateString({}, i18nValidationMessage('validation.course.end.isDateString'))
   end: string;
-
-  @IsInt(i18nValidationMessage('validation.course.creatorId.isInt'))
-  @IsNotEmpty(i18nValidationMessage('validation.course.creatorId.isNotEmpty'))
-  creatorId: number;
 }
 
 export class UpdateCourseDto {
@@ -56,4 +53,10 @@ export class UpdateCourseDto {
   @IsOptional()
   @IsDateString({}, i18nValidationMessage('validation.course.end.isDateString'))
   end?: string;
+}
+
+export class courseIdDto {
+  @IsNotEmpty(i18nValidationMessage('validation.userId.isNotEmpty'))
+  @Type(() => Number)
+  courseId: number
 }
