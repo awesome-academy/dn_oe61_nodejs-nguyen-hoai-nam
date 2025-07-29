@@ -43,7 +43,7 @@ export class BlacklistService {
         return !!found;
     }
 
-    @Cron(CronExpression.EVERY_5_SECONDS)
+    @Cron(CronExpression.DAILY)
     async handleCron(): Promise<void> {
         const now = new Date();
 

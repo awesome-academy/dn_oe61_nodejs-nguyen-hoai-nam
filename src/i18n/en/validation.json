@@ -45,8 +45,11 @@
     "update_faild": "Update failed",
     "delete_success": "Delete successful",
     "delete_faild": "Delete failed",
+    "delete_not_allowed": "You are not allowed to delete this item.",
     "no_changes": "No changes were made",
-    "change_password_success": "Password changed successfully"
+    "change_password_success": "Password changed successfully",
+    "missing_required_fields": "Missing required information",
+    "get_detail_success": "Successfully retrieved user details."
   },
   "server": {
     "internal_server_error": "Internal server error"

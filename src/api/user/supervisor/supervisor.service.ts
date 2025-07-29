@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException, UsePipes } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/database/entities/user.entity';
 import { I18nUtils } from 'src/helper/utils/i18n-utils';
@@ -17,11 +17,18 @@ import { link_change_password, link_confirm_account } from 'src/helper/constants
 import { ChangePasswordDto } from 'src/validation/auth_validation/auth.validation';
 import { templatePug } from 'src/helper/constants/template.constant';
 import { BlacklistService } from 'src/api/auth/black_list.service';
+import { Course } from 'src/database/entities/course.entity';
+import { Subject } from 'src/database/entities/subject.entity';
+import { SupervisorCourse } from 'src/database/entities/supervisor_course.entity';
+import { courseEntities, subjectEntities, supervisorCourseEntities, tableName } from 'src/helper/constants/emtities.constant';
 
 @Injectable()
 export class SupervisorService {
     constructor(
         @InjectRepository(User) private readonly userRepo: Repository<User>,
+        @InjectRepository(Course) private readonly courseRepo: Repository<Course>,
+        @InjectRepository(Subject) private readonly subjectRepo: Repository<Subject>,
+        @InjectRepository(SupervisorCourse) private readonly supervisorCourse: Repository<SupervisorCourse>,
         private readonly i18nUtils: I18nUtils,
         private readonly databaseValidation: DatabaseValidation,
         private readonly mailerService: MailerService,
@@ -226,5 +233,127 @@ export class SupervisorService {
         const token = await this.jwtService.signAsync(payLoad, { expiresIn: '1d' });
         const confirmationUrl = `${link}?lang=${lang}&token=${token}`;
         return confirmationUrl;
+    }
+
+    async getAll(lang: string): Promise<ApiResponse> {
+        const supervisors: User[] = await this.userRepo.findBy({ role: Role.SUPERVISOR });
+
+        if (supervisors.length === 0) {
+            throw new NotFoundException(this.i18nUtils.translate('validation.auth.user_notfound', {}, lang))
+        }
+
+        const data = supervisors.map(users => {
+            return {
+                userId: users.userId,
+                userName: users.userName,
+                email: users.email,
+                role: users.role,
+                status: users.status
+            }
+        });
+
+        return {
+            success: true,
+            message: this.i18nUtils.translate('validation.response_api.success', {}, lang),
+            data: data
+        }
+    }
+
+    async delete(userId: number, lang: string): Promise<ApiResponse> {
+        const supervisor: User | null = await this.userRepo.findOneBy({ userId });
+
+        if (!supervisor || supervisor.role !== Role.SUPERVISOR) {
+            throw new NotFoundException(this.i18nUtils.translate('validation.crud.delete_not_allowed', {}, lang))
+        }
+
+        await this.databaseValidation.checkUserByCreator(this.courseRepo, tableName.course, courseEntities.creator, userId, lang);
+        await this.databaseValidation.checkUserBySubject(this.subjectRepo, tableName.subject, subjectEntities.creator, userId, lang);
+        await this.databaseValidation.checkSupervisorByCourse(this.supervisorCourse, tableName.supervisorCourse, supervisorCourseEntities.supervisor, userId, lang);
+
+        const deleteResult = await this.userRepo.delete(userId);
+        if (deleteResult.affected === 0) {
+            throw new BadRequestException(this.i18nUtils.translate('validation.crud.delete_faild', {}, lang))
+        }
+
+        return {
+            success: true,
+            message: this.i18nUtils.translate('validation.crud.delete_success', {}, lang),
+        }
+    }
+
+    async update(supervisorId: number, supervisorInput: UpdateUserDto, lang: string): Promise<ApiResponse> {
+
+        if (Object.keys(supervisorInput).length === 0) {
+            throw new BadRequestException(this.i18nUtils.translate('validation.crud.missing_required_fields', {}, lang));
+        }
+
+        if (!supervisorId) {
+            throw new NotFoundException(this.i18nUtils.translate('validation.auth.user_notfound', {}, lang));
+        }
+
+        const savedSupervisor = await this.findAndUpdateSupervisor(supervisorId, supervisorInput, lang);
+
+        return {
+            success: true,
+            message: this.i18nUtils.translate('validation.crud.update_success', {}, lang),
+            data: savedSupervisor
+        };
+    }
+
+    private async findSupervisorOrFail(userId: number, lang: string): Promise<User> {
+        const supervisor = await this.userRepo.findOneBy({ userId: userId, role: Role.SUPERVISOR });
+        if (!supervisor) {
+            throw new BadRequestException(this.i18nUtils.translate('validation.crud.no_changes', {}, lang));
+        }
+        return supervisor;
+    }
+
+    private async findAndUpdateSupervisor(supervisorId: number, supervisorInput: UpdateUserDto, lang: string) {
+        const supervisor = await this.findSupervisorOrFail(supervisorId, lang);
+
+        const { userName, email, password, status, role } = supervisorInput;
+
+        if (userName !== undefined) supervisor.userName = userName;
+        if (email !== undefined) supervisor.email = email;
+        if (password !== undefined) {
+            const saltRounds = this.getSaltRounds();
+            supervisor.password = await this.authService.hashPassword(password, saltRounds);
+        }
+        if (status !== undefined) supervisor.status = status;
+        if (role !== undefined) supervisor.role = role;
+
+        const savedSupervisor: User | null = await this.userRepo.save(supervisor);
+
+        if (!savedSupervisor) {
+            throw new NotFoundException(this.i18nUtils.translate('validation.crud.update_faild', {}, lang));
+        }
+
+        return {
+            userId: savedSupervisor.userId,
+            userName: savedSupervisor.userName,
+            email: savedSupervisor.email,
+            status: savedSupervisor.status,
+            role: savedSupervisor.role,
+        };
+    }
+
+    async getById(supervisorId: number, lang: string): Promise<ApiResponse> {
+        const supervisor = await this.userRepo.findOneBy({ userId: supervisorId, role: Role.SUPERVISOR, });
+
+        if (!supervisor) {
+            throw new NotFoundException(this.i18nUtils.translate('validation.auth.user_notfound', {}, lang),);
+        }
+
+        return {
+            success: true,
+            message: this.i18nUtils.translate('validation.crud.get_detail_success', {}, lang),
+            data: {
+                userId: supervisor.userId,
+                userName: supervisor.userName,
+                email: supervisor.email,
+                status: supervisor.status,
+                role: supervisor.role,
+            },
+        };
     }
 }

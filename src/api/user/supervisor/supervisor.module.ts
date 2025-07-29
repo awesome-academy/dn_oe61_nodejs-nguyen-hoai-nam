@@ -7,9 +7,13 @@ import { I18nUtils } from 'src/helper/utils/i18n-utils';
 import { AuthService } from 'src/api/auth/auth.service';
 import { BlacklistedToken } from 'src/database/entities/blacklisted_token.entity';
 import { BlacklistService } from 'src/api/auth/black_list.service';
+import { Course } from 'src/database/entities/course.entity';
+import { Subject } from 'src/database/entities/subject.entity';
+import { CourseSubject } from 'src/database/entities/course_subject.entity';
+import { SupervisorCourse } from 'src/database/entities/supervisor_course.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User,BlacklistedToken])],
+  imports: [TypeOrmModule.forFeature([User,BlacklistedToken, Course,Subject,SupervisorCourse])],
   controllers: [SupervisorController],
   providers: [SupervisorService,I18nUtils,AuthService,BlacklistService]
 })
