@@ -6,6 +6,9 @@ import {
   IsDateString,
   MaxLength,
   IsInt,
+  IsArray,
+  ArrayNotEmpty,
+  ArrayUnique,
 } from 'class-validator';
 import { CourseStatus } from '../../database/dto/course.dto';
 import { DefaultLength } from 'src/helper/constants/emtities.constant';
@@ -30,6 +33,11 @@ export class CreateCourseDto {
 
   @IsDateString({}, i18nValidationMessage('validation.course.end.isDateString'))
   end: string;
+
+  @IsArray(i18nValidationMessage('validation.course.subjectIds.isArray'))
+  @ArrayUnique(i18nValidationMessage('validation.course.subjectIds.arrayUnique'))
+  @ArrayNotEmpty(i18nValidationMessage('validation.course.subjectIds.arrayNotEmpty'))
+  subjectIds: number[];
 }
 
 export class UpdateCourseDto {

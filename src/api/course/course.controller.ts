@@ -15,9 +15,10 @@ export class CourseController {
     ) { }
 
     @Get()
-    async getAll(@QueryParam(['page', 'pageSize']) pagination: { page: number; pageSize: number }, @Language() lang: string) {
+    async getAll(@QueryParam(['page', 'pageSize']) pagination: { page: number; pageSize: number }, @UserDecorator() user: User, @Language() lang: string) {
         const { page, pageSize } = pagination;
-        const result = await this.courseService.getAll(page, pageSize, lang);
+        const { userId, role } = user;
+        const result = await this.courseService.getAll(userId, role, page, pageSize, lang);
         return result
     }
 

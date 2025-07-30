@@ -1,5 +1,6 @@
 import { BadRequestException, ForbiddenException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CourseSubjectStatus } from 'src/database/dto/course_subject.dto';
 import { Role } from 'src/database/dto/user.dto';
 import { Course } from 'src/database/entities/course.entity';
 import { CourseSubject } from 'src/database/entities/course_subject.entity';
@@ -8,6 +9,7 @@ import { User } from 'src/database/entities/user.entity';
 import { UserCourse } from 'src/database/entities/user_course.entity';
 import { tableName } from 'src/helper/constants/emtities.constant';
 import { ApiResponse } from 'src/helper/interface/api.interface';
+import { GetCourse } from 'src/helper/shared/get_course.shared';
 import { hashPassword } from 'src/helper/shared/hash_password.shared';
 import { PaginationService } from 'src/helper/shared/pagination.shared';
 import { I18nUtils } from 'src/helper/utils/i18n-utils';
@@ -20,23 +22,33 @@ export class CourseService {
     constructor(
         @InjectRepository(Course) private readonly courseRepo: Repository<Course>,
         @InjectRepository(UserCourse) private readonly UserCourseRepo: Repository<UserCourse>,
-        @InjectRepository(CourseSubject) private readonly CourseSubjectRepo: Repository<CourseSubject>,
+        @InjectRepository(CourseSubject) private readonly courseSubjectRepo: Repository<CourseSubject>,
         @InjectRepository(SupervisorCourse) private readonly SupervisorCourseRepo: Repository<SupervisorCourse>,
         @InjectRepository(User) private readonly userRepo: Repository<User>,
         private readonly hashPassword: hashPassword,
         private readonly databaseValidation: DatabaseValidation,
         private readonly i18nUtils: I18nUtils,
         private readonly paginationService: PaginationService,
-        private readonly dataSource: DataSource
+        private readonly dataSource: DataSource,
+        private readonly getCourse: GetCourse
     ) { }
 
-    async getAll(page: number, pageSize: number, lang: string) {
-        const { data: courses } = await this.paginationService.queryWithPagination(
-            this.courseRepo,
-            { page, pageSize },
-            { order: { createdAt: 'ASC' } },
-        );
+    private async getCoursesByRole(userId: number, role: string, page: number, pageSize: number): Promise<Course[]> {
+        if (role === Role.ADMIN) {
+            return await this.getCourse.getCoursesByAdmin(page, pageSize);
+        } else if (role === Role.SUPERVISOR) {
+            return await this.getCourse.getCoursesBySupervisor(userId, page, pageSize);
+        } else if (role === Role.TRAINEE) {
+            return await this.getCourse.getCoursesByTrainee(userId, page, pageSize);
+        } else {
+            return [];
+        }
+    }
 
+    async getAll(userId: number, role: string, page: number, pageSize: number, lang: string) {
+        let courses: Course[] = [];
+
+        courses = await this.getCoursesByRole(userId, role, page, pageSize);
         if (courses.length === 0) {
             throw new NotFoundException(this.i18nUtils.translate('validation.course.not_found', {}, lang));
         }
@@ -89,7 +101,23 @@ export class CourseService {
     }
 
     async create(courseInput: CreateCourseDto, userId: number, lang: string): Promise<ApiResponse> {
-        const { name, description, status, start, end } = courseInput;
+
+        const savedCourse = await this.savedCourse(courseInput, userId, lang)
+        await this.saveCourseSubjects(savedCourse.courseId, courseInput.subjectIds, lang);
+
+        return {
+            success: true,
+            message: this.i18nUtils.translate('validation.crud.create_success', {}, lang),
+            data: savedCourse
+        }
+    }
+
+    private async savedCourse(courseInput: CreateCourseDto, userId: number, lang: string): Promise<Course> {
+        const { name, description, status, start, end, subjectIds } = courseInput;
+
+        if (!subjectIds || subjectIds.length === 0) {
+            throw new BadRequestException(this.i18nUtils.translate('validation.course.arrayNotEmpty', {}, lang));
+        }
 
         const data = this.courseRepo.create({
             name: name,
@@ -106,10 +134,21 @@ export class CourseService {
             throw new BadRequestException(this.i18nUtils.translate('validation.crud.create_faild', {}, lang))
         }
 
-        return {
-            success: true,
-            message: this.i18nUtils.translate('validation.crud.create_success', {}, lang),
-            data: savedCourse
+        return savedCourse;
+    }
+
+    private async saveCourseSubjects(courseId: number, subjectIds: number[], lang: string) {
+        try {
+            for (const subjectId of subjectIds) {
+                const courseSubject = this.courseSubjectRepo.create({
+                    course: { courseId },
+                    subject: { subjectId },
+                    status: CourseSubjectStatus.NOT_STARTED,
+                });
+                await this.courseSubjectRepo.save(courseSubject);
+            }
+        } catch {
+            throw new InternalServerErrorException(this.i18nUtils.translate('validation.server.internal_server_error', {}, lang));
         }
     }
 

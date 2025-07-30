@@ -59,9 +59,9 @@
     "unsuccessful": "Unsuccessful"
   },
   "course": {
-    "not_found":"Không tìm thấy khoá học",
+    "not_found": "Không tìm thấy khoá học",
     "user_duplicate": "The supervisor is already assigned to this course",
-    "user_notfound":"The supervisor does not exist in this course",
+    "user_notfound": "The supervisor does not exist in this course",
     "user_not_supervisor": "Only users with the SUPERVISOR role can be assigned to a course",
     "name": {
       "isString": "Course name must be a string",
@@ -84,6 +84,12 @@
     "creatorId": {
       "isInt": "creator_id must be an integer",
       "isNotEmpty": "creator_id cannot be empty"
+    },
+    "subjectIds": {
+      "isArray": "subjectIds must be an array",
+      "arrayNotEmpty": "At least one subject must be selected",
+      "arrayUnique": "subjectIds must not contain duplicate values",
+      "isIntEach": "Each element in subjectIds must be an integer"
     }
   },
   "course_subject": {

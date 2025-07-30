@@ -62,9 +62,9 @@
     "unsuccessful": "Không thành công"
   },
   "course": {
-    "not_found":"Không tìm thấy khoá học",
-    "user_duplicate":"Giám sát viên đã tồn tại trong khoá học này",
-    "user_notfound":"Giám sát viên không tồn tại trong khoá học này",
+    "not_found": "Không tìm thấy khoá học",
+    "user_duplicate": "Giám sát viên đã tồn tại trong khoá học này",
+    "user_notfound": "Giám sát viên không tồn tại trong khoá học này",
     "user_not_supervisor": "Chỉ có giám sát viên mới được gán vào khoá học",
     "name": {
       "isString": "Tên khóa học phải là chuỗi",
@@ -87,6 +87,12 @@
     "creatorId": {
       "isInt": "creator_id phải là số nguyên",
       "isNotEmpty": "creator_id không được để trống"
+    },
+    "subjectIds": {
+      "isArray": "subjectIds phải là một mảng",
+      "arrayNotEmpty": "Phải chọn ít nhất 1 môn học",
+      "arrayUnique": "subjectIds không được chứa các giá trị trùng",
+      "isIntEach": "Mỗi phần tử trong subjectIds phải là số nguyên"
     }
   },
   "course_subject": {
@@ -104,6 +110,9 @@
     }
   },
   "subject": {
+    "subject_id": {
+      "isNotEmpty": "subject_id không được để trống"
+    },
     "name": {
       "isString": "Tên môn học phải là chuỗi",
       "isNotEmpty": "Tên môn học không được để trống",
