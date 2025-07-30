@@ -108,8 +108,8 @@ export class TraineeService {
             throw new NotFoundException(this.i18nUtils.translate('validation.crud.delete_not_allowed', {}, lang))
         }
 
-        await this.databaseValidation.checkUserRelationExists(this.userSubjectRepo, tableName.user_subject, userSubject.USER, traineeId, lang);
-        await this.databaseValidation.checkUserRelationExists(this.userCourseRepo, tableName.user_course, userCourse.USER, traineeId, lang);
+        await this.databaseValidation.checkUserRelationExists(this.userSubjectRepo, tableName.userSubject, userSubject.USER, traineeId, lang);
+        await this.databaseValidation.checkUserRelationExists(this.userCourseRepo, tableName.userCourse, userCourse.USER, traineeId, lang);
 
         const deleteTrainee = await this.userRepo.delete(traineeId);
 

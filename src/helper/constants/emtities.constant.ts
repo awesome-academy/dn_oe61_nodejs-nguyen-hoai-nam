@@ -4,8 +4,9 @@ export const tableName = {
     subject: 'subject',
     supervisorCourse: 'supervisor_course',
     supervisor: 'supervisor',
-    user_subject: 'user_subject',
-    user_course: 'user_course'
+    userSubject: 'user_subject',
+    userCourse: 'user_course',
+    courseSubject: 'course_subject'
 }
 
 export const courseEntities = {
@@ -59,5 +60,17 @@ export const userCourse = {
     STATUS: 'status',
 };
 
-
-
+export const courseConstants = {
+    ID: 'courseId',
+    NAME: 'name',
+    DESCRIPTION: 'description',
+    STATUS: 'status',
+    START: 'start',
+    END: 'end',
+    CREATED_AT: 'createdAt',
+    UPDATED_AT: 'updatedAt',
+    CREATOR: 'creator',
+    COURSE_SUBJECTS: 'courseSubjects',
+    SUPERVISOR_COURSES: 'supervisorCourses',
+    USER_COURSES: 'userCourses',
+} as const;
