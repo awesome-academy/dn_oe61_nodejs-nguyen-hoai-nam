@@ -59,6 +59,10 @@
     "unsuccessful": "Unsuccessful"
   },
   "course": {
+    "not_found":"Không tìm thấy khoá học",
+    "user_duplicate": "The supervisor is already assigned to this course",
+    "user_notfound":"The supervisor does not exist in this course",
+    "user_not_supervisor": "Only users with the SUPERVISOR role can be assigned to a course",
     "name": {
       "isString": "Course name must be a string",
       "isNotEmpty": "Course name cannot be empty",

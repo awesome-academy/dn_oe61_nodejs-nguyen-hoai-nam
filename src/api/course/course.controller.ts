@@ -6,6 +6,7 @@ import { courseIdDto, CreateCourseDto, UpdateCourseDto } from 'src/validation/cl
 import { Language } from 'src/helper/decorators/language.decorator';
 import { QueryParam, UserDecorator } from 'src/helper/decorators/user.decorator';
 import { User } from 'src/database/entities/user.entity';
+import { AssignSupervisorDto } from 'src/validation/class_validation/supervisor_course.validation';
 
 @Controller('course')
 export class CourseController {
@@ -45,6 +46,21 @@ export class CourseController {
     @Put(':courseId')
     async update(@Body() courseInput: UpdateCourseDto, @Param() courseId: courseIdDto, @Language() lang: string) {
         const result = await this.courseService.update(courseInput, courseId.courseId, lang);
+        return result;
+    }
+
+    @AuthRoles(Role.ADMIN)
+    @Post(':courseId/supervisor')
+    async assignSupervisorToCourse(@Param() courseId: courseIdDto, @Body() supervisorId: AssignSupervisorDto, @Language() lang: string) {
+        const result = await this.courseService.assignSupervisorToCourse(courseId.courseId, supervisorId.supervisorId, lang);
+        return result;
+    }
+
+    @AuthRoles(Role.ADMIN)
+    @Delete(':courseId/supervisor/:supervisorId')
+    async removeSupervisorFromCourse(@Param() param: { courseId: number; supervisorId: number }, @Language() lang: string) {
+        const { courseId, supervisorId } = param;
+        const result = await this.courseService.removeSupervisorFromCourse(courseId, supervisorId, lang);
         return result;
     }
 }

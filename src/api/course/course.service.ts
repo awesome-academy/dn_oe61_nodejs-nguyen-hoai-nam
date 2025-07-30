@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Role } from 'src/database/dto/user.dto';
 import { Course } from 'src/database/entities/course.entity';
@@ -6,7 +6,7 @@ import { CourseSubject } from 'src/database/entities/course_subject.entity';
 import { SupervisorCourse } from 'src/database/entities/supervisor_course.entity';
 import { User } from 'src/database/entities/user.entity';
 import { UserCourse } from 'src/database/entities/user_course.entity';
-import { courseConstants, tableName, userCourse } from 'src/helper/constants/emtities.constant';
+import { tableName } from 'src/helper/constants/emtities.constant';
 import { ApiResponse } from 'src/helper/interface/api.interface';
 import { hashPassword } from 'src/helper/shared/hash_password.shared';
 import { PaginationService } from 'src/helper/shared/pagination.shared';
@@ -22,6 +22,7 @@ export class CourseService {
         @InjectRepository(UserCourse) private readonly UserCourseRepo: Repository<UserCourse>,
         @InjectRepository(CourseSubject) private readonly CourseSubjectRepo: Repository<CourseSubject>,
         @InjectRepository(SupervisorCourse) private readonly SupervisorCourseRepo: Repository<SupervisorCourse>,
+        @InjectRepository(User) private readonly userRepo: Repository<User>,
         private readonly hashPassword: hashPassword,
         private readonly databaseValidation: DatabaseValidation,
         private readonly i18nUtils: I18nUtils,
@@ -202,5 +203,65 @@ export class CourseService {
         }
 
         return savedCourse;
+    }
+
+    async assignSupervisorToCourse(courseId: number, supervisorId: number, lang: string): Promise<ApiResponse> {
+
+        const user = await this.checkUserRole(supervisorId, lang);
+        if (!user) {
+            throw new BadRequestException(this.i18nUtils.translate('validation.course.user_not_supervisor', {}, lang));
+        }
+
+        const existing = await this.checkAssigned(courseId, supervisorId, lang);
+        if (existing) {
+            throw new BadRequestException(this.i18nUtils.translate('validation.course.user_duplicate', {}, lang));
+        }
+
+        try {
+            const assignment = this.SupervisorCourseRepo.create({
+                supervisor: { userId: supervisorId },
+                course: { courseId: courseId }
+            });
+
+            const result = await this.SupervisorCourseRepo.save(assignment);
+            return {
+                success: true,
+                message: this.i18nUtils.translate('validation.crud.create_success', {}, lang),
+                data: result
+            }
+        } catch {
+            throw new InternalServerErrorException(this.i18nUtils.translate('validation.server.internal_server_error', {}, lang));
+        }
+    }
+
+    private async checkUserRole(supervisorId: number, lang: string) {
+        const user: User | null = await this.userRepo.findOneBy({ userId: supervisorId, role: Role.SUPERVISOR });
+        return user;
+    }
+
+    private async checkAssigned(courseId: number, supervisorId: number, lang: string) {
+        const existing = await this.SupervisorCourseRepo.findOneBy({
+            course: { courseId },
+            supervisor: { userId: supervisorId }
+        });
+
+        return existing;
+    }
+
+    async removeSupervisorFromCourse(courseId: number, supervisorId: number, lang: string) {
+        const existing = await this.checkAssigned(courseId, supervisorId, lang);
+        if (!existing) {
+            throw new BadRequestException(this.i18nUtils.translate('validation.course.user_notfound', {}, lang));
+        }
+
+        try {
+            await this.SupervisorCourseRepo.remove(existing);
+            return {
+                success: true,
+                message: this.i18nUtils.translate('validation.crud.delete_success', {}, lang),
+            };
+        } catch {
+            throw new InternalServerErrorException(this.i18nUtils.translate('validation.server.internal_server_error', {}, lang));
+        }
     }
 } 

@@ -63,6 +63,9 @@
   },
   "course": {
     "not_found":"Không tìm thấy khoá học",
+    "user_duplicate":"Giám sát viên đã tồn tại trong khoá học này",
+    "user_notfound":"Giám sát viên không tồn tại trong khoá học này",
+    "user_not_supervisor": "Chỉ có giám sát viên mới được gán vào khoá học",
     "name": {
       "isString": "Tên khóa học phải là chuỗi",
       "isNotEmpty": "Tên khóa học không được để trống",
