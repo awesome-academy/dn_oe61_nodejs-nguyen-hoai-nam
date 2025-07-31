@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { CourseController } from './course.controller';
 import { CourseService } from './course.service';
 import { I18nUtils } from 'src/helper/utils/i18n-utils';
@@ -11,10 +11,11 @@ import { SupervisorCourse } from 'src/database/entities/supervisor_course.entity
 import { PaginationService } from 'src/helper/shared/pagination.shared';
 import { User } from 'src/database/entities/user.entity';
 import { GetCourse } from 'src/helper/shared/get_course.shared';
+import { UserSubject } from 'src/database/entities/user_subject.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Course,UserCourse,CourseSubject,SupervisorCourse,User])],
+  imports: [TypeOrmModule.forFeature([Course,UserCourse,CourseSubject,SupervisorCourse,User,UserSubject])],
   controllers: [CourseController],
-  providers: [CourseService,I18nUtils,hashPassword,PaginationService,GetCourse]
+  providers: [CourseService,I18nUtils,hashPassword,PaginationService,GetCourse,Logger]
 })
 export class SourseModule {}

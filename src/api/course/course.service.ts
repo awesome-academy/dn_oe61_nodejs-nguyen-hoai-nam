@@ -7,12 +7,14 @@ import { CourseStatus } from 'src/database/dto/course.dto';
 import { CourseSubjectStatus } from 'src/database/dto/course_subject.dto';
 import { Role } from 'src/database/dto/user.dto';
 import { UserCourseStatus } from 'src/database/dto/user_course.dto';
+import { UserSubjectStatus } from 'src/database/dto/user_subject.dto';
 import { Course } from 'src/database/entities/course.entity';
 import { CourseSubject } from 'src/database/entities/course_subject.entity';
 import { SupervisorCourse } from 'src/database/entities/supervisor_course.entity';
 import { User } from 'src/database/entities/user.entity';
 import { UserCourse } from 'src/database/entities/user_course.entity';
-import { firstCourseProgress, todayDate } from 'src/helper/constants/cron_expression.constant';
+import { UserSubject } from 'src/database/entities/user_subject.entity';
+import { firstCourseProgress, firstUserSubjectProgress, todayDate } from 'src/helper/constants/cron_expression.constant';
 import { tableName } from 'src/helper/constants/emtities.constant';
 import { templatePug } from 'src/helper/constants/template.constant';
 import { ApiResponse } from 'src/helper/interface/api.interface';
@@ -20,7 +22,7 @@ import { GetCourse } from 'src/helper/shared/get_course.shared';
 import { I18nUtils } from 'src/helper/utils/i18n-utils';
 import { CreateCourseDto, UpdateCourseDto } from 'src/validation/class_validation/course.validation';
 import { DatabaseValidation } from 'src/validation/existence/existence.validator';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, EntityManager, In, Repository } from 'typeorm';
 
 @Injectable()
 export class CourseService {
@@ -30,6 +32,7 @@ export class CourseService {
         @InjectRepository(CourseSubject) private readonly courseSubjectRepo: Repository<CourseSubject>,
         @InjectRepository(SupervisorCourse) private readonly supervisorCourseRepo: Repository<SupervisorCourse>,
         @InjectRepository(User) private readonly userRepo: Repository<User>,
+        @InjectRepository(UserSubject) private readonly userSubjectRepo: Repository<UserSubject>,
         private readonly databaseValidation: DatabaseValidation,
         private readonly i18nUtils: I18nUtils,
         private readonly dataSource: DataSource,
@@ -147,7 +150,7 @@ export class CourseService {
         const queryRunner = this.dataSource.createQueryRunner();
         await queryRunner.connect();
         await queryRunner.startTransaction();
-        
+
         try {
             const courseSubject = subjectIds.map(subjectId => {
                 return this.courseSubjectRepo.create({
@@ -161,7 +164,7 @@ export class CourseService {
             await queryRunner.commitTransaction();
         } catch (error) {
             await queryRunner.rollbackTransaction();
-            this.logger.error(`saveCourseSubjects failed: ${error?.message || error}`,error?.stack,'CourseService',
+            this.logger.error(`saveCourseSubjects failed: ${error?.message || error}`, error?.stack, 'CourseService',
             );
             throw new InternalServerErrorException(this.i18nUtils.translate('validation.server.internal_server_error', {}, lang));
         } finally {
@@ -388,7 +391,7 @@ export class CourseService {
         }
     }
 
-    private async getCourseById(savedUserCourse: UserCourse, lang: string) {
+    private async getCourseById(savedUserCourse: UserCourse, lang: string): Promise<Course> {
         const course: Course | null = await this.courseRepo.findOneBy({ courseId: savedUserCourse.course.courseId });
         if (!course) {
             throw new BadRequestException(this.i18nUtils.translate('validation.course.user_not_trainee', {}, lang));
@@ -396,7 +399,7 @@ export class CourseService {
         return course;
     }
 
-    private async sendEmail(email: string, subject: string, template: string, context: object, lang: string) {
+    private async sendEmail(email: string, subject: string, template: string, context: object, lang: string): Promise<void> {
         try {
             await this.mailerService.sendMail({
                 to: email,
@@ -409,7 +412,7 @@ export class CourseService {
         }
     }
 
-    async removeTraineeFromCourse(courseId: number, traineeId: number, lang: string) {
+    async removeTraineeFromCourse(courseId: number, traineeId: number, lang: string): Promise<ApiResponse> {
         const existing = await this.userCourseRepo.findOne({
             where: {
                 course: { courseId: courseId },
@@ -443,4 +446,189 @@ export class CourseService {
             throw new InternalServerErrorException(this.i18nUtils.translate('validation.server.internal_server_error', {}, lang));
         }
     }
-} 
+
+    async startCourse(courseId: number, lang: string): Promise<ApiResponse> {
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+
+        try {
+            await this.changeStatusCourseSubject(courseId, lang, queryRunner.manager);
+            await this.assignSubjectsToUsersInCourse(courseId, lang, queryRunner.manager);
+
+            await queryRunner.commitTransaction();
+
+            return {
+                success: true,
+                message: this.i18nUtils.translate('validation.course.start_course_success'),
+            };
+
+        } catch (error) {
+            await queryRunner.rollbackTransaction();
+            this.logger.error('startCourse failed', error?.stack || error);
+            throw new InternalServerErrorException(this.i18nUtils.translate('validation.server.internal_server_error', {}, lang));
+
+        } finally {
+            await queryRunner.release();
+        }
+    }
+
+    private async findCourseSubject(courseId: number, lang: string, status: CourseSubjectStatus): Promise<CourseSubject[]> {
+        const findCourse = await this.courseSubjectRepo.find({
+            where: {
+                course: { courseId: courseId, status: CourseStatus.ACTIVE },
+                status: status,
+            },
+            relations: ['course']
+        });
+
+        if (findCourse.length === 0) {
+            throw new BadRequestException(this.i18nUtils.translate('validation.course.not_found', {}, lang));
+        }
+        return findCourse;
+    }
+
+    private async changeStatusCourseSubject(courseId: number, lang: string, manager: EntityManager): Promise<void> {
+        const courses = await this.findCourseSubject(courseId, lang, CourseSubjectStatus.NOT_STARTED);
+
+        for (const course of courses) {
+            course.status = CourseSubjectStatus.START;
+        }
+
+        await manager.save(courses);
+    }
+
+    private async findUserCourse(courseId: number, lang: string): Promise<UserCourse[]> {
+        const userCourse = await this.userCourseRepo.find({
+            where: {
+                course: { courseId: courseId },
+                status: UserCourseStatus.RESIGN,
+            },
+            relations: ['user']
+        });
+
+        if (userCourse.length === 0) {
+            throw new BadRequestException(this.i18nUtils.translate('validation.course.trainee_not_found', {}, lang));
+        }
+
+        return userCourse;
+    }
+
+    private async assignSubjectsToUsersInCourse(courseId: number, lang: string, manager: EntityManager): Promise<void> {
+        const subjects = await this.findCourseSubject(courseId, lang, CourseSubjectStatus.NOT_STARTED);
+        const users = await this.findUserCourse(courseId, lang);
+
+        const newDataUserCourse = subjects.flatMap((subject) => {
+            return users.map((user) => {
+                const userId = user.user.userId;
+                const courseSubjectId = subject.courseSubjectId;
+
+                return this.userSubjectRepo.create({
+                    subjectProgress: firstUserSubjectProgress,
+                    status: UserSubjectStatus.NOT_STARTED,
+                    user: { userId: userId },
+                    courseSubject: { courseSubjectId: courseSubjectId }
+                });
+            });
+        });
+
+        await manager.save(newDataUserCourse);
+
+    }
+
+    async finishCourse(courseId: number, lang: string): Promise<ApiResponse> {
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+
+        try {
+            const courses = await this.findCourseSubject(courseId, lang, CourseSubjectStatus.START);
+            await this.finishCourseSubjects(courses, queryRunner.manager);
+            const userSubjects = await this.finishUserSubjects(courses);
+            await this.finishUserCourses(courseId, lang, userSubjects);
+
+            await queryRunner.commitTransaction();
+
+            return {
+                success: true,
+                message: this.i18nUtils.translate('validation.course.start_course_success'),
+            };
+        } catch (error) {
+            await queryRunner.rollbackTransaction();
+            this.logger.error('startCourse failed', error?.stack || error);
+            throw new InternalServerErrorException(this.i18nUtils.translate('validation.server.internal_server_error', {}, lang));
+
+        } finally {
+            await queryRunner.release();
+        }
+    }
+
+    private async finishCourseSubjects(courses: CourseSubject[], manager: EntityManager): Promise<void> {
+        courses.forEach(c => c.status = CourseSubjectStatus.FINISH);
+        await manager.save(courses);
+    }
+
+    private async finishUserSubjects(courses: CourseSubject[]): Promise<UserSubject[]> {
+        const courseSubjectIds = (courses)
+            .map(c => c.courseSubjectId);
+
+        const userSubjects = await this.userSubjectRepo.find({
+            where: { courseSubject: { courseSubjectId: In(courseSubjectIds) }, },
+            relations: ['user']
+        });
+
+        return this.userSubjectRepo.save(
+            userSubjects.map(us => ({
+                ...us,
+                status: UserSubjectStatus.COMPLETED,
+                finishedAt: new Date(),
+            }))
+        );
+    }
+
+    private async finishUserCourses(courseId: number, lang: string, userSubjects: UserSubject[]): Promise<void> {
+        const userCourses = await this.userCourseRepo.find({
+            where: {
+                course: { courseId: courseId }
+            },
+            relations: ['user']
+        });
+
+        if (userCourses.length === 0) {
+            throw new BadRequestException(this.i18nUtils.translate('validation.course.not_found', {}, lang))
+        }
+
+        const avgProgress = this.calculateUserCourseProgress(userSubjects);
+        const updatedUserCourses = userCourses.map(userCourse => {
+            const progress = avgProgress[userCourse.user.userId];
+            const status = progress > 50 ? UserCourseStatus.PASS : UserCourseStatus.FAIL;
+            return {
+                ...userCourse,
+                courseProgress: progress,
+                status,
+                finishedAt: new Date(),
+            };
+        });
+
+        await this.userCourseRepo.save(updatedUserCourses);
+    }
+
+    private calculateUserCourseProgress(userSubjects: UserSubject[]): Record<number, number> {
+        const progressByUser: Record<number, number[]> = {};
+
+        for (const userSubject of userSubjects) {
+            const userId = userSubject.user.userId;
+            if (!progressByUser[userId]) {
+                progressByUser[userId] = [];
+            }
+            progressByUser[userId].push(userSubject.subjectProgress);
+        }
+
+        return Object.fromEntries(
+            Object.entries(progressByUser).map(([userIdStr, progresses]) => {
+                const average = progresses.reduce((sum, score) => sum + score, 0) / progresses.length;
+                return [Number(userIdStr), Math.round(average)];
+            })
+        );
+    }
+}
