@@ -71,6 +71,7 @@
     "user_course_success": "Bạn đã được thêm vào khóa học trên S*learn!",
     "user_course_remove": "Bạn đã bị xoá khỏi khoá trên S*learn!",
     "trainee_not_found": "Trainee không tồn tại trong khoá học này",
+    "start_course_success": "Đã kích hoạt khoá học thành công",
     "name": {
       "isString": "Tên khóa học phải là chuỗi",
       "isNotEmpty": "Tên khóa học không được để trống",

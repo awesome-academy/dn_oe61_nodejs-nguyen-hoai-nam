@@ -8,3 +8,4 @@ export const CronExpression = {
 
 export const todayDate = new Date().toLocaleDateString('en-CA');
 export const firstCourseProgress = 0;
+export const firstUserSubjectProgress = 0;
