@@ -159,6 +159,9 @@
     }
   },
   "task": {
+    "task_not_found": "Task không tồn tại",
+    "taskId": "taskId không được để trống",
+    "task_in_use": "TaskId đang được sử dụng",
     "name": {
       "isString": "Tên task phải là chuỗi",
       "isNotEmpty": "Tên task không được để trống"

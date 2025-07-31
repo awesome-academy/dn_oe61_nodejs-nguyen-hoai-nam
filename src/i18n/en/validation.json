@@ -156,6 +156,9 @@
     }
   },
   "task": {
+    "taskId": "taskId cannot be empty",
+    "task_not_found": "Task does not exist",
+    "task_in_use": "TaskId is in use",
     "name": {
       "isString": "Task name must be a string",
       "isNotEmpty": "Task name must not be empty"

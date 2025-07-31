@@ -4,8 +4,9 @@ import { ValidationModule } from 'src/validation/validation.module';
 import { UserModule } from './user/user.module';
 import { SourseModule } from './course/course.module';
 import { SubjectModule } from './subject/subject.module';
+import { TaskModule } from './task/task.module';
 
 @Module({
-    imports: [AuthModule, ValidationModule, UserModule, SourseModule, SubjectModule],
+    imports: [AuthModule, ValidationModule, UserModule, SourseModule, SubjectModule, TaskModule],
 })
 export class ApiModule {}
