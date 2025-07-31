@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { Role } from 'src/database/dto/user.dto';
 import { AuthRoles } from 'src/helper/decorators/auth_roles.decorator';
 import { CourseService } from './course.service';
@@ -7,6 +7,7 @@ import { Language } from 'src/helper/decorators/language.decorator';
 import { QueryParam, UserDecorator } from 'src/helper/decorators/user.decorator';
 import { User } from 'src/database/entities/user.entity';
 import { AssignSupervisorDto } from 'src/validation/class_validation/supervisor_course.validation';
+import { userIdDto } from 'src/validation/class_validation/user.validation';
 
 @Controller('course')
 export class CourseController {
@@ -15,9 +16,10 @@ export class CourseController {
     ) { }
 
     @Get()
-    async getAll(@QueryParam(['page', 'pageSize']) pagination: { page: number; pageSize: number }, @Language() lang: string) {
+    async getAll(@QueryParam(['page', 'pageSize']) pagination: { page: number; pageSize: number }, @UserDecorator() user: User, @Language() lang: string) {
         const { page, pageSize } = pagination;
-        const result = await this.courseService.getAll(page, pageSize, lang);
+        const { userId, role } = user;
+        const result = await this.courseService.getAll(userId, role, page, pageSize, lang);
         return result
     }
 
@@ -61,6 +63,21 @@ export class CourseController {
     async removeSupervisorFromCourse(@Param() param: { courseId: number; supervisorId: number }, @Language() lang: string) {
         const { courseId, supervisorId } = param;
         const result = await this.courseService.removeSupervisorFromCourse(courseId, supervisorId, lang);
+        return result;
+    }
+
+    @AuthRoles(Role.ADMIN,Role.SUPERVISOR)
+    @Post(':courseId/trainee')
+    async assignTraineeToCourse (@Param() courseId: courseIdDto, @Body() traineeId:userIdDto, @Language() lang:string) {
+        const result = await this.courseService.assignTraineeToCourse(courseId.courseId,traineeId.userId,lang);
+        return result;
+    }
+
+    @AuthRoles(Role.ADMIN,Role.SUPERVISOR)
+    @Delete(':courseId/trainee/:traineeId')
+    async removeTraineeFromCourse (@Param() param: { courseId: number; traineeId: number},@Language() lang:string) {
+        const { courseId, traineeId } = param;
+        const result = await this.courseService.removeTraineeFromCourse(courseId,traineeId,lang)
         return result;
     }
 }

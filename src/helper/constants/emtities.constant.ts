@@ -74,3 +74,12 @@ export const courseConstants = {
     SUPERVISOR_COURSES: 'supervisorCourses',
     USER_COURSES: 'userCourses',
 } as const;
+
+export const userCourseConstants = {
+    ID: 'userCourseId',
+    COURSE: 'course',
+    USER: 'user',
+    REGISTRATION_DATE: 'registrationDate',
+    PROGRESS: 'courseProgress',
+    STATUS: 'status',
+} as const;

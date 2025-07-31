@@ -62,10 +62,15 @@
     "unsuccessful": "Không thành công"
   },
   "course": {
-    "not_found":"Không tìm thấy khoá học",
-    "user_duplicate":"Giám sát viên đã tồn tại trong khoá học này",
-    "user_notfound":"Giám sát viên không tồn tại trong khoá học này",
+    "not_found": "Không tìm thấy khoá học",
+    "user_duplicate": "Giám sát viên đã tồn tại trong khoá học này",
+    "user_notfound": "Giám sát viên không tồn tại trong khoá học này",
     "user_not_supervisor": "Chỉ có giám sát viên mới được gán vào khoá học",
+    "user_not_trainee": "Chỉ có học viên mới được tham gia vào khoá học",
+    "trainee_has_active_course": "Học viên đang tham gia một khoá học khác.",
+    "user_course_success": "Bạn đã được thêm vào khóa học trên S*learn!",
+    "user_course_remove": "Bạn đã bị xoá khỏi khoá trên S*learn!",
+    "trainee_not_found": "Trainee không tồn tại trong khoá học này",
     "name": {
       "isString": "Tên khóa học phải là chuỗi",
       "isNotEmpty": "Tên khóa học không được để trống",
@@ -87,6 +92,12 @@
     "creatorId": {
       "isInt": "creator_id phải là số nguyên",
       "isNotEmpty": "creator_id không được để trống"
+    },
+    "subjectIds": {
+      "isArray": "subjectIds phải là một mảng",
+      "arrayNotEmpty": "Phải chọn ít nhất 1 môn học",
+      "arrayUnique": "subjectIds không được chứa các giá trị trùng",
+      "isIntEach": "Mỗi phần tử trong subjectIds phải là số nguyên"
     }
   },
   "course_subject": {
@@ -104,6 +115,9 @@
     }
   },
   "subject": {
+    "subject_id": {
+      "isNotEmpty": "subject_id không được để trống"
+    },
     "name": {
       "isString": "Tên môn học phải là chuỗi",
       "isNotEmpty": "Tên môn học không được để trống",

@@ -48,3 +48,9 @@ export class UpdateUserCourseDto {
     @IsEnum(UserCourseStatus, i18nValidationMessage('validation.user_course.status.isEnum'))
     status?: UserCourseStatus;
 }
+
+export class AssignSupervisorDto {
+    @IsInt(i18nValidationMessage('validation.supervisor_course.supervisorId.isInt'))
+    @IsNotEmpty(i18nValidationMessage('validation.supervisor_course.supervisorId.isNotEmpty'))
+    supervisorId: number;
+}

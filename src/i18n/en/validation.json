@@ -59,10 +59,15 @@
     "unsuccessful": "Unsuccessful"
   },
   "course": {
-    "not_found":"Không tìm thấy khoá học",
+    "not_found": "No course found",
     "user_duplicate": "The supervisor is already assigned to this course",
-    "user_notfound":"The supervisor does not exist in this course",
+    "user_notfound": "The supervisor does not exist in this course",
     "user_not_supervisor": "Only users with the SUPERVISOR role can be assigned to a course",
+    "user_not_trainee": "Only members can join the course",
+    "trainee_has_active_course":"Students are currently taking another active course",
+    "user_course_success": "You have been added to a course on S*learn!",
+    "user_course_remove": "You have been removed from the course on S*learn!",
+    "trainee_not_found": "Trainee does not exist in this course",
     "name": {
       "isString": "Course name must be a string",
       "isNotEmpty": "Course name cannot be empty",
@@ -84,6 +89,12 @@
     "creatorId": {
       "isInt": "creator_id must be an integer",
       "isNotEmpty": "creator_id cannot be empty"
+    },
+    "subjectIds": {
+      "isArray": "subjectIds must be an array",
+      "arrayNotEmpty": "At least one subject must be selected",
+      "arrayUnique": "subjectIds must not contain duplicate values",
+      "isIntEach": "Each element in subjectIds must be an integer"
     }
   },
   "course_subject": {

@@ -10,10 +10,11 @@ import { CourseSubject } from 'src/database/entities/course_subject.entity';
 import { SupervisorCourse } from 'src/database/entities/supervisor_course.entity';
 import { PaginationService } from 'src/helper/shared/pagination.shared';
 import { User } from 'src/database/entities/user.entity';
+import { GetCourse } from 'src/helper/shared/get_course.shared';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Course,UserCourse,CourseSubject,SupervisorCourse,User])],
   controllers: [CourseController],
-  providers: [CourseService,I18nUtils,hashPassword,PaginationService]
+  providers: [CourseService,I18nUtils,hashPassword,PaginationService,GetCourse]
 })
 export class SourseModule {}
