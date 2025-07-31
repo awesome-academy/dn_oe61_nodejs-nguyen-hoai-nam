@@ -119,7 +119,8 @@
     "subject_not_found": "Không tồn tại bài học nào",
     "user_not_found": "Chỉ có giám sát viên mới được thao tác với môn học",
     "subject_has_tasks": "Không thể xoá môn học vì vẫn còn bài tập liên quan",
-    "subject_has_courses": "Không thể xoá môn học vì vẫn còn khoá học liên quan",
+    "subject_duplicate": "Môn học đã tồn tại.",
+    "subject": "Không thể xoá môn học vì vẫn còn khoá học liên quan",
     "subject_id": {
       "isNotEmpty": "subject_id không được để trống"
     },
@@ -159,6 +160,9 @@
     }
   },
   "task": {
+    "task_not_found": "Task không tồn tại",
+    "taskId": "taskId không được để trống",
+    "task_in_use": "TaskId đang được sử dụng",
     "name": {
       "isString": "Tên task phải là chuỗi",
       "isNotEmpty": "Tên task không được để trống"
