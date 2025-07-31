@@ -64,10 +64,11 @@
     "user_notfound": "The supervisor does not exist in this course",
     "user_not_supervisor": "Only users with the SUPERVISOR role can be assigned to a course",
     "user_not_trainee": "Only members can join the course",
-    "trainee_has_active_course":"Students are currently taking another active course",
+    "trainee_has_active_course": "Students are currently taking another active course",
     "user_course_success": "You have been added to a course on S*learn!",
     "user_course_remove": "You have been removed from the course on S*learn!",
     "trainee_not_found": "Trainee does not exist in this course",
+    "start_course_success": "Course activated successfully",
     "name": {
       "isString": "Course name must be a string",
       "isNotEmpty": "Course name cannot be empty",
@@ -112,6 +113,13 @@
     }
   },
   "subject": {
+    "subject_not_found":"No subject exists",
+    "user_not_found": "Only supervisors are allowed to work with the subject.",
+    "subject_has_tasks": "Cannot delete course because there are still related assignments",
+    "subject_has_courses": "Cannot delete course because there are still related courses",
+    "subject_id": {
+      "isNotEmpty": "subject_id cannot be empty"
+    },
     "name": {
       "isString": "Subject name must be a string",
       "isNotEmpty": "Subject name cannot be empty",
@@ -128,6 +136,13 @@
     "creatorId": {
       "isInt": "creator_id must be an integer",
       "isNotEmpty": "creator_id cannot be empty"
+    },
+    "taskIds": {
+      "tasks_not_found": "Some tasks do not exist",
+      "isArray": "taskIds must be an array.",
+      "arrayNotEmpty": "You must select at least one task.",
+      "arrayUnique": "taskIds must not contain duplicate values.",
+      "isIntEach": "Each item in taskIds must be an integer."
     }
   },
   "supervisor_course": {
@@ -141,6 +156,10 @@
     }
   },
   "task": {
+    "name": {
+      "isString": "Task name must be a string",
+      "isNotEmpty": "Task name must not be empty"
+    },
     "fileUrl": {
       "isString": "file_url must be a string",
       "isNotEmpty": "file_url cannot be empty"

@@ -71,6 +71,7 @@
     "user_course_success": "Bạn đã được thêm vào khóa học trên S*learn!",
     "user_course_remove": "Bạn đã bị xoá khỏi khoá trên S*learn!",
     "trainee_not_found": "Trainee không tồn tại trong khoá học này",
+    "start_course_success": "Đã kích hoạt khoá học thành công",
     "name": {
       "isString": "Tên khóa học phải là chuỗi",
       "isNotEmpty": "Tên khóa học không được để trống",
@@ -115,6 +116,10 @@
     }
   },
   "subject": {
+    "subject_not_found": "Không tồn tại bài học nào",
+    "user_not_found": "Chỉ có giám sát viên mới được thao tác với môn học",
+    "subject_has_tasks": "Không thể xoá môn học vì vẫn còn bài tập liên quan",
+    "subject_has_courses": "Không thể xoá môn học vì vẫn còn khoá học liên quan",
     "subject_id": {
       "isNotEmpty": "subject_id không được để trống"
     },
@@ -134,6 +139,13 @@
     "creatorId": {
       "isInt": "creator_id phải là số nguyên",
       "isNotEmpty": "creator_id không được để trống"
+    },
+    "taskIds": {
+      "tasks_not_found": "Một vài task không tồn tại",
+      "isArray": "taskId phải là một mảng",
+      "arrayNotEmpty": "Phải chọn ít nhất 1 môn học",
+      "arrayUnique": "taskId không được chứa các giá trị trùng",
+      "isIntEach": "Mỗi phần tử trong taskId phải là số nguyên"
     }
   },
   "supervisor_course": {
@@ -147,6 +159,10 @@
     }
   },
   "task": {
+    "name": {
+      "isString": "Tên task phải là chuỗi",
+      "isNotEmpty": "Tên task không được để trống"
+    },
     "fileUrl": {
       "isString": "file_url phải là chuỗi",
       "isNotEmpty": "file_url không được để trống"

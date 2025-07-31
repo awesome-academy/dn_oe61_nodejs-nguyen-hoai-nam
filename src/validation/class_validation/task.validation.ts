@@ -7,6 +7,10 @@ import {
 import { i18nValidationMessage } from 'src/helper/decorators/i18n-validation.decorator';
 
 export class CreateTaskDto {
+    @IsString(i18nValidationMessage('validation.task.name.isString'))
+    @IsNotEmpty(i18nValidationMessage('validation.task.name.isNotEmpty'))
+    name: string;
+
     @IsString(i18nValidationMessage('validation.task.fileUrl.isString'))
     @IsNotEmpty(i18nValidationMessage('validation.task.fileUrl.isNotEmpty'))
     fileUrl: string;

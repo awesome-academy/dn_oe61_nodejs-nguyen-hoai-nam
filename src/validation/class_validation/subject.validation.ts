@@ -5,9 +5,14 @@ import {
     IsInt,
     Min,
     MaxLength,
+    IsArray,
+    ArrayUnique,
+    ArrayNotEmpty,
 } from 'class-validator';
 import { DefaultLength } from 'src/helper/constants/emtities.constant';
 import { i18nValidationMessage } from 'src/helper/decorators/i18n-validation.decorator';
+import { CreateTaskDto } from './task.validation';
+import { Type } from 'class-transformer';
 
 export class CreateSubjectDto {
     @IsString(i18nValidationMessage('validation.subject.name.isString'))
@@ -23,9 +28,10 @@ export class CreateSubjectDto {
     @Min(0, i18nValidationMessage('validation.subject.studyDuration.min'))
     studyDuration: number;
 
-    @IsInt(i18nValidationMessage('validation.subject.creatorId.isInt'))
-    @IsNotEmpty(i18nValidationMessage('validation.subject.creatorId.isNotEmpty'))
-    creatorId: number;
+    @IsArray(i18nValidationMessage('validation.subject.taskIds.isArray'))
+    @ArrayUnique(i18nValidationMessage('validation.subject.taskIds.arrayUnique'))
+    @ArrayNotEmpty(i18nValidationMessage('validation.subject.taskIds.arrayNotEmpty'))
+    tasks: CreateTaskDto[];
 }
 
 export class UpdateSubjectDto {
@@ -42,4 +48,10 @@ export class UpdateSubjectDto {
     @IsInt(i18nValidationMessage('validation.subject.studyDuration.isInt'))
     @Min(0, i18nValidationMessage('validation.subject.studyDuration.min'))
     studyDuration?: number;
+}
+
+export class subjectIdDto {
+    @IsNotEmpty(i18nValidationMessage('validation.userId.isNotEmpty'))
+    @Type(() => Number)
+    subjectId: number
 }
