@@ -68,6 +68,7 @@
     "user_course_success": "You have been added to a course on S*learn!",
     "user_course_remove": "You have been removed from the course on S*learn!",
     "trainee_not_found": "Trainee does not exist in this course",
+    "start_course_success": "Course activated successfully",
     "name": {
       "isString": "Course name must be a string",
       "isNotEmpty": "Course name cannot be empty",

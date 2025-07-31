@@ -66,18 +66,25 @@ export class CourseController {
         return result;
     }
 
-    @AuthRoles(Role.ADMIN,Role.SUPERVISOR)
+    @AuthRoles(Role.ADMIN, Role.SUPERVISOR)
     @Post(':courseId/trainee')
-    async assignTraineeToCourse (@Param() courseId: courseIdDto, @Body() traineeId:userIdDto, @Language() lang:string) {
-        const result = await this.courseService.assignTraineeToCourse(courseId.courseId,traineeId.userId,lang);
+    async assignTraineeToCourse(@Param() courseId: courseIdDto, @Body() traineeId: userIdDto, @Language() lang: string) {
+        const result = await this.courseService.assignTraineeToCourse(courseId.courseId, traineeId.userId, lang);
         return result;
     }
 
-    @AuthRoles(Role.ADMIN,Role.SUPERVISOR)
+    @AuthRoles(Role.ADMIN, Role.SUPERVISOR)
     @Delete(':courseId/trainee/:traineeId')
-    async removeTraineeFromCourse (@Param() param: { courseId: number; traineeId: number},@Language() lang:string) {
+    async removeTraineeFromCourse(@Param() param: { courseId: number; traineeId: number }, @Language() lang: string) {
         const { courseId, traineeId } = param;
-        const result = await this.courseService.removeTraineeFromCourse(courseId,traineeId,lang)
+        const result = await this.courseService.removeTraineeFromCourse(courseId, traineeId, lang)
+        return result;
+    }
+
+    @AuthRoles(Role.ADMIN, Role.SUPERVISOR)
+    @Post(':courseId/start')
+    async startCourse(@Param() courseId: courseIdDto, @Language() lang: string) {
+        const result = await this.courseService.startCourse(courseId.courseId, lang);
         return result;
     }
 }
