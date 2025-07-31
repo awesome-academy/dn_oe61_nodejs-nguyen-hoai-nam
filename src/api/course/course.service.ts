@@ -22,7 +22,7 @@ import { GetCourse } from 'src/helper/shared/get_course.shared';
 import { I18nUtils } from 'src/helper/utils/i18n-utils';
 import { CreateCourseDto, UpdateCourseDto } from 'src/validation/class_validation/course.validation';
 import { DatabaseValidation } from 'src/validation/existence/existence.validator';
-import { DataSource, EntityManager, Repository } from 'typeorm';
+import { DataSource, EntityManager, In, Repository } from 'typeorm';
 
 @Injectable()
 export class CourseService {
@@ -454,7 +454,6 @@ export class CourseService {
 
         try {
             await this.changeStatusCourseSubject(courseId, lang, queryRunner.manager);
-            await this.findUserCourse(courseId, lang);
             await this.assignSubjectsToUsersInCourse(courseId, lang, queryRunner.manager);
 
             await queryRunner.commitTransaction();
@@ -474,11 +473,11 @@ export class CourseService {
         }
     }
 
-    private async findCourseSubject(courseId: number, lang: string): Promise<CourseSubject[]> {
+    private async findCourseSubject(courseId: number, lang: string, status: CourseSubjectStatus): Promise<CourseSubject[]> {
         const findCourse = await this.courseSubjectRepo.find({
             where: {
                 course: { courseId: courseId, status: CourseStatus.ACTIVE },
-                status: CourseSubjectStatus.NOT_STARTED,
+                status: status,
             },
             relations: ['course']
         });
@@ -490,7 +489,7 @@ export class CourseService {
     }
 
     private async changeStatusCourseSubject(courseId: number, lang: string, manager: EntityManager): Promise<void> {
-        const courses = await this.findCourseSubject(courseId, lang);
+        const courses = await this.findCourseSubject(courseId, lang, CourseSubjectStatus.NOT_STARTED);
 
         for (const course of courses) {
             course.status = CourseSubjectStatus.START;
@@ -516,7 +515,7 @@ export class CourseService {
     }
 
     private async assignSubjectsToUsersInCourse(courseId: number, lang: string, manager: EntityManager): Promise<void> {
-        const subjects = await this.findCourseSubject(courseId, lang);
+        const subjects = await this.findCourseSubject(courseId, lang, CourseSubjectStatus.NOT_STARTED);
         const users = await this.findUserCourse(courseId, lang);
 
         const newDataUserCourse = subjects.flatMap((subject) => {
@@ -535,5 +534,101 @@ export class CourseService {
 
         await manager.save(newDataUserCourse);
 
+    }
+
+    async finishCourse(courseId: number, lang: string): Promise<ApiResponse> {
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+
+        try {
+            const courses = await this.findCourseSubject(courseId, lang, CourseSubjectStatus.START);
+            await this.finishCourseSubjects(courses, queryRunner.manager);
+            const userSubjects = await this.finishUserSubjects(courses);
+            await this.finishUserCourses(courseId, lang, userSubjects);
+
+            await queryRunner.commitTransaction();
+
+            return {
+                success: true,
+                message: this.i18nUtils.translate('validation.course.start_course_success'),
+            };
+        } catch (error) {
+            await queryRunner.rollbackTransaction();
+            this.logger.error('startCourse failed', error?.stack || error);
+            throw new InternalServerErrorException(this.i18nUtils.translate('validation.server.internal_server_error', {}, lang));
+
+        } finally {
+            await queryRunner.release();
+        }
+    }
+
+    private async finishCourseSubjects(courses: CourseSubject[], manager: EntityManager): Promise<void> {
+        courses.forEach(c => c.status = CourseSubjectStatus.FINISH);
+        await manager.save(courses);
+    }
+
+    private async finishUserSubjects(courses: CourseSubject[]): Promise<UserSubject[]> {
+        const courseSubjectIds = (courses)
+            .map(c => c.courseSubjectId);
+
+        const userSubjects = await this.userSubjectRepo.find({
+            where: { courseSubject: { courseSubjectId: In(courseSubjectIds) }, },
+            relations: ['user']
+        });
+
+        return this.userSubjectRepo.save(
+            userSubjects.map(us => ({
+                ...us,
+                status: UserSubjectStatus.COMPLETED,
+                finishedAt: new Date(),
+            }))
+        );
+    }
+
+    private async finishUserCourses(courseId: number, lang: string, userSubjects: UserSubject[]): Promise<void> {
+        const userCourses = await this.userCourseRepo.find({
+            where: {
+                course: { courseId: courseId }
+            },
+            relations: ['user']
+        });
+
+        if (userCourses.length === 0) {
+            throw new BadRequestException(this.i18nUtils.translate('validation.course.not_found', {}, lang))
+        }
+
+        const avgProgress = this.calculateUserCourseProgress(userSubjects);
+        const updatedUserCourses = userCourses.map(userCourse => {
+            const progress = avgProgress[userCourse.user.userId];
+            const status = progress > 50 ? UserCourseStatus.PASS : UserCourseStatus.FAIL;
+            return {
+                ...userCourse,
+                courseProgress: progress,
+                status,
+                finishedAt: new Date(),
+            };
+        });
+
+        await this.userCourseRepo.save(updatedUserCourses);
+    }
+
+    private calculateUserCourseProgress(userSubjects: UserSubject[]): Record<number, number> {
+        const progressByUser: Record<number, number[]> = {};
+
+        for (const userSubject of userSubjects) {
+            const userId = userSubject.user.userId;
+            if (!progressByUser[userId]) {
+                progressByUser[userId] = [];
+            }
+            progressByUser[userId].push(userSubject.subjectProgress);
+        }
+
+        return Object.fromEntries(
+            Object.entries(progressByUser).map(([userIdStr, progresses]) => {
+                const average = progresses.reduce((sum, score) => sum + score, 0) / progresses.length;
+                return [Number(userIdStr), Math.round(average)];
+            })
+        );
     }
 }

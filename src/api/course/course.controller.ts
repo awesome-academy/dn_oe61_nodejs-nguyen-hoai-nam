@@ -87,4 +87,12 @@ export class CourseController {
         const result = await this.courseService.startCourse(courseId.courseId, lang);
         return result;
     }
+
+    @AuthRoles(Role.ADMIN, Role.SUPERVISOR)
+    @Post(':courseId/finish')
+    async finishCourse(@Param() courseId: courseIdDto, @Language() lang: string) {
+        const result = await this.courseService.finishCourse(courseId.courseId, lang);
+        return result;
+    }
+
 }
