@@ -36,4 +36,7 @@ export class UserCourse {
     nullable: false,
   })
   status: UserCourseStatus;
+
+  @Column({ type: 'timestamp', nullable: true })
+  finishedAt: Date;
 }

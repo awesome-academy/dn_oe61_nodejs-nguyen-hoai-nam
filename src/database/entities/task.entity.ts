@@ -8,6 +8,13 @@ export class Task {
   taskId: number;
 
   @Column({
+    type: 'varchar',
+    length: 255,
+    nullable: false,
+  })
+  name: string;
+
+  @Column({
     type: 'text',
     nullable: false,
   })

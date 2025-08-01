@@ -31,6 +31,9 @@ export class UserSubject {
   })
   status: UserSubjectStatus;
 
+  @Column({ type: 'timestamp', nullable: true })
+  finishedAt: Date;
+
   @OneToMany(() => UserTask, ut => ut.userSubject)
   userTasks: UserTask[];
 }

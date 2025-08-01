@@ -12,10 +12,10 @@ export class PaginationService {
         options: PaginationParams,
         findOptions?: FindManyOptions<TEntity>,
     ): Promise<PaginationResult<TEntity>> {
-        let page = typeof options.page === 'number' && options.page > 0 ? options.page : 1;
+        let page = Number(options.page) > 0 ? Number(options.page) : 1;
 
-        let pageSize = typeof options.pageSize === 'number' && options.pageSize > 0
-            ? Math.min(options.pageSize, this.MAX_PAGE_SIZE)
+        let pageSize = Number(options.pageSize) > 0
+            ? Math.min(Number(options.pageSize), this.MAX_PAGE_SIZE)
             : this.DEFAULT_PAGE_SIZE;
 
         const totalItems = await repo.count({ where: findOptions?.where });
