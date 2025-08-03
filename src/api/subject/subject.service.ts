@@ -56,6 +56,8 @@ export class SubjectService {
                 subjects: savedSubject,
                 tasks: savedTasks
             }
+            
+            await queryRunner.commitTransaction();
 
             return data;
         } catch (error) {
