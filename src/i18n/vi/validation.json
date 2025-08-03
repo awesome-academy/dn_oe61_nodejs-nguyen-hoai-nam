@@ -102,6 +102,8 @@
     }
   },
   "course_subject": {
+    "already_exists": "Môn học đã tồn tại trong khoá học",
+    "course_subject_not_found": "Không tồn tại bài học hoặc khoá học nào",
     "courseId": {
       "isInt": "course_id phải là số nguyên",
       "isNotEmpty": "course_id không được để trống"

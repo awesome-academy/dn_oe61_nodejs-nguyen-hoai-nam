@@ -99,6 +99,8 @@
     }
   },
   "course_subject": {
+    "already_exists": "The subject already exists in the course",
+    "course_subject_not_found": "No lesson or course exists",
     "courseId": {
       "isInt": "course_id must be an integer",
       "isNotEmpty": "course_id cannot be empty"

@@ -8,6 +8,7 @@ import {
     IsArray,
     ArrayUnique,
     ArrayNotEmpty,
+    IsNumber,
 } from 'class-validator';
 import { DefaultLength } from 'src/helper/constants/emtities.constant';
 import { i18nValidationMessage } from 'src/helper/decorators/i18n-validation.decorator';
@@ -54,4 +55,12 @@ export class subjectIdDto {
     @IsNotEmpty(i18nValidationMessage('validation.userId.isNotEmpty'))
     @Type(() => Number)
     subjectId: number
+}
+
+export class SubjectIdsDto {
+    @IsArray(i18nValidationMessage('validation.subjectIds.mustBeArray'))
+    @IsNotEmpty(i18nValidationMessage('validation.subjectIds.isNotEmpty'))
+    @IsNumber({}, { each: true, ...i18nValidationMessage('validation.subjectIds.isNumber') })
+    @Type(() => Number)
+    subjectIds: number[];
 }
