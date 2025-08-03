@@ -48,7 +48,3 @@ export class TraineeInCourseDto {
   name: string;
   email: string;
 }
-
-
-
-

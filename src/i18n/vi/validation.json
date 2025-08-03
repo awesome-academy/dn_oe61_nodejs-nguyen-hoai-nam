@@ -248,5 +248,21 @@
       "isEnum": "Trạng thái không hợp lệ",
       "isNotEmpty": "Trạng thái không được để trống"
     }
+  },
+  "report": {
+    "send_mail_end_course": "[Nhắc nhở] Khóa học sắp kết thúc",
+    "not_found": "Không có bào cáo nào cho khoá học và môn học",
+    "type": {
+      "isEnum": "Loại báo cáo không hợp lệ (daily hoặc monthly)"
+    },
+    "startDate": {
+      "isDate": "Ngày bắt đầu không hợp lệ"
+    },
+    "endDate": {
+      "isDate": "Ngày kết thúc không hợp lệ"
+    },
+    "courseId": {
+      "isNumber": "ID khóa học phải là số"
+    }
   }
 }

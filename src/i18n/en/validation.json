@@ -245,5 +245,21 @@
       "isEnum": "Invalid status",
       "isNotEmpty": "Status cannot be empty"
     }
+  },
+  "report": {
+    "send_mail_end_course": "[Reminder] Course is about to end",
+    "not_found": "There are no reports for the course and subject",
+    "type": {
+      "isEnum": "Invalid report type (must be 'daily' or 'monthly')"
+    },
+    "startDate": {
+      "isDate": "Start date must be a valid date string"
+    },
+    "endDate": {
+      "isDate": "End date must be a valid date string"
+    },
+    "courseId": {
+      "isNumber": "Course ID must be a number"
+    }
   }
 }

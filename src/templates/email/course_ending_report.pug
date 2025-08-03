@@ -1,0 +1,62 @@
+doctype html
+html
+  head
+    meta(charset='UTF-8')
+    title Thông báo khóa học sắp kết thúc
+    style.
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f6f9fc;
+        color: #333;
+        padding: 20px;
+      }
+      .container {
+        background-color: #fff;
+        padding: 30px;
+        border-radius: 10px;
+        max-width: 600px;
+        margin: auto;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      }
+      h2 {
+        color: #2c3e50;
+      }
+      .highlight {
+        color: #e74c3c;
+        font-weight: bold;
+      }
+      .footer {
+        margin-top: 40px;
+        font-size: 13px;
+        color: #999;
+        text-align: center;
+      }
+
+  body
+    .container
+      h2 Xin chào #{supervisorName},
+
+      p(style="font-size: 16px") 
+        | Khóa học 
+        span.highlight #{courseName} 
+        | của bạn đang sắp kết thúc vào ngày 
+        span.highlight #{endDate}.
+
+      p(style="font-size: 15px")
+        | Dưới đây là tổng quan tiến độ hiện tại:
+
+      ul
+        li Tổng số học viên: 
+          strong #{totalUsers}
+        li Số lượng môn đã hoàn thành: 
+          strong #{totalSubjectsDone}
+
+      p(style="margin-top: 20px")
+        | Vui lòng kiểm tra tiến độ học viên và thực hiện các bước cần thiết nếu có.
+
+      p Trân trọng,
+
+      p(style="margin-top: 10px; font-weight: bold") Đội ngũ Training System
+
+    .footer
+      p Email này được gửi tự động từ hệ thống. Vui lòng không trả lời lại.

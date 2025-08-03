@@ -37,8 +37,12 @@ export class UserSubjectService {
         try {
             const userSubject = await this.validateUserSubjectForSupervisor(userSubjectId, supervisorId, lang);
 
-            const courseId = userSubject.courseSubject.course.courseId;
-            const subjectId = userSubject.courseSubject.subject.subjectId;
+            if (!userSubject) {
+                throw new NotFoundException(this.i18nUtils.translate('validation.user_subject.not_found', {}, lang));
+            }
+
+            const courseId = userSubject?.courseSubject?.course?.courseId;
+            const subjectId = userSubject?.courseSubject?.subject?.subjectId;
             await this.validateCourseSubjectStarted(courseId, subjectId, lang);
 
             await this.userSubjectRepo.update(userSubjectId, {
@@ -165,7 +169,6 @@ export class UserSubjectService {
             }
 
             const subject = userSubject.courseSubject.subject;
-
             return {
                 name: subject.name,
                 description: subject.description,
@@ -217,21 +220,21 @@ export class UserSubjectService {
             const usId = task.userSubject.userSubjectId;
             if (!acc[usId]) acc[usId] = [];
             acc[usId].push({
-                taskId: task.task.taskId,
-                taskName: task.task.name,
-                status: task.status,
+                taskId: task?.task?.taskId,
+                taskName: task?.task?.name,
+                status: task?.status,
             });
             return acc;
         }, {} as Record<number, { taskId: number; taskName: string; status: UserTaskStatus }[]>);
 
         const activityHistory = userSubjects.map((us) => ({
-            userSubjectId: us.userSubjectId,
-            courseName: us.courseSubject.course.name,
-            subjectName: us.courseSubject.subject.name,
-            subjectStatus: us.status,
-            startedAt: us.startedAt,
-            finishedAt: us.finishedAt,
-            tasks: tasksGroupedBySubject[us.userSubjectId] || [],
+            userSubjectId: us?.userSubjectId,
+            courseName: us?.courseSubject?.course?.name,
+            subjectName: us?.courseSubject?.subject?.name,
+            subjectStatus: us?.status,
+            startedAt: us?.startedAt,
+            finishedAt: us?.finishedAt,
+            tasks: tasksGroupedBySubject[us?.userSubjectId] || [],
         }));
 
         return activityHistory;
@@ -241,34 +244,45 @@ export class UserSubjectService {
         try {
             await this.checkViewerPermission(courseId, viewer, lang);
 
-            const userSubjects = await this.userSubjectRepo.find({
-                where: {
-                    courseSubject: { course: { courseId } },
-                    user: { userId: traineeId },
-                },
-                relations: ['courseSubject', 'courseSubject.subject', 'courseSubject.course'],
-            });
-
-            if (userSubjects.length === 0) {
-                throw new NotFoundException(this.i18nUtils.translate('validation.user_subject.not_found', {}, lang));
-            }
-
-            const userTasks = await this.userTaskRepo.find({
-                where: {
-                    userSubject: { user: { userId: traineeId }, courseSubject: { course: { courseId } } },
-                },
-                relations: ['task', 'userSubject', 'userSubject.courseSubject'],
-            });
-
-            if (userTasks.length === 0) {
-                throw new NotFoundException(this.i18nUtils.translate('validation.user_task.user_task_not_found', {}, lang));
-            }
+            const userSubjects = await this.findUserSubjectAndgetrelations(traineeId, courseId,lang);
+            const userTasks = await this.findUsertaskAndgetrelations(traineeId, courseId,lang);
 
             return this.buildProgressDto(userSubjects, userTasks);
         } catch (error) {
             this.logger.error(`startSubject: ${error}`);
             throw new InternalServerErrorException(this.i18nUtils.translate('validation.server.internal_server_error', {}, lang))
         }
+    }
+
+    private async findUserSubjectAndgetrelations(traineeId: number, courseId: number, lang: string) {
+        const userSubjects = await this.userSubjectRepo.find({
+            where: {
+                courseSubject: { course: { courseId } },
+                user: { userId: traineeId },
+            },
+            relations: ['courseSubject', 'courseSubject.subject', 'courseSubject.course'],
+        });
+
+        if (userSubjects.length === 0) {
+            throw new NotFoundException(this.i18nUtils.translate('validation.user_subject.not_found', {}, lang));
+        }
+
+        return userSubjects;
+    }
+
+    private async findUsertaskAndgetrelations(traineeId: number, courseId: number, lang: string) {
+        const userTasks = await this.userTaskRepo.find({
+            where: {
+                userSubject: { user: { userId: traineeId }, courseSubject: { course: { courseId } } },
+            },
+            relations: ['task', 'userSubject', 'userSubject.courseSubject'],
+        });
+
+        if (userTasks.length === 0) {
+            throw new NotFoundException(this.i18nUtils.translate('validation.user_task.user_task_not_found', {}, lang));
+        }
+
+        return userTasks;
     }
 
     private async checkViewerPermission(courseId: number, viewer: User, lang: string): Promise<void> {

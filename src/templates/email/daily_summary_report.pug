@@ -1,0 +1,29 @@
+doctype html
+html
+  head
+    style.
+      table { border-collapse: collapse; width: 100%; }
+      th, td { border: 1px solid #ddd; padding: 8px; }
+      th { background-color: #4CAF50; color: white; }
+  body
+    h2 Báo cáo hoạt động học viên trong ngày #{reportDate}
+    p Xin chào #{supervisorName},
+
+    if activitySummary.length > 0
+      table
+        thead
+          tr
+            th Tên học viên
+            th Số task được giao
+            th Số task đã hoàn thành
+        tbody
+          each activity in activitySummary
+            tr
+              td #{activity.userName}
+              td #{activity.taskCount}
+              td #{activity.doneCount}
+    else
+      p Không có hoạt động nào trong ngày hôm nay.
+
+    p Trân trọng,
+    p Đội ngũ quản trị
