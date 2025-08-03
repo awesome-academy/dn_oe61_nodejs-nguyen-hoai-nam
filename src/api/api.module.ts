@@ -7,8 +7,9 @@ import { SubjectModule } from './subject/subject.module';
 import { TaskModule } from './task/task.module';
 import { CourseSubjectModule } from './course_subject/course_subject.module';
 import { UserCourseModule } from './user_course/user_course.module';
+import { UserTaskModule } from './user_task/user_task.module';
 
 @Module({
-    imports: [AuthModule, ValidationModule, UserModule, SourseModule, SubjectModule, TaskModule, CourseSubjectModule, UserCourseModule],
+    imports: [AuthModule, ValidationModule, UserModule, SourseModule, SubjectModule, TaskModule, CourseSubjectModule, UserCourseModule, UserTaskModule],
 })
 export class ApiModule {}

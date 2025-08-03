@@ -222,6 +222,9 @@
     }
   },
   "user_task": {
+    "user_task_not_found_date": "Không có dữ liệu cho nhiệm vụ",
+    "user_task_not_found": "Không tìm thấy nhiệm vụ tương ứng",
+    "complete_task_success": "Báo cáo nhiệm vụ thành công",
     "userSubjectId": {
       "isInt": "user_subject_id phải là số nguyên",
       "isNotEmpty": "user_subject_id không được để trống"
