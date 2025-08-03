@@ -31,6 +31,9 @@ export class UserSubject {
   })
   status: UserSubjectStatus;
 
+  @Column({ type: 'datetime', nullable: true, name: 'started_at' })
+  startedAt: Date;
+
   @Column({ type: 'timestamp', nullable: true })
   finishedAt: Date;
 

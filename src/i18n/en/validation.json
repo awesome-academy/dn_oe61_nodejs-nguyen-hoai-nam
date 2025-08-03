@@ -99,6 +99,8 @@
     }
   },
   "course_subject": {
+    "not_found": "Course-subject relationship not found.",
+    "not_started": "This subject in the course has not been started.",
     "already_exists": "The subject already exists in the course",
     "course_subject_not_found": "No lesson or course exists",
     "courseId": {
@@ -200,6 +202,14 @@
     }
   },
   "user_subject": {
+      "not_found": "Your subject could not be found.",
+      "not_belong_to_user": "This subject does not belong to you.",
+      "already_started": "This subject has already been started.",
+      "not_belong_to_creator": "You are not authorized to start this subject for the trainee.",
+      "not_in_progress": "The subject is not currently in progress.",
+      "not_all_done": "You must complete all tasks in this subject before finishing it.",
+      "start_success": "Subject started successfully",
+      "finish_success": "Topic ended successfully", 
     "userId": {
       "isInt": "user_id must be an integer",
       "isNotEmpty": "user_id cannot be empty"
@@ -219,6 +229,7 @@
     }
   },
   "user_task": {
+    "already_created": "Tasks for this subject have already been created.",
     "user_task_not_found_date": "No data available for the task",
     "user_task_not_found": "Corresponding task not found",
     "complete_task_success": "Mission successful report",

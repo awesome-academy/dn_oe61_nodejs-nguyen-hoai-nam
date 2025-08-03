@@ -102,6 +102,8 @@
     }
   },
   "course_subject": {
+    "not_found": "Không tìm thấy mối liên kết giữa môn học và khóa học.",
+    "not_started": "Môn học này trong khóa học chưa được bắt đầu.",
     "already_exists": "Môn học đã tồn tại trong khoá học",
     "course_subject_not_found": "Không tồn tại bài học hoặc khoá học nào",
     "courseId": {
@@ -203,9 +205,17 @@
     }
   },
   "user_subject": {
+    "not_found": "Không tìm thấy môn học của bạn.",
+    "not_belong_to_user": "Môn học này không thuộc về bạn.",
+    "already_started": "Môn học này đã được bắt đầu.",
+    "not_belong_to_creator": "Bạn không có quyền bắt đầu môn học này cho học viên.",
+    "not_in_progress":"Môn học hiện không ở trạng thái đang học.",
+    "not_all_done":"Bạn phải hoàn thành tất cả nhiệm vụ trong môn học trước khi kết thúc.",
+    "start_success": "Chủ đề đã bắt đầu thành công",
+    "finish_success": "Kết thúc chủ đề thành công",
     "userId": {
-      "isInt": "user_id phải là số nguyên",
-      "isNotEmpty": "user_id không được để trống"
+      "isInt": "id phải là số nguyên",
+      "isNotEmpty": "id không được để trống"
     },
     "courseSubjectId": {
       "isInt": "course_subject_id phải là số nguyên",
@@ -222,6 +232,7 @@
     }
   },
   "user_task": {
+    "already_created": "Bạn đã có nhiệm vụ cho môn học này.",
     "user_task_not_found_date": "Không có dữ liệu cho nhiệm vụ",
     "user_task_not_found": "Không tìm thấy nhiệm vụ tương ứng",
     "complete_task_success": "Báo cáo nhiệm vụ thành công",
