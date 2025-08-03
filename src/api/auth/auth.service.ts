@@ -13,6 +13,7 @@ import { Role } from 'src/database/dto/user.dto';
 import { AuthErrors } from 'src/helper/constants/error.constant';
 import { I18nUtils } from 'src/helper/utils/i18n-utils';
 import { Request } from 'express';
+import { LoginResponse, RegisterResponse, UserProfileResponse } from 'src/helper/interface/auth.interface';
 
 @Injectable()
 export class AuthService {
@@ -25,7 +26,7 @@ export class AuthService {
   ) { }
 
 
-  async login(userInput: AuthDto, lang: string): Promise<ApiResponse> {
+  async login(userInput: AuthDto, lang: string): Promise<LoginResponse> {
     const { email, password } = userInput;
 
     const user = await this.databaseValidation.checkEmailExists(this.userRepo, email);
@@ -47,24 +48,22 @@ export class AuthService {
     const accessToken = await this.generateToken(payload);
 
     if (!accessToken) {
-      throw new UnauthorizedException(AuthErrors.LOGIN_FAILED);
+      throw new UnauthorizedException(this.i18nUtils.translate('validation.auth.login_fail', {}, lang));
     }
 
-    return {
-      success: true,
-      message: this.i18nUtils.translate('validation.auth.login_success', {}, lang),
-      data: {
-        user: {
-          id: user.userId,
-          name: user.userName,
-          role: user.role,
-        },
-        token: accessToken,
+    const data = {
+      user: {
+        id: user.userId,
+        name: user.userName,
+        role: user.role,
       },
-    };
+      token: accessToken,
+    }
+
+    return data;
   }
 
-  async register(userInput: CreateUserDto, lang: string): Promise<ApiResponse> {
+  async register(userInput: CreateUserDto, lang: string): Promise<ApiResponse | RegisterResponse> {
     const { email, password, userName } = userInput;
 
     const existingUser = await this.databaseValidation.checkEmailExists(this.userRepo, userInput.email.trim());
@@ -92,36 +91,31 @@ export class AuthService {
       throw new UnauthorizedException(AuthErrors.REGISTER_FAILED);
     }
 
-    return {
-      success: true,
-      message: this.i18nUtils.translate('validation.auth.register_success', {}, lang),
-      data: {
-        id: newUser.userId,
-        email: newUser.email,
-        name: newUser.userName,
-        role: newUser.role,
-        status: newUser.status,
-      }
-    };
+    const data = {
+      id: newUser.userId,
+      email: newUser.email,
+      name: newUser.userName,
+      role: newUser.role,
+      status: newUser.status,
+    }
+
+    return data;
   }
 
-  async getProfile(user: User, lang: string): Promise<ApiResponse> {
+  async getProfile(user: User, lang: string): Promise<ApiResponse | UserProfileResponse> {
 
     if (!user || !user?.userId || !user?.userName || !user?.email || !user?.role) {
       throw new NotFoundException(this.i18nUtils.translate('validation.auth.user_notfound', {}, lang))
     }
 
-    return {
-      success: true,
-      data: {
-        user_profile: {
-          id: user.userId,
-          userName: user.userName,
-          email: user.email,
-          role: user.role
-        }
-      }
+    const data = {
+      id: user.userId,
+      userName: user.userName,
+      email: user.email,
+      role: user.role
     }
+
+    return data;
   }
 
   async comparePassword(passwordInput: string, userPassword: string) {

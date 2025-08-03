@@ -6,6 +6,7 @@ import { UserDecorator } from 'src/helper/decorators/user.decorator';
 import { User } from 'src/database/entities/user.entity';
 import { Role } from 'src/database/dto/user.dto';
 import { AuthRoles } from 'src/helper/decorators/auth_roles.decorator';
+import { ApiExcludeEndpoint } from '@nestjs/swagger';
 
 @Controller('user')
 export class UserController {
@@ -25,6 +26,7 @@ export class UserController {
         return result;
     }
 
+    @ApiExcludeEndpoint()
     @Get(':userId')
     @AuthRoles(Role.ADMIN, Role.SUPERVISOR)
     async viewProfile(@Param('userId') userId: number, @UserDecorator('role') userRole: string, @Language() lang: string) {

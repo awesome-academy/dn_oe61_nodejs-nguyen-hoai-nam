@@ -4,7 +4,9 @@ import { CreateUserDto, UpdateUserDto, userIdDto } from 'src/validation/class_va
 import { Language } from 'src/helper/decorators/language.decorator';
 import { Role } from 'src/database/dto/user.dto';
 import { AuthRoles } from 'src/helper/decorators/auth_roles.decorator';
+import { ApiExcludeController} from '@nestjs/swagger';
 
+@ApiExcludeController()
 @Controller('trainee')
 export class TraineeController {
     constructor(

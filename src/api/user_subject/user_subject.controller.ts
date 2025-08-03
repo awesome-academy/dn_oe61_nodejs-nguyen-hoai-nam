@@ -10,6 +10,7 @@ import { Role } from 'src/database/dto/user.dto';
 import { traineeIdDto } from 'src/validation/class_validation/user.validation';
 import { ApiResponse } from 'src/helper/interface/api.interface';
 import { ActivityHistoryDto, SubjectWithTasksDto, TraineeCourseProgressDto, TraineeInCourseDto } from 'src/helper/interface/user_subject.interface';
+import { ApiExcludeEndpoint } from '@nestjs/swagger';
 
 @Controller('user_subject')
 export class UserSubjectController {
@@ -18,6 +19,7 @@ export class UserSubjectController {
         private readonly i18nUtils: I18nUtils
     ) { }
 
+    @ApiExcludeEndpoint()
     @AuthRoles(Role.SUPERVISOR)
     @Post(':userSubjectId/start')
     async startSubject(@Param() userSubjectId: UserSubjectIdDto, @UserDecorator() user: User, @Language() lang: string): Promise<ApiResponse> {
@@ -52,12 +54,14 @@ export class UserSubjectController {
         return result;
     }
 
+    @ApiExcludeEndpoint()
     @AuthRoles(Role.SUPERVISOR, Role.ADMIN)
     @Get(':courseId/trainee/:traineeId/progress')
     async getTraineeProgress(@Param('courseId') courseId: number, @Param('traineeId') traineeId: number, @UserDecorator() user: User, @Language() lang: string): Promise<ApiResponse | TraineeCourseProgressDto> {
         return this.userSubjectService.getTraineeCourseProgress(courseId, traineeId, user, lang);
     }
 
+    @ApiExcludeEndpoint()
     @AuthRoles(Role.SUPERVISOR, Role.ADMIN)
     @Get(':courseId/trainees')
     async listTraineesInCourse(@Param('courseId') courseId: number, @UserDecorator() user: User, @Language() lang: string): Promise<ApiResponse | TraineeInCourseDto[]> {

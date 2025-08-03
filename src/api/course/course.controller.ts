@@ -8,6 +8,7 @@ import { QueryParam, UserDecorator } from 'src/helper/decorators/user.decorator'
 import { User } from 'src/database/entities/user.entity';
 import { AssignSupervisorDto } from 'src/validation/class_validation/supervisor_course.validation';
 import { userIdDto } from 'src/validation/class_validation/user.validation';
+import { ApiExcludeEndpoint } from '@nestjs/swagger';
 
 @Controller('course')
 export class CourseController {
@@ -29,7 +30,8 @@ export class CourseController {
         const result = await this.courseService.getById(courseId.courseId, user, lang);
         return result;
     }
-
+    
+    @ApiExcludeEndpoint()
     @AuthRoles(Role.ADMIN, Role.SUPERVISOR)
     @Post('')
     async create(@Body() courseInput: CreateCourseDto, @UserDecorator('userId') userId: number, @Language() lang: string) {
@@ -37,6 +39,7 @@ export class CourseController {
         return result;
     }
 
+    @ApiExcludeEndpoint()
     @AuthRoles(Role.ADMIN, Role.SUPERVISOR)
     @Delete(':courseId')
     async delete(@Param() courseId: courseIdDto, @Language() lang: string) {
@@ -44,6 +47,7 @@ export class CourseController {
         return result;
     }
 
+    @ApiExcludeEndpoint()
     @AuthRoles(Role.ADMIN, Role.SUPERVISOR)
     @Put(':courseId')
     async update(@Body() courseInput: UpdateCourseDto, @Param() courseId: courseIdDto, @Language() lang: string) {
@@ -51,6 +55,7 @@ export class CourseController {
         return result;
     }
 
+    @ApiExcludeEndpoint()
     @AuthRoles(Role.ADMIN)
     @Post(':courseId/supervisor')
     async assignSupervisorToCourse(@Param() courseId: courseIdDto, @Body() supervisorId: AssignSupervisorDto, @Language() lang: string) {
@@ -58,6 +63,7 @@ export class CourseController {
         return result;
     }
 
+    @ApiExcludeEndpoint()
     @AuthRoles(Role.ADMIN)
     @Delete(':courseId/supervisor/:supervisorId')
     async removeSupervisorFromCourse(@Param() param: { courseId: number; supervisorId: number }, @Language() lang: string) {
@@ -66,6 +72,7 @@ export class CourseController {
         return result;
     }
 
+    @ApiExcludeEndpoint()
     @AuthRoles(Role.ADMIN, Role.SUPERVISOR)
     @Post(':courseId/trainee')
     async assignTraineeToCourse(@Param() courseId: courseIdDto, @Body() traineeId: userIdDto, @Language() lang: string) {
@@ -73,6 +80,7 @@ export class CourseController {
         return result;
     }
 
+    @ApiExcludeEndpoint()
     @AuthRoles(Role.ADMIN, Role.SUPERVISOR)
     @Delete(':courseId/trainee/:traineeId')
     async removeTraineeFromCourse(@Param() param: { courseId: number; traineeId: number }, @Language() lang: string) {
@@ -81,6 +89,7 @@ export class CourseController {
         return result;
     }
 
+    @ApiExcludeEndpoint()
     @AuthRoles(Role.ADMIN, Role.SUPERVISOR)
     @Post(':courseId/start')
     async startCourse(@Param() courseId: courseIdDto, @Language() lang: string) {
@@ -88,6 +97,7 @@ export class CourseController {
         return result;
     }
 
+    @ApiExcludeEndpoint()
     @AuthRoles(Role.ADMIN, Role.SUPERVISOR)
     @Post(':courseId/finish')
     async finishCourse(@Param() courseId: courseIdDto, @Language() lang: string) {

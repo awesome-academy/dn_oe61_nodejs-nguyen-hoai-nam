@@ -10,6 +10,9 @@ import { Task } from 'src/database/entities/task.entity';
 import { Subject } from 'src/database/entities/subject.entity';
 import { ApiResponse } from 'src/helper/interface/api.interface';
 import { I18nUtils } from 'src/helper/utils/i18n-utils';
+import { ApiExcludeController } from '@nestjs/swagger';
+
+@ApiExcludeController()
 @Controller('subject')
 export class SubjectController {
     constructor(

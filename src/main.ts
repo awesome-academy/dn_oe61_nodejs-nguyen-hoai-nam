@@ -7,9 +7,24 @@ import { Language } from './helper/decorators/language.decorator';
 import { asyncLocalStorage } from './middleware/language.middleware';
 import { LanguageRequest } from './helper/constants/lang.constant';
 import * as path from 'path';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  const config = new DocumentBuilder()
+    .setTitle('Training System')
+    .setDescription('Tài liệu API cho hệ thống Training System')
+    .setVersion('1.0')
+    .addBearerAuth({
+      type: 'http',
+      scheme: 'bearer',
+      bearerFormat: 'JWT',
+    }, 'access-token')
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api_docs', app, document);
 
   const expressApp = app.getHttpAdapter().getInstance();
   expressApp.set('views', path.join(__dirname, '..', 'src', 'templates', 'email'));
@@ -36,7 +51,7 @@ async function bootstrap() {
                 }
               }),
             );
-            return translatedMessages.join(', ') ;
+            return translatedMessages.join(', ');
           }),
         );
         throw new BadRequestException({

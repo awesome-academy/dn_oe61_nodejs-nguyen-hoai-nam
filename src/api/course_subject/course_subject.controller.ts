@@ -8,7 +8,9 @@ import { subjectIdDto, SubjectIdsDto } from 'src/validation/class_validation/sub
 import { ApiResponse } from 'src/helper/interface/api.interface';
 import { CreateCourseWithSubjectsDto, DeleteCourseSubjectResult, GetByIdCourseWithSubjectsDto } from 'src/helper/interface/course_subject.interface';
 import { I18nUtils } from 'src/helper/utils/i18n-utils';
+import { ApiExcludeController } from '@nestjs/swagger';
 
+@ApiExcludeController()
 @Controller('course_subject')
 export class CourseSubjectController {
     constructor(
