@@ -8,7 +8,11 @@ import { QueryParam, UserDecorator } from 'src/helper/decorators/user.decorator'
 import { User } from 'src/database/entities/user.entity';
 import { AssignSupervisorDto } from 'src/validation/class_validation/supervisor_course.validation';
 import { userIdDto } from 'src/validation/class_validation/user.validation';
-import { ApiExcludeEndpoint } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiExcludeEndpoint } from '@nestjs/swagger';
+import { CourseDetailDto, CourseListItem } from 'src/helper/interface/course.iterface';
+import { ApiResponse } from 'src/helper/interface/api.interface';
+import { ApiResponseGetAllCourse } from 'src/helper/swagger/course/get_all_response.decorator';
+import { ApiResponseGetByIdCourse } from 'src/helper/swagger/course/get_by_id_response.decorator';
 
 @Controller('course')
 export class CourseController {
@@ -16,17 +20,21 @@ export class CourseController {
         private readonly courseService: CourseService,
     ) { }
 
+    @ApiResponseGetAllCourse()
+    @ApiBearerAuth('access-token')
     @Get()
-    async getAll(@QueryParam(['page', 'pageSize']) pagination: { page: number; pageSize: number }, @UserDecorator() user: User, @Language() lang: string) {
+    async getAll(@QueryParam(['page', 'pageSize']) pagination: { page: number; pageSize: number }, @UserDecorator() user: User, @Language() lang: string): Promise<ApiResponse | CourseListItem[]> {
         const { page, pageSize } = pagination;
         const { userId, role } = user;
         const result = await this.courseService.getAll(userId, role, page, pageSize, lang);
         return result
     }
 
+    @ApiResponseGetByIdCourse()
+    @ApiBearerAuth('access-token')
     @AuthRoles(Role.ADMIN, Role.SUPERVISOR, Role.TRAINEE)
     @Get(':courseId')
-    async getById(@Param() courseId: courseIdDto, @UserDecorator() user: User, @Language() lang: string) {
+    async getById(@Param() courseId: courseIdDto, @UserDecorator() user: User, @Language() lang: string): Promise<ApiResponse | CourseDetailDto> {
         const result = await this.courseService.getById(courseId.courseId, user, lang);
         return result;
     }

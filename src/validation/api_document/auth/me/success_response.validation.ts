@@ -1,6 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class MeSuccessResponseDto {
+    @ApiProperty({example: 200})
+    code: number;
+    
     @ApiProperty({ example: true })
     success: boolean;
 
