@@ -59,3 +59,9 @@ export class userIdDto {
     @Type(() => Number)
     userId: number
 }
+
+export class traineeIdDto {
+    @IsNotEmpty(i18nValidationMessage('validation.userId.isNotEmpty'))
+    @Type(() => Number)
+    traineeId: number
+}

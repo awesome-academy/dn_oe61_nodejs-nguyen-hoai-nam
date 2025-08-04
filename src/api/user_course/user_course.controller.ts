@@ -1,0 +1,30 @@
+import { Controller, Get, Param, Post } from '@nestjs/common';
+import { Role } from 'src/database/dto/user.dto';
+import { AuthRoles } from 'src/helper/decorators/auth_roles.decorator';
+import { Language } from 'src/helper/decorators/language.decorator';
+import { courseIdDto } from 'src/validation/class_validation/course.validation';
+import { UserCourseService } from './user_course.service';
+import { UserDecorator } from 'src/helper/decorators/user.decorator';
+import { User } from 'src/database/entities/user.entity';
+import { ApiResponse } from 'src/helper/interface/api.interface';
+import { AssignTraineeToCourseResponseDto } from 'src/helper/interface/course.iterface';
+import { traineeIdDto, userIdDto } from 'src/validation/class_validation/user.validation';
+
+@Controller('user_course')
+export class UserCourseController {
+    constructor(private readonly userCourseSErvice: UserCourseService) { }
+
+    @AuthRoles(Role.TRAINEE)
+    @Post(':courseId/trainee')
+    async registerToCourse(@Param() courseId: courseIdDto, @UserDecorator() traineeId: User, @Language() lang: string): Promise<ApiResponse | AssignTraineeToCourseResponseDto> {
+        const result = await this.userCourseSErvice.registerToCourse(courseId.courseId, traineeId, lang);
+        return result;
+    }
+
+    @AuthRoles(Role.TRAINEE)
+    @Get('trainee/:traineeId/courses/active')
+    async viewActiveCourse(@Param() traineeId: traineeIdDto, @Language() lang: string) {
+        const result = await this.userCourseSErvice.viewActiveCourse(traineeId.traineeId, lang);
+        return result;
+    }
+}
