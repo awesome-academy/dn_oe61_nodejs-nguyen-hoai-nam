@@ -4,7 +4,6 @@ import { UserSubjectStatus } from 'src/database/dto/user_subject.dto';
 import { UserTaskStatus } from 'src/database/dto/user_task.dto';
 import { Course } from 'src/database/entities/course.entity';
 import { CourseSubject } from 'src/database/entities/course_subject.entity';
-import { SupervisorCourse } from 'src/database/entities/supervisor_course.entity';
 import { Task } from 'src/database/entities/task.entity';
 import { User } from 'src/database/entities/user.entity';
 import { UserCourse } from 'src/database/entities/user_course.entity';
@@ -16,7 +15,7 @@ import { address, formatDate, formatDateForMySQL } from 'src/helper/shared/forma
 import { GetCourse } from 'src/helper/shared/get_course.shared';
 import { I18nUtils } from 'src/helper/utils/i18n-utils';
 import { CompleteTaskDto } from 'src/validation/class_validation/user_task.validation';
-import { DataSource, EntityManager, Not, Repository } from 'typeorm';
+import { DataSource, EntityManager, Repository } from 'typeorm';
 
 @Injectable()
 export class UserTaskService {

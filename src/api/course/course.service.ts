@@ -75,6 +75,16 @@ export class CourseService {
         return datas;
     }
 
+    async getMyCourses(userId: number, role: string): Promise<Course[]> {
+        if (role === Role.SUPERVISOR) {
+            return await this.getCourse.getCoursesBySupervisor(userId, 1, 100);
+        } else if (role === Role.TRAINEE) {
+            return await this.getCourse.getCoursesByTrainee(userId, 1, 100);
+        } else {
+            return [];
+        }
+    }
+
     async getById(courseId: number, user: User, lang: string): Promise<CourseDetailDto> {
         const course = await this.courseRepo.findOneBy({ courseId: courseId });
 

@@ -1,0 +1,48 @@
+//- Admin Layout Template - Reusable for all admin pages
+//- Usage: include ../layouts/admin-layout
+//- Variables to pass:
+//-   - title: string (page title)
+//-   - currentPage: string (current active page)
+//-   - description: string (page description)
+
+mixin adminLayout(title, currentPage, description, pageTitle)
+  doctype html
+  html(lang="en")
+    head
+      meta(charset="UTF-8")
+      meta(name="viewport", content="width=device-width, initial-scale=1.0")
+      title= title || 'Admin Dashboard - Training System'
+      script(src="https://cdn.tailwindcss.com")
+      link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css")
+      link(href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet")
+      link(rel="stylesheet", href="/css/admin_layout.css")
+      style(type="text/css").
+
+    body(class="min-h-screen flex")
+      //- Include Sidebar Component
+      include ../components/sidebar
+      +sidebar(currentPage || 'dashboard', 'Admin User', 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face')
+
+      //- Main Content Area
+      div(class="flex-1 flex flex-col main-content")
+        //- Header
+        header(class="main-header px-6 py-4 flex items-center justify-between")
+          div(class="flex items-center space-x-4")
+            button(class="md:hidden p-2 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100" id="sidebarToggle")
+              i(class="fas fa-bars")
+            div
+              h1(class="text-xl font-semibold text-gray-900")= pageTitle || 'Admin Dashboard'
+              p(class="text-sm text-gray-500")= description || 'Training System'
+          div(class="flex items-center space-x-3")
+            button(class="p-2 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100 relative")
+              i(class="fas fa-bell")
+              span(class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full")
+            button(class="p-2 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100" onclick="logout()")
+              i(class="fas fa-sign-out-alt")
+
+        //- Page Content
+        main(class="flex-1 p-6")
+          block
+
+      script(src="/js/admin_layout.js")
+      block scripts 

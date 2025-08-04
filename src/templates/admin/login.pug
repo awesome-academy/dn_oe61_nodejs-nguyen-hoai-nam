@@ -1,0 +1,121 @@
+// src/templates/admin/login.pug
+doctype html
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title= title || 'Login - Training System'
+    script(src="https://cdn.tailwindcss.com")
+    link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css")
+    link(href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet")
+    style(type="text/css").
+      body {
+        font-family: 'Inter', sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+      }
+      
+      .login-container {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      }
+      
+      .input-field {
+        transition: all 0.3s ease;
+      }
+      
+      .input-field:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      }
+      
+      .login-button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        transition: all 0.3s ease;
+      }
+      
+      .login-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+      }
+
+  body(class="min-h-screen flex items-center justify-center p-4")
+    div(class="login-container w-full max-w-md p-8")
+      div(class="text-center mb-8")
+        img(src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/f909c6d0-b6a0-4215-a6ad-4d511e9b4418.png" alt="Logo" class="w-16 h-16 rounded-xl shadow-lg mx-auto mb-4")
+        h1(class="text-2xl font-bold text-gray-800 mb-2") Training System
+        p(class="text-gray-600") Sign in to your account
+
+      form(id="login-form" class="space-y-6")
+        div
+          label(for="email" class="block text-sm font-medium text-gray-700 mb-2") Email
+          div(class="relative")
+            i(class="fas fa-envelope absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400")
+            input(type="email" id="email" name="email" required class="input-field w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none" placeholder="Enter your email")
+        
+        div
+          label(for="password" class="block text-sm font-medium text-gray-700 mb-2") Password
+          div(class="relative")
+            i(class="fas fa-lock absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400")
+            input(type="password" id="password" name="password" required class="input-field w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none" placeholder="Enter your password")
+        
+        div(id="error-message" class="hidden text-red-600 text-sm text-center")
+        
+        button(type="submit" class="login-button w-full py-3 text-white font-medium rounded-lg flex items-center justify-center")
+          i(class="fas fa-sign-in-alt mr-2")
+          span Sign In
+
+      div(class="mt-6 text-center")
+        p(class="text-sm text-gray-600") Don't have an account? 
+          a(href="/auth/register" class="text-indigo-600 hover:text-indigo-500 font-medium") Contact Admin
+
+    script.
+      document.getElementById('login-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const errorMessage = document.getElementById('error-message');
+        const submitButton = document.querySelector('button[type="submit"]');
+        
+        // Reset error message
+        errorMessage.classList.add('hidden');
+        
+        // Show loading state
+        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i><span>Signing in...</span>';
+        submitButton.disabled = true;
+        
+        try {
+          const response = await fetch('/auth/login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email, password }),
+          });
+          
+          const result = await response.json();
+          
+          if (response.ok && result.success) {
+            // Store token
+            localStorage.setItem('token', result.data.token);
+            sessionStorage.setItem('token', result.data.token);
+            
+            // Redirect to dashboard
+            window.location.href = '/admin/dashboard';
+          } else {
+            // Show error message
+            errorMessage.textContent = result.message || 'Login failed';
+            errorMessage.classList.remove('hidden');
+          }
+        } catch (error) {
+          errorMessage.textContent = 'Network error. Please try again.';
+          errorMessage.classList.remove('hidden');
+        } finally {
+          // Reset button state
+          submitButton.innerHTML = '<i class="fas fa-sign-in-alt mr-2"></i><span>Sign In</span>';
+          submitButton.disabled = false;
+        }
+      });

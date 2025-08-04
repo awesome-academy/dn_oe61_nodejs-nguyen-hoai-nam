@@ -6,6 +6,13 @@ import { LanguageRequest } from "src/helper/constants/lang.constant";
 import { IS_PUBLIC_KEY } from "src/helper/decorators/metadata.decorator";
 import { I18nUtils } from "src/helper/utils/i18n-utils";
 
+
+export interface RequestWithCookies {
+    cookies?: Record<string, string>;
+    headers?: Record<string, string>;
+    [key: string]: any;
+}
+
 @Injectable()
 export class AuthGuard implements CanActivate {
     constructor(
@@ -22,7 +29,7 @@ export class AuthGuard implements CanActivate {
 
         if (isPublic) return true;
 
-        const request = context.switchToHttp().getRequest();
+        const request = context.switchToHttp().getRequest<RequestWithCookies>();
         const token = this.checkTokenFromHeader(request);
         const lang = LanguageRequest();
 
@@ -40,15 +47,13 @@ export class AuthGuard implements CanActivate {
         return true
     }
 
-    private checkTokenFromHeader(request: Request): string | undefined {
-        const authHeader = request.headers['authorization'];
+    private checkTokenFromHeader(request: RequestWithCookies): string | undefined {
+        const authHeader = request.cookies?.['token'];
 
-        if (!authHeader || typeof authHeader !== 'string' || !authHeader.startsWith('Bearer ')) {
+        if (!authHeader || typeof authHeader !== 'string') {
             return undefined;
         }
-
-        const token = authHeader.split(' ')[1];
-        return token
+        return authHeader
     }
 }
 

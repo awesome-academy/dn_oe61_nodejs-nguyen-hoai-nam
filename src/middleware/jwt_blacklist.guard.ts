@@ -15,8 +15,9 @@ export class JwtBlacklistGuard implements CanActivate {
         const lang = LanguageRequest();
 
         let token: string | undefined;
-        const authHeader = request.headers?.authorization || request.headers?.Authorization;
-        if (authHeader && typeof authHeader === 'string' && authHeader.startsWith('Bearer ')) {
+        const authHeader = request.query?.token || request.body?.token;
+
+        if (authHeader && typeof authHeader === 'string') {
             token = authHeader.substring(7);
         }
 

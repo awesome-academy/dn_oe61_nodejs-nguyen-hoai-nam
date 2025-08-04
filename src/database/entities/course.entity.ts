@@ -5,6 +5,7 @@ import { SupervisorCourse } from './supervisor_course.entity';
 import { UserCourse } from './user_course.entity';
 import { CourseStatus } from '../dto/course.dto';
 import { DefaultLength } from 'src/helper/constants/emtities.constant';
+import { ChatMessage } from './chat_message.entity';
 
 @Entity()
 export class Course {
@@ -61,4 +62,7 @@ export class Course {
 
   @OneToMany(() => UserCourse, (uc) => uc.course)
   userCourses: UserCourse[];
+
+  @OneToMany(() => ChatMessage, (message) => message.course)
+  chatMessages: ChatMessage[];
 }
