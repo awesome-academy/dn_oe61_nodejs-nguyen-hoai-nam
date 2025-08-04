@@ -31,6 +31,15 @@ export class SubjectService {
     ) { }
 
     async create(subjectInput: CreateSubjectDto, user: User, lang: string): Promise<{ subjects: Subject; tasks: Task[] }> {
+        const existing = await this.subjectRepo.findOneBy({
+            name: subjectInput.name,
+            creator: { userId: user.userId },
+        });
+
+        if (existing) {
+            throw new BadRequestException(this.i18nUtils.translate('validation.subject.subject_duplicate', {}, lang),);
+        }
+
         const { tasks } = subjectInput;
 
         await this.checkUserRole(user.userId, user.role, lang);

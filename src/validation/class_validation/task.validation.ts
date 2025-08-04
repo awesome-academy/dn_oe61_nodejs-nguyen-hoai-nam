@@ -1,3 +1,4 @@
+import { Type } from 'class-transformer';
 import {
     IsNotEmpty,
     IsString,
@@ -21,7 +22,21 @@ export class CreateTaskDto {
 }
 
 export class UpdateTaskDto {
+    @IsString(i18nValidationMessage('validation.task.name.isString'))
+    @IsOptional()
+    name?: string;
+
     @IsOptional()
     @IsString(i18nValidationMessage('validation.task.fileUrl.isString'))
     fileUrl?: string;
+
+    @IsInt(i18nValidationMessage('validation.task.subjectId.isInt'))
+    @IsOptional()
+    subjectId: number;
+}
+
+export class TaskIdDto {
+    @IsNotEmpty(i18nValidationMessage('validation.task.taskId'))
+    @Type(() => Number)
+    taskId: number
 }

@@ -117,6 +117,7 @@
     "user_not_found": "Only supervisors are allowed to work with the subject.",
     "subject_has_tasks": "Cannot delete course because there are still related assignments",
     "subject_has_courses": "Cannot delete course because there are still related courses",
+    "subject_duplicate": "Subject already exists.",
     "subject_id": {
       "isNotEmpty": "subject_id cannot be empty"
     },
@@ -156,6 +157,9 @@
     }
   },
   "task": {
+    "taskId": "taskId cannot be empty",
+    "task_not_found": "Task does not exist",
+    "task_in_use": "TaskId is in use",
     "name": {
       "isString": "Task name must be a string",
       "isNotEmpty": "Task name must not be empty"
