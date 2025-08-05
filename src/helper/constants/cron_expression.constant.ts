@@ -10,3 +10,4 @@ export const todayDate = new Date().toLocaleDateString('en-CA');
 export const firstCourseProgress = 0;
 export const firstUserSubjectProgress = 0;
 export const course_process_constant = 50;
+export const maxProgress = 100;
