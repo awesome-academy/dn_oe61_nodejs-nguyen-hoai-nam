@@ -7,7 +7,9 @@ import { Language } from 'src/helper/decorators/language.decorator';
 import { Public } from 'src/helper/decorators/metadata.decorator';
 import { ChangePasswordDto } from 'src/validation/auth_validation/auth.validation';
 import { JwtBlacklistGuard } from 'src/middleware/jwt_blacklist.guard';
+import { ApiExcludeController } from '@nestjs/swagger';
 
+@ApiExcludeController()
 @Controller('supervisor')
 export class SupervisorController {
     constructor(private readonly supervisorService: SupervisorService) { }

@@ -7,7 +7,9 @@ import { ApiResponse } from 'src/helper/interface/api.interface';
 import { TaskWithSubjectDto } from 'src/helper/interface/task.interface';
 import { Task } from 'src/database/entities/task.entity';
 import { I18nUtils } from 'src/helper/utils/i18n-utils';
+import { ApiExcludeController } from '@nestjs/swagger';
 
+@ApiExcludeController()
 @Controller('task')
 export class TaskController {
     constructor(

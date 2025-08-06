@@ -1,5 +1,4 @@
 import { Body, Controller, Get, Post, Req } from '@nestjs/common';
-import { Request } from 'express';
 import { AuthDto } from 'src/validation/auth_validation/auth.validation';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from 'src/validation/class_validation/user.validation';
@@ -7,30 +6,55 @@ import { Language } from 'src/helper/decorators/language.decorator';
 import { Public } from 'src/helper/decorators/metadata.decorator';
 import { User } from 'src/database/entities/user.entity';
 import { UserDecorator } from 'src/helper/decorators/user.decorator';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiResponseLogin } from 'src/helper/swagger/auth/login_response.decorator';
+import { ApiResponseRegister } from 'src/helper/swagger/auth/response_regiser.decorator';
+import { LoginResponse, RegisterResponse, UserProfileResponse } from 'src/helper/interface/auth.interface';
+import { ApiResponse } from 'src/helper/interface/api.interface';
+import { I18nUtils } from 'src/helper/utils/i18n-utils';
+import { ApiResponseMe } from 'src/helper/swagger/auth/me_response.decorator';
 
+@ApiTags('auths')
 @Controller('auth')
 export class AuthController {
     constructor(
         private readonly authService: AuthService,
+        private readonly i18nUtils: I18nUtils,
     ) { }
 
+    @ApiResponseLogin()
     @Public()
     @Post('login')
-    async login(@Body() userInput: AuthDto, @Language() lang: string) {
-        const result = await this.authService.login(userInput,lang);
-        return result;
+    async login(@Body() userInput: AuthDto, @Language() lang: string): Promise<ApiResponse | LoginResponse> {
+        const result = await this.authService.login(userInput, lang);
+        return {
+            success: true,
+            message: this.i18nUtils.translate('validation.auth.login_success', {}, lang),
+            data: result
+        };
     }
 
+    @ApiResponseRegister()
     @Public()
     @Post('register')
-    async register(@Body() userInput: CreateUserDto, @Language() lang: string) {
-        const result = await this.authService.register(userInput,lang);
-        return result;
+    async register(@Body() userInput: CreateUserDto, @Language() lang: string): Promise<ApiResponse | RegisterResponse> {
+        const result = await this.authService.register(userInput, lang);
+        return {
+            success: true,
+            message: this.i18nUtils.translate('validation.auth.register_success', {}, lang),
+            data: result
+        }
     }
 
+    @ApiBearerAuth('access-token')
+    @ApiResponseMe()
     @Get('me')
-    async getProfile(@UserDecorator() user: User, @Language() lang: string) {
-        const result = await this.authService.getProfile(user,lang);
-        return result;
+    async getProfile(@UserDecorator() user: User, @Language() lang: string): Promise<ApiResponse | UserProfileResponse> {
+        const result = await this.authService.getProfile(user, lang);
+        return {
+            success: true,
+            message: this.i18nUtils.translate('validation.response_api.success', {}, lang),
+            data: result
+        }
     }
 }
