@@ -3,5 +3,7 @@ export const templatePug = {
     welcome: "welcome",
     assignUserToCourse: 'assign_course',
     removeUserCourse: "remove_user_course",
-    traineeRegisterSuccess: "trainee_register_success"
+    traineeRegisterSuccess: "trainee_register_success",
+    courseEndingReport: "course_ending_report",
+    dailySummaryReport: "daily_summary_report"
 }

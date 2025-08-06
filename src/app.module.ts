@@ -35,6 +35,8 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { JwtModule } from '@nestjs/jwt';
 import { BlacklistedToken } from './database/entities/blacklisted_token.entity';
 import { ScheduleModule } from '@nestjs/schedule';
+import { MailQueueModule } from './helper/Queue/mail/mail_queue.module';
+import { BullModule } from '@nestjs/bull';
 dotenv.config();
 
 @Module({
@@ -105,7 +107,14 @@ dotenv.config();
       secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '7d' },
     }),
-    ScheduleModule.forRoot()
+    BullModule.forRoot({
+      redis: {
+        host: 'localhost',
+        port: 6379,
+      },
+    }),
+    ScheduleModule.forRoot(),
+    MailQueueModule,
   ],
   controllers: [AppController],
   providers: [
