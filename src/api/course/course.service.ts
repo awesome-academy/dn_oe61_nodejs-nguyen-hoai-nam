@@ -14,7 +14,7 @@ import { SupervisorCourse } from 'src/database/entities/supervisor_course.entity
 import { User } from 'src/database/entities/user.entity';
 import { UserCourse } from 'src/database/entities/user_course.entity';
 import { UserSubject } from 'src/database/entities/user_subject.entity';
-import { course_process_constant, firstCourseProgress, firstUserSubjectProgress, todayDate } from 'src/helper/constants/cron_expression.constant';
+import { course_process_constant, firstCourseProgress, firstUserSubjectProgress, maxProgress, todayDate } from 'src/helper/constants/cron_expression.constant';
 import { tableName } from 'src/helper/constants/emtities.constant';
 import { templatePug } from 'src/helper/constants/template.constant';
 import { ApiResponse } from 'src/helper/interface/api.interface';
@@ -352,7 +352,7 @@ export class CourseService {
         }
     }
 
-    private async validateTraineeHasNoActiveCourse(userId: number, alias: string, relationField: string, lang: string):Promise<void> {
+    private async validateTraineeHasNoActiveCourse(userId: number, alias: string, relationField: string, lang: string): Promise<void> {
         const count = await this.userCourseRepo.createQueryBuilder(alias)
             .innerJoin(`${alias}.${relationField}`, relationField)
             .where(`${alias}.user_id = :userId`, { userId })
@@ -591,14 +591,17 @@ export class CourseService {
             if (!progressByUser[userId]) {
                 progressByUser[userId] = [];
             }
-            progressByUser[userId].push(userSubject.subjectProgress);
+
+            const cappedProgress = Math.max(0, Math.min(userSubject.subjectProgress, maxProgress));
+            progressByUser[userId].push(cappedProgress);
         }
 
         return Object.fromEntries(
             Object.entries(progressByUser).map(([userIdStr, progresses]) => {
                 const average = progresses.reduce((sum, score) => sum + score, 0) / progresses.length;
-                return [Number(userIdStr), Math.round(average)];
+                return [Number(userIdStr), Math.max(0, Math.min(maxProgress, Math.round(average)))];
             })
         );
     }
+
 }
