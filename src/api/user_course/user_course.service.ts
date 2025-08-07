@@ -225,4 +225,17 @@ export class UserCourseService {
 
         return course;
     }
+
+    async searchCourses(name: string, lang: string) {
+        const courses = await this.courseRepo
+            .createQueryBuilder('course')
+            .where('course.name LIKE :name', { name: `%${name}%` })
+            .getMany();
+
+        if (courses.length === 0) {
+            throw new BadRequestException(this.i18nUtils.translate('validation.course.not_found', {}, lang));
+        }
+
+        return courses;
+    }
 }
