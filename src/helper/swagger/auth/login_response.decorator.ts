@@ -17,9 +17,9 @@ export function ApiResponseLogin() {
             description: 'Thông tin đăng nhập của người dùng',
             examples: {
                 example1: {
-                    summary: 'Ví dụ đăng nhập với tài khoản Admin',
+                    summary: 'Ví dụ đăng nhập với tài khoản',
                     value: {
-                        email: 'admin123@gmail.com',
+                        email: 'trainee1@gmail.com',
                         password: 'Namnam16@',
                     },
                 },
