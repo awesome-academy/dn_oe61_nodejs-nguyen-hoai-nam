@@ -25,12 +25,6 @@ export class UserTask {
   status: UserTaskStatus;
 
   @Column({ type: 'datetime', nullable: true })
-  assignedAt?: Date;
-
-  @Column({ type: 'datetime', nullable: true })
-  dueAt?: Date;
-
-  @Column({ type: 'datetime', nullable: true })
   doneAt?: Date;
 }
 

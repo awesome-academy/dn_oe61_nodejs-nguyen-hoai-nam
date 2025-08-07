@@ -1,20 +1,19 @@
-import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserSubjectStatus } from 'src/database/dto/user_subject.dto';
 import { UserTaskStatus } from 'src/database/dto/user_task.dto';
 import { Course } from 'src/database/entities/course.entity';
 import { CourseSubject } from 'src/database/entities/course_subject.entity';
-import { Task } from 'src/database/entities/task.entity';
 import { User } from 'src/database/entities/user.entity';
 import { UserCourse } from 'src/database/entities/user_course.entity';
+import { Task } from 'src/database/entities/task.entity';
 import { UserSubject } from 'src/database/entities/user_subject.entity';
 import { UserTask } from 'src/database/entities/user_task.entity';
-import { maxProgress } from 'src/helper/constants/cron_expression.constant';
-import { TrainingCalendarDto } from 'src/helper/interface/user_task.interface';
-import { address, formatDate, formatDateForMySQL } from 'src/helper/shared/format_date.shared';
+import { maxProgress, millisecondsPerDay } from 'src/helper/constants/cron_expression.constant';
+import { TrainingCalendarDto, ViewTaskDto } from 'src/helper/interface/user_task.interface';
+import { formatDateForMySQL } from 'src/helper/shared/format_date.shared';
 import { GetCourse } from 'src/helper/shared/get_course.shared';
 import { I18nUtils } from 'src/helper/utils/i18n-utils';
-import { CompleteTaskDto } from 'src/validation/class_validation/user_task.validation';
 import { DataSource, EntityManager, Repository } from 'typeorm';
 
 @Injectable()
@@ -33,100 +32,168 @@ export class UserTaskService {
         private readonly logger: Logger,
     ) { }
 
+
     async getTrainingCalendar(traineeId: number, lang: string, fromDate?: string, toDate?: string): Promise<TrainingCalendarDto[]> {
-        const user = await this.userRepo.findOneBy({ userId: traineeId });
-        if (!user) {
-            throw new NotFoundException(this.i18nUtils.translate('validation.auth.user_notfound', {}, lang));
+        await this.ensureTraineeExists(traineeId, lang);
+
+        const startDate = fromDate ? new Date(formatDateForMySQL(fromDate)) : undefined;
+        const endDate = toDate ? new Date(formatDateForMySQL(toDate)) : undefined;
+
+        const calendarEventList = await this.buildCalendarEventsFromDb(traineeId, startDate, endDate);
+
+        if (calendarEventList.length === 0) {
+            throw new BadRequestException(this.i18nUtils.translate('validation.user_subject.not_found', {}, lang),);
         }
 
-        const results = await this.queryInformationUserTask(traineeId, lang, fromDate, toDate);
-
-        return results.map(row => ({
-            courseName: row.course_name,
-            subjectName: row.subject_name,
-            taskName: row.task_name,
-            status: row.status,
-            assignedAt: row.assigned_at ? formatDate(new Date(row.assigned_at), address) : null,
-            dueAt: row.due_at ? formatDate(new Date(row.due_at), address) : null,
+        return calendarEventList.map(event => ({
+            courseName: event.courseName,
+            subjectName: event.subjectName,
+            taskName: event.taskName,
+            startAt: event.start.toISOString(),
+            endAt: event.end.toISOString(),
+            type: event.type,
         }));
     }
 
-    private async queryInformationUserTask(traineeId: number, lang: string, fromDate?: string, toDate?: string) {
-        const fromDateFormatted = fromDate ? formatDateForMySQL(fromDate) : undefined;
-        const toDateFormatted = toDate ? formatDateForMySQL(toDate) : undefined;
-
-        const query = this.userTaskRepo
-            .createQueryBuilder('userTask')
-            .leftJoin('userTask.userSubject', 'userSubject')
-            .leftJoin('userSubject.user', 'user')
-            .leftJoin('userSubject.courseSubject', 'courseSubject')
-            .leftJoin('courseSubject.course', 'course')
-            .leftJoin('courseSubject.subject', 'subject')
-            .leftJoin('userTask.task', 'task')
-            .where('user.user_id = :userId', { userId: traineeId })
-            .andWhere('userTask.assignedAt IS NOT NULL');
-
-        if (fromDateFormatted) {
-            query.andWhere('userTask.assignedAt >= :fromDate', { fromDate: fromDateFormatted });
+    private async ensureTraineeExists(traineeId: number, lang: string) {
+        const trainee = await this.userRepo.findOne({ where: { userId: traineeId } });
+        if (!trainee) {
+            throw new NotFoundException(this.i18nUtils.translate('validation.user.not_found', {}, lang));
         }
-
-        if (toDateFormatted) {
-            query.andWhere('userTask.assignedAt <= :toDate', { toDate: toDateFormatted });
-        }
-
-        query.select([
-            'course.name AS course_name',
-            'subject.name AS subject_name',
-            'task.name AS task_name',
-            'userTask.status AS status',
-            'userTask.assignedAt AS assigned_at',
-            'userTask.dueAt AS due_at',
-        ]);
-
-        query.orderBy('userTask.assignedAt', 'ASC');
-
-        const results = await query.getRawMany();
-        return results;
     }
 
-    async completeTask(userId: number, taskId: number, dto: CompleteTaskDto, lang: string): Promise<void> {
+    private async buildCalendarEventsFromDb(traineeId: number, fromDate?: Date, toDate?: Date) {
+        const taskCountsSubQuery = this.taskRepo.createQueryBuilder('task')
+            .select('task.subject', 'subjectId')
+            .addSelect('COUNT(task.taskId)', 'taskCount')
+            .groupBy('task.subject');
+
+        const rankedTasksSubQuery = this.taskRepo.createQueryBuilder('task')
+            .where(`NOT EXISTS (
+                SELECT 1
+                FROM user_task ut
+                JOIN user_subject us ON ut.user_subject_id = us.user_subject_id
+                WHERE ut.task_id = task.task_id AND us.user_id = :traineeId
+            )`)
+            .select('task.taskId', 'taskId')
+            .addSelect('task.name', 'taskName')
+            .addSelect('task.subject', 'subjectId')
+            .addSelect('ROW_NUMBER() OVER(PARTITION BY task.subject ORDER BY task.taskId ASC) - 1', 'taskIndex');
+
+        const query = this.userSubjectRepo.createQueryBuilder('us')
+            .innerJoin('us.courseSubject', 'cs')
+            .innerJoin('cs.subject', 's')
+            .innerJoin('cs.course', 'c')
+            .innerJoin(`(${rankedTasksSubQuery.getQuery()})`, 'rt', 's.subjectId = rt.subjectId')
+            .innerJoin(`(${taskCountsSubQuery.getQuery()})`, 'stc', 's.subjectId = stc.subjectId')
+            .where('us.user_id = :traineeId', { traineeId })
+            .andWhere('us.startedAt IS NOT NULL')
+            .andWhere('us.finishedAt IS NULL')
+            .andWhere('stc.taskCount > 0')
+            .select([
+                'c.name AS courseName',
+                's.name AS subjectName',
+                'rt.taskName AS taskName',
+                'us.startedAt AS startedAt',
+                's.studyDuration AS studyDuration',
+                'stc.taskCount AS taskCount',
+                'rt.taskIndex AS taskIndex',
+            ]);
+
+        const rawEvents = await query.getRawMany();
+
+        const allEvents = rawEvents.map(event => {
+            const millisecondsPerHour = 60 * 60 * 1000;
+            const totalDurationInMs = event.studyDuration * millisecondsPerHour;
+            const slotDurationInMs = totalDurationInMs / event.taskCount;
+            const assignedDate = new Date(event.startedAt.getTime() + slotDurationInMs * event.taskIndex);
+            const dueDate = new Date(assignedDate.getTime() + slotDurationInMs);
+
+            return {
+                courseName: event.courseName,
+                subjectName: event.subjectName,
+                taskName: event.taskName,
+                start: assignedDate,
+                end: dueDate,
+                type: 'task' as const,
+            };
+        });
+
+        const filteredEvents = allEvents.filter(event => {
+            if (fromDate && event.end < fromDate) return false;
+            if (toDate && event.start > toDate) return false;
+            return true;
+        });
+
+        return filteredEvents.sort((a, b) => a.start.getTime() - b.start.getTime());
+    }
+
+    async completeTask(userId: number, taskId: number, lang: string): Promise<void> {
         await this.dataSource.transaction(async (manager) => {
-            const userTask = await this.markTaskAsDone(userId, taskId, dto, lang, manager);
-            await this.updateUserSubjectProgressAndStatus(userTask.userSubject.userSubjectId, manager,lang);
+            const userTask = await this.markTaskAsDone(userId, taskId, lang, manager);
+            await this.updateUserSubjectProgressAndStatus(userTask.userSubject.userSubjectId, manager, lang);
         });
     }
 
-    private async markTaskAsDone(userId: number, taskId: number, dto: CompleteTaskDto, lang: string, manager: EntityManager): Promise<UserTask> {
-        const { userSubjectId } = dto;
+    private async markTaskAsDone(userId: number, taskId: number, lang: string, manager: EntityManager): Promise<UserTask> {
+        try {
 
+            const task = await this.findTaskOrFail(taskId, lang, manager);
+            const userSubjectId = task.subject.subjectId;
+
+            await this.ensureUserTaskNotExists(userSubjectId, taskId, lang, manager);
+            const userSubject = await this.findUserSubjectOrFail(userSubjectId, userId, lang, manager);
+
+            const newUserTask = manager.getRepository(UserTask).create({
+                userSubject,
+                task,
+                status: UserTaskStatus.DONE,
+                doneAt: new Date(),
+            });
+
+            return await manager.getRepository(UserTask).save(newUserTask);
+        } catch (error) {
+            this.logger.error(`markTaskAsDone failed: ${error?.message || error}`, error?.stack);
+            throw new InternalServerErrorException(this.i18nUtils.translate('validation.server.internal_server_error', {}, lang));
+        }
+    }
+
+    private async findUserSubjectOrFail(userSubjectId: number, userId: number, lang: string, manager: EntityManager): Promise<UserSubject> {
         const userSubject = await manager.getRepository(UserSubject).findOne({
-            where: {
-                userSubjectId,
-                user: { userId },
-            },
+            where: { userSubjectId, },
             relations: ['user'],
         });
 
         if (!userSubject) {
             throw new NotFoundException(this.i18nUtils.translate('validation.user_subject.user_subject_not_found', {}, lang));
         }
+        return userSubject;
+    }
 
-        const task = await manager.getRepository(Task).findOneBy({ taskId });
+    private async findTaskOrFail(taskId: number, lang: string, manager: EntityManager): Promise<Task> {
+        const task = await manager.getRepository(Task).findOne({ where: { taskId: taskId }, relations: ['subject'] });
+
         if (!task) {
             throw new NotFoundException(this.i18nUtils.translate('validation.task.task_not_found', {}, lang));
         }
 
-        const newUserTask = manager.getRepository(UserTask).create({
-            userSubject,
-            task,
-            status: UserTaskStatus.DONE,
-            doneAt: new Date(),
-        });
-
-        return await manager.getRepository(UserTask).save(newUserTask);
+        return task;
     }
 
-    private async updateUserSubjectProgressAndStatus(userSubjectId: number, manager: EntityManager,lang:string): Promise<void> {
+    private async ensureUserTaskNotExists(userSubjectId: number, taskId: number, lang: string, manager: EntityManager): Promise<void> {
+        const userTask = await manager.getRepository(UserTask).findOne({
+            where: {
+                task: { taskId },
+                userSubject: { userSubjectId }
+            }
+        });
+
+        if (userTask) {
+            throw new NotFoundException(this.i18nUtils.translate('validation.user_task.complete_task_faild', {}, lang));
+        }
+    }
+
+    private async updateUserSubjectProgressAndStatus(userSubjectId: number, manager: EntityManager, lang: string): Promise<void> {
         const userTaskRepo = manager.getRepository(UserTask);
 
         const [totalTasks, doneTasks] = await Promise.all([
@@ -140,7 +207,7 @@ export class UserTaskService {
         ]);
 
         if (totalTasks === 0) {
-            throw new BadRequestException(this.i18nUtils.translate('validation.user_task.user_task_not_found_date',{},lang))
+            throw new BadRequestException(this.i18nUtils.translate('validation.user_task.user_task_not_found_date', {}, lang))
         }
 
         const rawProgress = (doneTasks / totalTasks) * maxProgress;
@@ -157,4 +224,22 @@ export class UserTaskService {
 
         await manager.getRepository(UserSubject).update({ userSubjectId }, updatePayload);
     }
+
+    async getViewTask(userId: number, taskId: number, lang: string): Promise<ViewTaskDto> {
+        const result = await this.dataSource
+            .createQueryBuilder('task', 't')
+            .select(['t.name', 't.file_url'])
+            .innerJoin('user_task', 'ut', 'ut.task_id = t.task_id')
+            .innerJoin('user_subject', 'us', 'us.user_subject_id = ut.user_subject_id')
+            .where('t.task_id = :taskId', { taskId })
+            .andWhere('us.user_id = :userId', { userId })
+            .getRawOne();
+
+        if (!result) {
+            throw new BadRequestException(this.i18nUtils.translate('validation.task.task_not_found', {}, lang));
+        }
+
+        return result;
+    }
+
 }
