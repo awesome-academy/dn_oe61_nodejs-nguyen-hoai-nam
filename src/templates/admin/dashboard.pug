@@ -6,8 +6,8 @@ include layouts/admin-layout
     div(class="dashboard-card p-8 mb-8")
       div(class="flex items-center justify-between")
         div
-          h2(class="text-2xl font-bold text-gray-900 mb-2") Xin chào!
-          p(class="text-gray-600") Sau đây là những thông tin về khóa học của bạn hiện nay.
+          h2(class="text-2xl font-bold text-gray-900 mb-2" data-i18n="dashboard.welcome") Xin chào!
+          p(class="text-gray-600" data-i18n="dashboard.description") Sau đây là những thông tin về khóa học của bạn hiện nay.
         div(class="text-right")
           p(class="text-2xl font-bold text-indigo-600" id="current-date")
 
@@ -18,51 +18,51 @@ include layouts/admin-layout
           div(class="p-3 rounded-full bg-blue-100 text-blue-600")
             i(class="fas fa-graduation-cap text-xl")
           div(class="ml-4")
-            p(class="text-sm font-medium text-gray-600") Tổng số khóa học
+            p(class="text-sm font-medium text-gray-600" data-i18n="dashboard.totalCourses") Tổng số khóa học
             p(class="text-2xl font-bold text-gray-900" id="total-courses") 0
       div(class="dashboard-card p-6 bg-white border rounded-lg")
         div(class="flex items-center")
           div(class="p-3 rounded-full bg-green-100 text-green-600")
             i(class="fas fa-users text-xl")
           div(class="ml-4")
-            p(class="text-sm font-medium text-gray-600") Học viên đang học
+            p(class="text-sm font-medium text-gray-600" data-i18n="dashboard.activeStudents") Học viên đang học
             p(class="text-2xl font-bold text-gray-900" id="active-students") 0
       div(class="dashboard-card p-6 bg-white border rounded-lg")
         div(class="flex items-center")
           div(class="p-3 rounded-full bg-yellow-100 text-yellow-600")
             i(class="fas fa-tasks text-xl")
           div(class="ml-4")
-            p(class="text-sm font-medium text-gray-600") Công việc đang chờ
+            p(class="text-sm font-medium text-gray-600" data-i18n="dashboard.pendingTasks") Công việc đang chờ
             p(class="text-2xl font-bold text-gray-900" id="pending-tasks") 0
       div(class="dashboard-card p-6 bg-white border rounded-lg")
         div(class="flex items-center")
           div(class="p-3 rounded-full bg-purple-100 text-purple-600")
             i(class="fas fa-chart-line text-xl")
           div(class="ml-4")
-            p(class="text-sm font-medium text-gray-600") Tỷ lệ hoàn thành
+            p(class="text-sm font-medium text-gray-600" data-i18n="dashboard.completionRate") Tỷ lệ hoàn thành
             p(class="text-2xl font-bold text-gray-900" id="completion-rate") 0%
 
     //- Quick Actions
     div(class="grid grid-cols-1 lg:grid-cols-2 gap-8")
       div(class="dashboard-card p-6")
-        h3(class="text-lg font-semibold text-gray-900 mb-4") Hành động nhanh
+        h3(class="text-lg font-semibold text-gray-900 mb-4" data-i18n="dashboard.quickActions") Hành động nhanh
         div(class="space-y-3")
           a(href="/chat" class="flex items-center p-3 rounded-lg hover:bg-gray-50 transition-colors bg-white")
             i(class="fas fa-comment-dots text-indigo-600 mr-3") 
-            span(class="text-gray-700") Bắt đầu trò chuyện
+            span(class="text-gray-700" data-i18n="dashboard.startChat") Bắt đầu trò chuyện
           a(href="/admin/courses" class="flex items-center p-3 rounded-lg hover:bg-gray-50 transition-colors" style="background-color: rgb(245, 245, 245);")
             i(class="fas fa-graduation-cap text-green-600 mr-3")
-            span(class="text-gray-700") Quản lý khóa học
+            span(class="text-gray-700" data-i18n="dashboard.manageCourses") Quản lý khóa học
           a(href="/admin/users" class="flex items-center p-3 rounded-lg hover:bg-gray-50 transition-colors bg-white")
             i(class="fas fa-users text-blue-600 mr-3")
-            span(class="text-gray-700") Xem người dùng
+            span(class="text-gray-700" data-i18n="dashboard.viewUsers") Xem người dùng
 
       div(class="dashboard-card p-6")
-        h3(class="text-lg font-semibold text-gray-900 mb-4") Hoạt động gần đây
+        h3(class="text-lg font-semibold text-gray-900 mb-4" data-i18n="dashboard.recentActivity") Hoạt động gần đây
         div(class="space-y-3" id="recent-activity")
           div(class="flex items-center p-3 rounded-lg bg-gray-50")
             i(class="fas fa-info-circle text-gray-400 mr-3")
-            span(class="text-sm text-gray-600") Không có hoạt động gần đây
+            span(class="text-sm text-gray-600" data-i18n="dashboard.noActivity") Không có hoạt động gần đây
 
   block scripts
     script.

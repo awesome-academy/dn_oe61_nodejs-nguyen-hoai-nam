@@ -78,6 +78,7 @@ export class UserService {
             userId: getUser.userId,
             userName: getUser.userName,
             email: getUser.email,
+            status: getUser.status,
             role: getUser.role,
         } as User;
 
@@ -95,7 +96,7 @@ export class UserService {
                 .where('user.userId = :userId', { userId });
 
             if (userRole === Role.SUPERVISOR) {
-                query.andWhere('user.role = :role', { role: Role.TRAINEE });
+                query.andWhere('user.role IN (:...roles)', { roles: [Role.TRAINEE, Role.SUPERVISOR] });
             } else if (userRole !== Role.ADMIN) {
                 query.andWhere('1 = 0');
             }
@@ -105,5 +106,24 @@ export class UserService {
         } catch (error) {
             throw new InternalServerErrorException(this.i18nUtils.translate('validation.server.internal_server_error', {}, lang));
         }
+    }
+
+    async getAllUsers (lang:string) {
+        const users = await this.userRepo.find();
+        if(users.length === 0){
+            throw new NotFoundException(this.i18nUtils.translate('validation.auth.user_notfound', {}, lang))
+        }
+
+        const data = users.map(user => {
+            return {
+                userId: user.userId,
+                userName: user.userName,
+                email: user.email,
+                role: user.role,
+                status: user.status,
+                createdAt: user.createdAt
+            }
+        });
+        return data;
     }
 }

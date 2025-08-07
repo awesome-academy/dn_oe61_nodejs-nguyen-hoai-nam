@@ -40,7 +40,7 @@ export class UserController {
         const result = await this.userService.editProfileUser(user, userId, lang);
         return {
             success: true,
-            message: this.i18nUtils.translate('validation.crud.update_success'),
+            message: this.i18nUtils.translate('validation.crud.update_success', {}, lang),
             data: result
         }
     }
@@ -51,5 +51,17 @@ export class UserController {
     async viewProfile(@Param('userId') userId: number, @UserDecorator('role') userRole: string, @Language() lang: string) {
         const result = await this.userService.viewProfile(userId, userRole, lang);
         return result;
+    }
+
+    @ApiExcludeEndpoint()
+    @Get('')
+    @AuthRoles(Role.ADMIN, Role.SUPERVISOR)
+    async getAllUsers(@Language() lang: string) {
+        const result = await this.userService.getAllUsers(lang);
+        return {
+            success: true,
+            message: this.i18nUtils.translate('validation.response_api.success', {}, lang),
+            data: result
+        }
     }
 }

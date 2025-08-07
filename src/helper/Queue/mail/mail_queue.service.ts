@@ -12,7 +12,7 @@ export class MailQueueService {
       attempts: 3,
       backoff: {
         type: 'exponential',
-        delay: 5000,
+        delay: 60000,
       },
       removeOnComplete: true,
       removeOnFail: false,

@@ -22,7 +22,7 @@ export class DailySummaryEmailService {
         private readonly logger: Logger,
     ) { }
 
-    @Cron(CronExpression.DAILY_AT_23_59)
+    @Cron(CronExpression.DAILY_AT_23_59, { name: 'daily-summary' })
     async sendDailySummaryEmails() {
         const supervisors = await this.getAllSupervisors();
 

@@ -10,8 +10,9 @@ import { UserCourseModule } from './user_course/user_course.module';
 import { UserTaskModule } from './user_task/user_task.module';
 import { UserSubjectModule } from './user_subject/user_subject.module';
 import { ReportingModule } from './reporting/reporting.module';
+import { CronAdminModule } from './cron/cron_admin.module';
 
 @Module({
-    imports: [AuthModule, ValidationModule, UserModule, SourseModule, SubjectModule, TaskModule, CourseSubjectModule, UserCourseModule, UserTaskModule, UserSubjectModule, ReportingModule],
+    imports: [AuthModule, ValidationModule, UserModule, SourseModule, SubjectModule, TaskModule, CourseSubjectModule, UserCourseModule, UserTaskModule, UserSubjectModule, ReportingModule, CronAdminModule],
 })
 export class ApiModule {}

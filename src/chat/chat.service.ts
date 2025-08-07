@@ -1,19 +1,19 @@
-// src/chat/chat.service.ts
 import { ForbiddenException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ChatMessage } from '../database/entities/chat_message.entity';
 import { UserCourse } from '../database/entities/user_course.entity';
-import { Course } from '../database/entities/course.entity';
 import { User } from '../database/entities/user.entity';
 import { I18nUtils } from 'src/helper/utils/i18n-utils';
+import { SupervisorCourse } from 'src/database/entities/supervisor_course.entity';
 
 @Injectable()
 export class ChatService {
   constructor(
     @InjectRepository(ChatMessage) private chatMessageRepository: Repository<ChatMessage>,
     @InjectRepository(UserCourse) private userCourseRepository: Repository<UserCourse>,
-    @InjectRepository(Course) private courseRepository: Repository<Course>,
+    @InjectRepository(SupervisorCourse) private supervisorCourseRepository: Repository<SupervisorCourse>,
+    @InjectRepository(User) private userRepository: Repository<User>,
     private readonly i18nUtils: I18nUtils,
   ) { }
 
@@ -30,7 +30,13 @@ export class ChatService {
         sender: { userId: data.senderId },
       });
 
-      return await this.chatMessageRepository.save(message);
+      const saved = await this.chatMessageRepository.save(message);
+
+      const sender = await this.userRepository.findOne({ where: { userId: data.senderId } });
+      if (sender) {
+        saved.sender = sender;
+      }
+      return saved;
     } catch {
       throw new InternalServerErrorException(this.i18nUtils.translate('validation.server.internal_server_error', {}, lang));
     }
@@ -99,12 +105,11 @@ export class ChatService {
 
   async validateUserAccess(courseId: number, userId: number,lang:string): Promise<boolean> {
     try {
-      const course = await this.courseRepository.findOne({
-        where: { courseId },
-        relations: ['creator'],
+      const course = await this.supervisorCourseRepository.findOne({
+        where: { course: {courseId: courseId}, supervisor: {userId: userId} },
       });
-
-      if (course?.creator?.userId === userId) {
+      
+      if (course) {
         return true;
       }
 

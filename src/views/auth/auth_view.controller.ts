@@ -1,6 +1,8 @@
 import { Controller, Get, Render } from '@nestjs/common';
 import { Public } from 'src/helper/decorators/metadata.decorator';
+import { ApiExcludeController } from '@nestjs/swagger';
 
+@ApiExcludeController()
 @Controller('auth')
 export class AuthViewController {
     @Public()
@@ -12,8 +14,19 @@ export class AuthViewController {
             description: 'Sign in to your account'
         };
     }
+
+    @Public()
+    @Get('confirm_account')
+    @Render('confirm-account')
+    async confirmAccountPage() {
+        return {
+            title: 'Account Confirmation',
+            description: 'Confirm your account'
+        };
+    }
 }
 
+@ApiExcludeController()
 @Controller('admin/dashboard')
 export class DashboardViewController {
     @Public()

@@ -2,12 +2,14 @@ import { UserSubjectStatus } from "src/database/dto/user_subject.dto";
 import { UserTaskStatus } from "src/database/dto/user_task.dto";
 
 export class SubjectWithTasksDto {
+  subjectId: number;
   name: string;
   description: string;
   studyDuration: number;
   status: UserSubjectStatus;
   subjectProgress:number;
   tasks: {
+    taskId: number;
     name: string;
     fileUrl: string;
   }[];

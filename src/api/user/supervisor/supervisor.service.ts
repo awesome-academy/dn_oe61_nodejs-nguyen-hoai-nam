@@ -5,10 +5,8 @@ import { I18nUtils } from 'src/helper/utils/i18n-utils';
 import { CreateUserDto, UpdateUserDto } from 'src/validation/class_validation/user.validation';
 import { DatabaseValidation } from 'src/validation/existence/existence.validator';
 import { Repository } from 'typeorm';
-import * as bcrypt from 'bcrypt';
 import { ApiResponse } from 'src/helper/interface/api.interface';
 import { Role, UserStatus } from 'src/database/dto/user.dto';
-import { MailerService } from '@nestjs-modules/mailer';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { payLoadDataType } from 'src/helper/interface/pay_load.interface';
@@ -21,6 +19,7 @@ import { Course } from 'src/database/entities/course.entity';
 import { Subject } from 'src/database/entities/subject.entity';
 import { SupervisorCourse } from 'src/database/entities/supervisor_course.entity';
 import { courseEntities, subjectEntities, supervisorCourseEntities, tableName } from 'src/helper/constants/emtities.constant';
+import { MailQueueService } from 'src/helper/Queue/mail/mail_queue.service';
 
 @Injectable()
 export class SupervisorService {
@@ -31,7 +30,7 @@ export class SupervisorService {
         @InjectRepository(SupervisorCourse) private readonly supervisorCourse: Repository<SupervisorCourse>,
         private readonly i18nUtils: I18nUtils,
         private readonly databaseValidation: DatabaseValidation,
-        private readonly mailerService: MailerService,
+        private readonly mailQueueService: MailQueueService,
         private readonly jwtService: JwtService,
         private readonly configService: ConfigService,
         private readonly authService: AuthService,
@@ -124,8 +123,6 @@ export class SupervisorService {
             throw new BadRequestException(this.i18nUtils.translate('validation.auth.already_verified', {}, lang))
         }
 
-        await this.sendAccountVerifiedEmailAndBlacklist(user, token, lang);
-
         return {
             success: true,
             message: this.i18nUtils.translate('validation.auth.account_verified_success', {}, lang)
@@ -168,7 +165,8 @@ export class SupervisorService {
         if (!saveUser) {
             throw new BadRequestException(this.i18nUtils.translate('validation.crud.no_changes', {}, lang));
         }
-
+        
+        await this.sendAccountVerifiedEmailAndBlacklist(user, token, lang);
         await this.addToBlacklist(token, lang);
 
         return {
@@ -216,7 +214,7 @@ export class SupervisorService {
 
     private async sendEmail(email: string, subject: string, template: string, context: any, lang: string) {
         try {
-            await this.mailerService.sendMail({
+            await this.mailQueueService.enqueueMailJob({
                 to: email,
                 subject: subject,
                 template: template,
@@ -300,18 +298,10 @@ export class SupervisorService {
         };
     }
 
-    private async findSupervisorOrFail(userId: number, lang: string): Promise<User> {
-        const supervisor = await this.userRepo.findOneBy({ userId: userId, role: Role.SUPERVISOR });
-        if (!supervisor) {
-            throw new BadRequestException(this.i18nUtils.translate('validation.crud.no_changes', {}, lang));
-        }
-        return supervisor;
-    }
-
     private async findAndUpdateSupervisor(supervisorId: number, supervisorInput: UpdateUserDto, lang: string) {
         const supervisor = await this.findSupervisorOrFail(supervisorId, lang);
 
-        const { userName, email, password, status, role } = supervisorInput;
+        const { userName, email, password, status } = supervisorInput;
 
         if (userName !== undefined) supervisor.userName = userName;
         if (email !== undefined) supervisor.email = email;
@@ -320,7 +310,6 @@ export class SupervisorService {
             supervisor.password = await this.authService.hashPassword(password, saltRounds);
         }
         if (status !== undefined) supervisor.status = status;
-        if (role !== undefined) supervisor.role = role;
 
         const savedSupervisor: User | null = await this.userRepo.save(supervisor);
 
@@ -338,10 +327,10 @@ export class SupervisorService {
     }
 
     async getById(supervisorId: number, lang: string): Promise<ApiResponse> {
-        const supervisor = await this.userRepo.findOneBy({ userId: supervisorId, role: Role.SUPERVISOR, });
+        const supervisor = await this.userRepo.findOneBy({ userId: supervisorId, role: Role.SUPERVISOR });
 
         if (!supervisor) {
-            throw new NotFoundException(this.i18nUtils.translate('validation.auth.user_notfound', {}, lang),);
+            throw new NotFoundException(this.i18nUtils.translate('validation.auth.user_notfound', {}, lang));
         }
 
         return {
@@ -355,5 +344,13 @@ export class SupervisorService {
                 role: supervisor.role,
             },
         };
+    }
+
+    private async findSupervisorOrFail(userId: number, lang: string): Promise<User> {
+        const supervisor = await this.userRepo.findOneBy({ userId: userId, role: Role.SUPERVISOR });
+        if (!supervisor) {
+            throw new NotFoundException(this.i18nUtils.translate('validation.auth.user_notfound', {}, lang));
+        }
+        return supervisor;
     }
 }

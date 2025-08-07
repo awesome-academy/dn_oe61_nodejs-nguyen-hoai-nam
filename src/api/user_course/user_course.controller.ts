@@ -9,7 +9,7 @@ import { User } from 'src/database/entities/user.entity';
 import { ApiResponse } from 'src/helper/interface/api.interface';
 import { AssignTraineeToCourseResponseDto } from 'src/helper/interface/course.iterface';
 import { traineeIdDto, userIdDto } from 'src/validation/class_validation/user.validation';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiExcludeEndpoint } from '@nestjs/swagger';
 import { ApiResponseRegisterToCourse } from 'src/helper/swagger/user_course/user_course_response.decorator';
 import { ApiResponseGetActiveCourse } from 'src/helper/swagger/user_course/course_active_response.decorator';
 import { SearchCourseDto } from 'src/validation/class_validation/user_course.validation';
@@ -31,9 +31,17 @@ export class UserCourseController {
     @ApiResponseGetActiveCourse()
     @ApiBearerAuth('access-token')
     @AuthRoles(Role.TRAINEE)
-    @Get('trainee/:traineeId/courses/active')
-    async viewActiveCourse(@Param() traineeId: traineeIdDto, @Language() lang: string) {
-        const result = await this.userCourseSErvice.viewActiveCourse(traineeId.traineeId, lang);
+    @Get('trainee/courses/active')
+    async viewActiveCourse(@UserDecorator() traineeId: User, @Language() lang: string) {
+        const result = await this.userCourseSErvice.viewActiveCourse(traineeId.userId, lang);
+        return result;
+    }
+
+    @ApiExcludeEndpoint()
+    @AuthRoles(Role.SUPERVISOR, Role.ADMIN)
+    @Get(':courseId/users')
+    async getAllUserCourse(@Param() courseId: courseIdDto, @Language() lang: string) {
+        const result = await this.userCourseSErvice.getAllUserCourse(courseId.courseId, lang);
         return result;
     }
 

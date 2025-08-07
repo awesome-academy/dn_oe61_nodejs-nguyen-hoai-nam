@@ -139,10 +139,10 @@ export class UserTaskService {
         try {
 
             const task = await this.findTaskOrFail(taskId, lang, manager);
-            const userSubjectId = task.subject.subjectId;
+            const subjectId = task.subject.subjectId;
+            const userSubject = await this.findUserSubjectBySubject(subjectId, userId, lang, manager);
 
-            await this.ensureUserTaskNotExists(userSubjectId, taskId, lang, manager);
-            const userSubject = await this.findUserSubjectOrFail(userSubjectId, userId, lang, manager);
+            await this.ensureUserTaskNotExists(userSubject.userSubjectId, taskId, lang, manager);
 
             const newUserTask = manager.getRepository(UserTask).create({
                 userSubject,
@@ -158,21 +158,23 @@ export class UserTaskService {
         }
     }
 
-    private async findUserSubjectOrFail(userSubjectId: number, userId: number, lang: string, manager: EntityManager): Promise<UserSubject> {
-        const userSubject = await manager.getRepository(UserSubject).findOne({
-            where: { userSubjectId, },
-            relations: ['user'],
-        });
+    private async findUserSubjectBySubject(subjectId: number, userId: number, lang: string, manager: EntityManager): Promise<UserSubject> {
+        const userSubject = await manager.getRepository(UserSubject)
+            .createQueryBuilder('us')
+            .leftJoin('us.courseSubject', 'cs')
+            .leftJoin('cs.subject', 's')
+            .where('s.subjectId = :subjectId', { subjectId })
+            .andWhere('us.user_id = :userId', { userId })
+            .getOne();
 
         if (!userSubject) {
-            throw new NotFoundException(this.i18nUtils.translate('validation.user_subject.user_subject_not_found', {}, lang));
+            throw new NotFoundException(this.i18nUtils.translate('validation.user_subject.not_found', {}, lang));
         }
         return userSubject;
     }
 
     private async findTaskOrFail(taskId: number, lang: string, manager: EntityManager): Promise<Task> {
         const task = await manager.getRepository(Task).findOne({ where: { taskId: taskId }, relations: ['subject'] });
-
         if (!task) {
             throw new NotFoundException(this.i18nUtils.translate('validation.task.task_not_found', {}, lang));
         }
@@ -193,11 +195,23 @@ export class UserTaskService {
         }
     }
 
-    private async updateUserSubjectProgressAndStatus(userSubjectId: number, manager: EntityManager, lang: string): Promise<void> {
+    private async calculateSubjectProgress(userSubjectId: number,manager: EntityManager,lang: string,): Promise<{ progress: number; isCompleted: boolean }> {
+        const userSubject = await manager.getRepository(UserSubject).findOne({
+            where: { userSubjectId },
+            relations: ['courseSubject', 'courseSubject.subject'],
+        });
+
+        if (!userSubject) {
+            throw new NotFoundException(this.i18nUtils.translate('validation.user_subject.not_found', {}, lang));
+        }
+
+        const subjectId = userSubject.courseSubject.subject.subjectId;
+
         const userTaskRepo = manager.getRepository(UserTask);
+        const taskRepo = manager.getRepository(Task);
 
         const [totalTasks, doneTasks] = await Promise.all([
-            userTaskRepo.count({ where: { userSubject: { userSubjectId } } }),
+            taskRepo.count({ where: { subject: { subjectId } } }),
             userTaskRepo.count({
                 where: {
                     userSubject: { userSubjectId },
@@ -213,11 +227,18 @@ export class UserTaskService {
         const rawProgress = (doneTasks / totalTasks) * maxProgress;
         const cappedProgress = Math.max(0, Math.min(maxProgress, Math.round(rawProgress)));
 
+        return { progress: cappedProgress, isCompleted: doneTasks === totalTasks };
+    }
+
+    private async updateUserSubjectProgressAndStatus(userSubjectId: number, manager: EntityManager, lang: string): Promise<void> {
+
+        const { progress, isCompleted } = await this.calculateSubjectProgress(userSubjectId, manager, lang);
+
         const updatePayload: Partial<UserSubject> = {
-            subjectProgress: cappedProgress,
+            subjectProgress: progress,
         };
 
-        if (doneTasks === totalTasks) {
+        if (isCompleted) {
             updatePayload.status = UserSubjectStatus.COMPLETED;
             updatePayload.finishedAt = new Date();
         }
@@ -228,7 +249,7 @@ export class UserTaskService {
     async getViewTask(userId: number, taskId: number, lang: string): Promise<ViewTaskDto> {
         const result = await this.dataSource
             .createQueryBuilder('task', 't')
-            .select(['t.name', 't.file_url'])
+            .select(['t.taskId as taskId', 't.name as Name', 't.file_url as fileUrl'])
             .innerJoin('user_task', 'ut', 'ut.task_id = t.task_id')
             .innerJoin('user_subject', 'us', 'us.user_subject_id = ut.user_subject_id')
             .where('t.task_id = :taskId', { taskId })

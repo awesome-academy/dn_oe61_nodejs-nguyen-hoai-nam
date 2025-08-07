@@ -19,6 +19,8 @@ import { tableName } from 'src/helper/constants/emtities.constant';
 import { templatePug } from 'src/helper/constants/template.constant';
 import { ApiResponse } from 'src/helper/interface/api.interface';
 import { AssignTraineeToCourseResponseDto, CourseDetailDto, CourseListItem } from 'src/helper/interface/course.iterface';
+import { MyProfile } from 'src/helper/interface/user.interface';
+import { MailQueueService } from 'src/helper/Queue/mail/mail_queue.service';
 import { GetCourse } from 'src/helper/shared/get_course.shared';
 import { I18nUtils } from 'src/helper/utils/i18n-utils';
 import { CreateCourseDto, UpdateCourseDto } from 'src/validation/class_validation/course.validation';
@@ -38,32 +40,38 @@ export class CourseService {
         private readonly i18nUtils: I18nUtils,
         private readonly dataSource: DataSource,
         private readonly getCourse: GetCourse,
-        private readonly mailerService: MailerService,
+        private readonly mailQueueService: MailQueueService,
         private readonly logger: Logger,
 
     ) { }
 
-    private async getCoursesByRole(userId: number, role: string, page: number, pageSize: number): Promise<Course[]> {
+    private async getCoursesByRole(userId: number, role: string, page: number, pageSize: number): Promise<[Course[], number]> {
         if (role === Role.ADMIN) {
-            return await this.getCourse.getCoursesByAdmin(page, pageSize);
+            return this.getCourse.getCoursesByAdmin(page, pageSize);
         } else if (role === Role.SUPERVISOR) {
-            return await this.getCourse.getCoursesBySupervisor(userId, page, pageSize);
+            return this.getCourse.getCoursesBySupervisor(userId, page, pageSize);
         } else if (role === Role.TRAINEE) {
-            return await this.getCourse.getCoursesByTrainee(userId, page, pageSize);
+            return this.getCourse.getCoursesByTrainee(userId, page, pageSize);
         } else {
-            return [];
+            return [[], 0];
         }
     }
 
-    async getAll(userId: number, role: string, page: number, pageSize: number, lang: string): Promise<CourseListItem[]> {
-        let courses: Course[] = [];
+    async getAll(userId: number, role: string, page: number, pageSize: number, lang: string) {
+        const [courses, totalItems] = await this.getCoursesByRole(userId, role, page, pageSize);
 
-        courses = await this.getCoursesByRole(userId, role, page, pageSize);
-        if (courses.length === 0) {
-            throw new NotFoundException(this.i18nUtils.translate('validation.course.not_found', {}, lang));
+        if (totalItems === 0) {
+            return {
+                items: [],
+                meta: {
+                    totalItems: 0,
+                    totalPages: 0,
+                    currentPage: page,
+                },
+            };
         }
 
-        const datas: CourseListItem[] = courses.map(course => ({
+        const items: CourseListItem[] = courses.map(course => ({
             id: course.courseId,
             name: course.name,
             description: course.description,
@@ -72,21 +80,33 @@ export class CourseService {
             end: course.end,
         }));
 
-        return datas;
+        const totalPages = Math.ceil(totalItems / pageSize);
+
+        return {
+            items,
+            meta: {
+                totalItems,
+                totalPages,
+                currentPage: page,
+            },
+        };
     }
 
     async getMyCourses(userId: number, role: string): Promise<Course[]> {
+        let courses: Course[] = [];
         if (role === Role.SUPERVISOR) {
-            return await this.getCourse.getCoursesBySupervisor(userId, 1, 100);
+            [courses] = await this.getCourse.getCoursesBySupervisor(userId, null, null);
         } else if (role === Role.TRAINEE) {
-            return await this.getCourse.getCoursesByTrainee(userId, 1, 100);
-        } else {
-            return [];
+            [courses] = await this.getCourse.getCoursesByTrainee(userId, null, null);
         }
+        return courses;
     }
 
     async getById(courseId: number, user: User, lang: string): Promise<CourseDetailDto> {
-        const course = await this.courseRepo.findOneBy({ courseId: courseId });
+        const course = await this.courseRepo.findOne({
+            where: { courseId },
+            relations: ['creator', 'courseSubjects', 'courseSubjects.subject'],
+        });
 
         if (!course) {
             throw new NotFoundException(this.i18nUtils.translate('validation.course.not_found', {}, lang))
@@ -103,15 +123,18 @@ export class CourseService {
             }
         }
 
-        const data: CourseDetailDto = {
+        const courseDetail: CourseDetailDto = {
+            id: course.courseId,
+            courseId: course.courseId,
             name: course.name,
             description: course.description,
             status: course.status,
             start: course.start,
             end: course.end,
+            creator: course.creator ? { userId: course.creator.userId, userName: course.creator.userName } : null,
+            subjects: course.courseSubjects.map(cs => cs.subject),
         }
-
-        return data;
+        return courseDetail;
     }
 
     async create(courseInput: CreateCourseDto, userId: number, lang: string): Promise<Course> {
@@ -153,15 +176,16 @@ export class CourseService {
         await queryRunner.startTransaction();
 
         try {
-            const courseSubject = subjectIds.map(subjectId => {
-                return this.courseSubjectRepo.create({
+            const courseSubjectRepo = queryRunner.manager.getRepository(CourseSubject);
+            const courseSubjects = subjectIds.map(subjectId =>
+                courseSubjectRepo.create({
                     course: { courseId },
                     subject: { subjectId },
                     status: CourseSubjectStatus.NOT_STARTED
-                });
-            });
+                })
+            );
 
-            await queryRunner.manager.save(courseSubject);
+            await queryRunner.manager.save(courseSubjects);
             await queryRunner.commitTransaction();
         } catch (error) {
             await queryRunner.rollbackTransaction();
@@ -174,14 +198,16 @@ export class CourseService {
     }
 
     async delete(courseId: number, lang: string): Promise<void> {
-        const course = await this.courseRepo.findOne({ where: { courseId } });
+        const course = await this.courseRepo.findOne({
+            where: { courseId },
+            relations: ['creator', 'courseSubjects', 'courseSubjects.subject'],
+        });
 
         if (!course) {
             throw new NotFoundException(this.i18nUtils.translate('validation.crud.delete_not_allowed', {}, lang));
         }
 
         await this.checkAllCourseRelations(courseId, lang);
-
         await this.deleteCourseWithRelations(courseId, lang);
     }
 
@@ -193,10 +219,6 @@ export class CourseService {
 
     private async deleteCourseWithRelations(courseId: number, lang: string) {
         return await this.dataSource.transaction(async (manager) => {
-            await manager.delete(UserCourse, { course: { courseId } });
-            await manager.delete(CourseSubject, { course: { courseId } });
-            await manager.delete(SupervisorCourse, { course: { courseId } });
-
             const deleteResult = await manager.delete(this.courseRepo.target, { courseId });
 
             if (deleteResult.affected === 0) {
@@ -229,7 +251,11 @@ export class CourseService {
     }
 
     private async findCourseOrFail(courseId: number, lang: string): Promise<Course> {
-        const course = await this.courseRepo.findOneBy({ courseId: courseId });
+        const course = await this.courseRepo.findOneOrFail({
+            where: { courseId },
+            select: ['courseId', 'name', 'description', 'status', 'start', 'end'],
+        });
+
         if (!course) {
             throw new BadRequestException(this.i18nUtils.translate('validation.crud.no_changes', {}, lang));
         }
@@ -248,6 +274,7 @@ export class CourseService {
         if (end !== undefined) course.end = end;
         if (status !== undefined) course.status = status;
 
+        Object.assign(course, courseInput);
         const savedCourse: Course | null = await this.courseRepo.save(course);
 
         if (!savedCourse) {
@@ -276,10 +303,27 @@ export class CourseService {
             });
 
             const result = await this.supervisorCourseRepo.save(assignment);
+
+            await this.sendEmailAssignSupervisoeCourse(courseId, user, lang);
             return result;
-        } catch {
+        } catch (error) {
+            this.logger.error('Error assigning supervisor to course', 'CourseService', 'assignSupervisorToCourse', error?.stack);
             throw new InternalServerErrorException(this.i18nUtils.translate('validation.server.internal_server_error', {}, lang));
         }
+    }
+
+    private async sendEmailAssignSupervisoeCourse(courseId: number, user: User, lang: string) {
+        const course = await this.getCourseById(courseId, lang);
+        const subject = this.i18nUtils.translate('validation.course.assign_supervisor_success', {}, lang);
+        const template = templatePug.assignSupervisorToCourse;
+        const email = user.email;
+        const context = {
+            userName: user.userName,
+            courseName: course?.name,
+            startDate: format(course?.start, 'dd/MM/yyyy', { locale: vi }),
+            endDate: format(course?.end, 'dd/MM/yyyy', { locale: vi }),
+        }
+        await this.sendEmail(email, subject, template, context, lang);
     }
 
     private async checkUserRole(supervisorId: number, userRole: Role): Promise<User | null> {
@@ -288,15 +332,24 @@ export class CourseService {
     }
 
     private async checkAssigned(courseId: number, supervisorId: number, lang: string): Promise<SupervisorCourse | null> {
-        const existing = await this.supervisorCourseRepo.findOneBy({
-            course: { courseId },
-            supervisor: { userId: supervisorId }
+        const course = await this.courseRepo.findOneBy({ courseId });
+
+        if (!course) {
+            throw new BadRequestException(this.i18nUtils.translate('validation.course.not_found', {}, lang));
+        }
+
+        const existing = await this.supervisorCourseRepo.findOne({
+            where: {
+                course: { courseId },
+                supervisor: { userId: supervisorId }
+            },
+            relations: ['course', 'supervisor']
         });
 
         return existing;
     }
 
-    async removeSupervisorFromCourse(courseId: number, supervisorId: number, lang: string): Promise<void> {
+    async removeSupervisorFromCourse(courseId: number, supervisorId: number, lang: string): Promise<ApiResponse | void> {
         const existing = await this.checkAssigned(courseId, supervisorId, lang);
         if (!existing) {
             throw new BadRequestException(this.i18nUtils.translate('validation.course.user_notfound', {}, lang));
@@ -304,7 +357,20 @@ export class CourseService {
 
         try {
             await this.supervisorCourseRepo.remove(existing);
-        } catch {
+
+            const email = existing.supervisor.email;
+            const courseName = existing.course.name;
+            const subject = this.i18nUtils.translate('validation.course.supervisor_removed', {}, lang);
+            const template = templatePug.removeSupervisorToCourse;
+            const context = {
+                userName: existing.supervisor.userName,
+                courseName,
+                subject,
+            };
+
+            await this.sendEmail(email, subject, template, context, lang);
+        } catch (error) {
+            this.logger.error('Error removing supervisor from course', 'CourseService', 'removeSupervisorFromCourse', error?.stack);
             throw new InternalServerErrorException(this.i18nUtils.translate('validation.server.internal_server_error', {}, lang));
         }
     }
@@ -316,7 +382,7 @@ export class CourseService {
             throw new BadRequestException(this.i18nUtils.translate('validation.course.user_not_trainee', {}, lang));
         }
 
-        await this.validateTraineeHasNoActiveCourse(traineeId, tableName.userCourse, tableName.course, lang);
+        await this.validateTraineeHasNoActiveCourse(courseId, traineeId, tableName.userCourse, tableName.course, lang);
 
         const { savedUserCourse, course } = await this.createAndNotifyUserCourse(courseId, traineeId, user, lang);
 
@@ -343,7 +409,7 @@ export class CourseService {
             });
 
             const savedUserCourse = await this.userCourseRepo.save(data);
-            const course = await this.getCourseById(savedUserCourse, lang);
+            const course = await this.getCourseById(savedUserCourse.course.courseId, lang);
 
             const subject = this.i18nUtils.translate('validation.course.user_course_success', {}, lang);
             const template = templatePug.assignUserToCourse;
@@ -357,12 +423,22 @@ export class CourseService {
             await this.sendEmail(email, subject, template, context, lang);
 
             return { savedUserCourse, course };
-        } catch {
+        } catch (error) {
+            this.logger.error('Error creating user course', 'CourseService', 'createAndNotifyUserCourse', error?.stack);
             throw new InternalServerErrorException(this.i18nUtils.translate('validation.server.internal_server_error', {}, lang));
         }
     }
 
-    private async validateTraineeHasNoActiveCourse(userId: number, alias: string, relationField: string, lang: string): Promise<void> {
+    private async validateTraineeHasNoActiveCourse(courseId: number, userId: number, alias: string, relationField: string, lang: string): Promise<void> {
+        const existed = await this.userCourseRepo.findOne({
+            where: { course: { courseId }, user: { userId: userId } },
+        });
+        console.log(existed);
+        
+        if (existed) {
+            throw new BadRequestException(this.i18nUtils.translate('validation.course.trainee_has_active_course', {}, lang),);
+        }
+
         const count = await this.userCourseRepo.createQueryBuilder(alias)
             .innerJoin(`${alias}.${relationField}`, relationField)
             .where(`${alias}.user_id = :userId`, { userId })
@@ -375,8 +451,8 @@ export class CourseService {
         }
     }
 
-    private async getCourseById(savedUserCourse: UserCourse, lang: string): Promise<Course> {
-        const course: Course | null = await this.courseRepo.findOneBy({ courseId: savedUserCourse.course.courseId });
+    private async getCourseById(courseId: number, lang: string): Promise<Course> {
+        const course: Course | null = await this.courseRepo.findOneBy({ courseId });
         if (!course) {
             throw new BadRequestException(this.i18nUtils.translate('validation.course.user_not_trainee', {}, lang));
         }
@@ -385,13 +461,14 @@ export class CourseService {
 
     private async sendEmail(email: string, subject: string, template: string, context: object, lang: string): Promise<void> {
         try {
-            await this.mailerService.sendMail({
+            await this.mailQueueService.enqueueMailJob({
                 to: email,
                 subject: subject,
                 template: template,
-                context: context
+                context: context,
             });
-        } catch {
+        } catch (error) {
+            this.logger.error('Error sending email', 'CourseService', 'sendEmail', error);
             throw new InternalServerErrorException(this.i18nUtils.translate('validation.server.internal_server_error', {}, lang));
         }
     }
@@ -427,7 +504,7 @@ export class CourseService {
         }
     }
 
-    async startCourse(courseId: number, lang: string): Promise<ApiResponse> {
+    async startCourse(courseId: number, lang: string): Promise<void> {
         const queryRunner = this.dataSource.createQueryRunner();
         await queryRunner.connect();
         await queryRunner.startTransaction();
@@ -437,12 +514,6 @@ export class CourseService {
             await this.assignSubjectsToUsersInCourse(courseId, lang, queryRunner.manager);
 
             await queryRunner.commitTransaction();
-
-            return {
-                success: true,
-                message: this.i18nUtils.translate('validation.course.start_course_success'),
-            };
-
         } catch (error) {
             await queryRunner.rollbackTransaction();
             this.logger.error('startCourse failed', error?.stack || error);
@@ -516,7 +587,7 @@ export class CourseService {
 
     }
 
-    async finishCourse(courseId: number, lang: string): Promise<ApiResponse> {
+    async finishCourse(courseId: number, lang: string): Promise<void> {
         const queryRunner = this.dataSource.createQueryRunner();
         await queryRunner.connect();
         await queryRunner.startTransaction();
@@ -528,11 +599,6 @@ export class CourseService {
             await this.finishUserCourses(courseId, lang, userSubjects);
 
             await queryRunner.commitTransaction();
-
-            return {
-                success: true,
-                message: this.i18nUtils.translate('validation.course.start_course_success'),
-            };
         } catch (error) {
             await queryRunner.rollbackTransaction();
             this.logger.error('startCourse failed', error?.stack || error);
@@ -614,4 +680,25 @@ export class CourseService {
         );
     }
 
+    async getSupervisorsOfCourse(courseId: number, lang: string): Promise<MyProfile[]> {
+        const result = await this.supervisorCourseRepo.find({
+            where: { course: { courseId } },
+            relations: ['supervisor'],
+        });
+
+        if (result.length === 0) {
+            throw new BadRequestException(this.i18nUtils.translate('validation.course.supervisor_not_found', {}, lang));
+        }
+
+        const data = result.map(s => ({
+            userId: s.supervisor.userId,
+            userName: s.supervisor.userName,
+            email: s.supervisor.email,
+            role: s.supervisor.role,
+            status: s.supervisor.status,
+        })
+        );
+
+        return data;
+    }
 }

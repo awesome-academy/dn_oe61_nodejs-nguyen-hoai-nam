@@ -62,6 +62,10 @@
     "not_found": "No course found",
     "user_duplicate": "The supervisor is already assigned to this course",
     "user_notfound": "The supervisor does not exist in this course",
+    "assign_success": "The supervisor has been successfully assigned to this course",
+    "assign_fail": "The supervisor has not been assigned to this course",
+    "assign_trainee_success": "The trainee has been successfully assigned to this course",
+    "assign_trainee_fail": "The trainee has not been assigned to this course",
     "user_not_supervisor": "Only users with the SUPERVISOR role can be assigned to a course",
     "user_not_trainee": "Only members can join the course",
     "trainee_has_active_course": "Students are currently taking another active course",
@@ -69,6 +73,15 @@
     "user_course_remove": "You have been removed from the course on S*learn!",
     "trainee_not_found": "Trainee does not exist in this course",
     "start_course_success": "Course activated successfully",
+    "subject_exists": "The subject already exists in the course",
+    "supervisor_not_found": "No supervisor found",
+    "assign_supervisor_success": "The supervisor has been successfully assigned to this course",
+    "assign_supervisor_fail": "The supervisor has not been assigned to this course",
+    "supervisor_removed": "The supervisor has been removed from this course",
+    "remove_success": "Remove successfully",
+    "remove_faild": "Remove failed",
+    "remove_trainee_success": "Remove successfully trainee",
+    "remove_trainee_fail": "Remove failed trainee",
     "name": {
       "isString": "Course name must be a string",
       "isNotEmpty": "Course name cannot be empty",
@@ -271,5 +284,19 @@
     "chat.message_required": "Message content must not be empty.",
     "chat.course_not_found": "Course not found.",
     "chat.unauthorized_user": "Invalid user or not enrolled in the course."
+  },
+  "file": {
+    "invalid_file": "File không hợp lệ, chỉ nhận Excel"
+  },
+  "sheet": {
+    "sheet_not_found": "Sheet not found",
+    "subject_missing_tasks": "Subject missing tasks"
+  },
+  "cron": {
+      "listSuccess": "Cron jobs retrieved successfully",
+      "triggered": "Cron job executed",
+      "toggled_start": "Cron job started",
+      "toggled_stop": "Cron job stopped",
+    "job_not_found": "Cron job not found"
   }
 }

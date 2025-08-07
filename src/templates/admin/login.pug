@@ -99,12 +99,10 @@ html(lang="en")
           const result = await response.json();
           
           if (response.ok && result.success) {
-            // Store token
-            localStorage.setItem('token', result.data.token);
-            sessionStorage.setItem('token', result.data.token);
-            
-            // Redirect to dashboard
-            window.location.href = '/admin/dashboard';
+            // Redirect based on role
+            const role = result.data?.user?.role;
+            const redirectUrl = role === 'TRAINEE' ? '/admin/chat' : '/admin/dashboard';
+            window.location.href = redirectUrl;
           } else {
             // Show error message
             errorMessage.textContent = result.message || 'Login failed';

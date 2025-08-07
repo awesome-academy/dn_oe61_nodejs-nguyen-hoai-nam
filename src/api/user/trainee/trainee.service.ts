@@ -96,7 +96,7 @@ export class TraineeService {
 
         return {
             success: true,
-            message: this.i18nUtils.translate('validation.crud.create_cuccess', {}, lang),
+            message: this.i18nUtils.translate('validation.crud.create_success', {}, lang),
             data: result
         }
     }

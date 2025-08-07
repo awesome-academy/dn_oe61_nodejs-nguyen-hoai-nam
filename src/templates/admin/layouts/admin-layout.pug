@@ -13,15 +13,19 @@ mixin adminLayout(title, currentPage, description, pageTitle)
       meta(name="viewport", content="width=device-width, initial-scale=1.0")
       title= title || 'Admin Dashboard - Training System'
       script(src="https://cdn.tailwindcss.com")
+      //- Font Awesome for icons
       link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css")
+      //- SweetAlert2 for notifications
+      link(rel="stylesheet", href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css")
       link(href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet")
       link(rel="stylesheet", href="/css/admin_layout.css")
+      block styles
       style(type="text/css").
 
     body(class="min-h-screen flex")
       //- Include Sidebar Component
       include ../components/sidebar
-      +sidebar(currentPage || 'dashboard', 'Admin User', 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face')
+      +sidebar(currentPage || 'dashboard', 'Admin User', '\/img\/avatar.png')
 
       //- Main Content Area
       div(class="flex-1 flex flex-col main-content")
@@ -31,9 +35,19 @@ mixin adminLayout(title, currentPage, description, pageTitle)
             button(class="md:hidden p-2 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100" id="sidebarToggle")
               i(class="fas fa-bars")
             div
-              h1(class="text-xl font-semibold text-gray-900")= pageTitle || 'Admin Dashboard'
-              p(class="text-sm text-gray-500")= description || 'Training System'
-          div(class="flex items-center space-x-3")
+              h1(class="text-xl font-semibold text-gray-900" data-i18n="header.adminDashboard")= pageTitle || 'Admin Dashboard'
+              p(class="text-sm text-gray-500" data-i18n="header.trainingSystem")= description || 'Training System'
+          div(class="flex items-center space-x-4")
+            //- Language Switcher Dropdown
+            div(class="relative")
+              button(id="language-switcher-button" class="flex items-center space-x-2 p-2 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100")
+                i(class="fas fa-globe")
+                span(id="current-lang" class="text-sm font-medium") VN
+                i(class="fas fa-chevron-down text-xs")
+              div(id="language-switcher-menu" class="absolute right-0 mt-2 w-32 bg-white rounded-md shadow-lg py-1 hidden z-50")
+                a(href="#" data-lang="vn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100") Tiếng Việt
+                a(href="#" data-lang="en" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100") English
+
             button(class="p-2 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100 relative")
               i(class="fas fa-bell")
               span(class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full")
@@ -44,5 +58,13 @@ mixin adminLayout(title, currentPage, description, pageTitle)
         main(class="flex-1 p-6")
           block
 
+      //- SweetAlert2
+      script(src="https://cdn.jsdelivr.net/npm/sweetalert2@11")
+
+      //- translations dictionary
+      script(src="/js/i18n-data.js")
+      //- i18n helper
+      script(src="/js/i18n.js")
+      //- Custom script for admin layout logic
       script(src="/js/admin_layout.js")
-      block scripts 
+      block scripts
