@@ -6,6 +6,8 @@ import {
     Min,
     Max,
     IsOptional,
+    IsString,
+    MaxLength,
 } from 'class-validator';
 import { UserCourseStatus } from '../../database/dto/user_course.dto';
 import { i18nValidationMessage } from 'src/helper/decorators/i18n-validation.decorator';
@@ -53,4 +55,9 @@ export class AssignSupervisorDto {
     @IsInt(i18nValidationMessage('validation.supervisor_course.supervisorId.isInt'))
     @IsNotEmpty(i18nValidationMessage('validation.supervisor_course.supervisorId.isNotEmpty'))
     supervisorId: number;
+}
+
+export class SearchCourseDto {
+    @IsString(i18nValidationMessage('validation.course.name.isString'))
+    name: string;
 }

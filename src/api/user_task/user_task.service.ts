@@ -238,7 +238,6 @@ export class UserTaskService {
         if (!result) {
             throw new BadRequestException(this.i18nUtils.translate('validation.task.task_not_found', {}, lang));
         }
-
         return result;
     }
 

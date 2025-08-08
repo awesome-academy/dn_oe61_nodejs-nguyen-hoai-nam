@@ -5,6 +5,8 @@ export class SubjectWithTasksDto {
   name: string;
   description: string;
   studyDuration: number;
+  status: UserSubjectStatus;
+  subjectProgress:number;
   tasks: {
     name: string;
     fileUrl: string;
