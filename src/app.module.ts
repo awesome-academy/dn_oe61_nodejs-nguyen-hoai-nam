@@ -37,6 +37,9 @@ import { BlacklistedToken } from './database/entities/blacklisted_token.entity';
 import { ScheduleModule } from '@nestjs/schedule';
 import { MailQueueModule } from './helper/Queue/mail/mail_queue.module';
 import { BullModule } from '@nestjs/bull';
+import { ChatModule } from './chat/chat.module';
+import { ChatMessage } from './database/entities/chat_message.entity';
+import { ViewsModule } from './views/views.module';
 dotenv.config();
 
 @Module({
@@ -68,7 +71,7 @@ dotenv.config();
 
         return {
           ...dbConfig,
-          entities: [User, Course, Subject, Task, CourseSubject, SupervisorCourse, UserCourse, UserSubject, UserTask, BlacklistedToken],
+          entities: [User, Course, Subject, Task, CourseSubject, SupervisorCourse, UserCourse, UserSubject, UserTask, BlacklistedToken,ChatMessage],
           namingStrategy: new SnakeNamingStrategy(),
           synchronize: false,
           logging: false,
@@ -115,6 +118,8 @@ dotenv.config();
     }),
     ScheduleModule.forRoot(),
     MailQueueModule,
+    ChatModule,
+    ViewsModule,
   ],
   controllers: [AppController],
   providers: [

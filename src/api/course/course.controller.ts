@@ -30,6 +30,14 @@ export class CourseController {
         return result
     }
 
+    @AuthRoles(Role.SUPERVISOR, Role.TRAINEE)
+    @Get('my_courses')
+    async getMyCourses(@UserDecorator() user: User) {
+        const { userId, role } = user;
+        const result = await this.courseService.getMyCourses(userId, role);
+        return result;
+    }
+
     @ApiResponseGetByIdCourse()
     @ApiBearerAuth('access-token')
     @AuthRoles(Role.ADMIN, Role.SUPERVISOR, Role.TRAINEE)
@@ -38,7 +46,7 @@ export class CourseController {
         const result = await this.courseService.getById(courseId.courseId, user, lang);
         return result;
     }
-    
+
     @ApiExcludeEndpoint()
     @AuthRoles(Role.ADMIN, Role.SUPERVISOR)
     @Post('')

@@ -202,14 +202,14 @@
     }
   },
   "user_subject": {
-      "not_found": "Your subject could not be found.",
-      "not_belong_to_user": "This subject does not belong to you.",
-      "already_started": "This subject has already been started.",
-      "not_belong_to_creator": "You are not authorized to start this subject for the trainee.",
-      "not_in_progress": "The subject is not currently in progress.",
-      "not_all_done": "You must complete all tasks in this subject before finishing it.",
-      "start_success": "Subject started successfully",
-      "finish_success": "Topic ended successfully", 
+    "not_found": "Your subject could not be found.",
+    "not_belong_to_user": "This subject does not belong to you.",
+    "already_started": "This subject has already been started.",
+    "not_belong_to_creator": "You are not authorized to start this subject for the trainee.",
+    "not_in_progress": "The subject is not currently in progress.",
+    "not_all_done": "You must complete all tasks in this subject before finishing it.",
+    "start_success": "Subject started successfully",
+    "finish_success": "Topic ended successfully",
     "userId": {
       "isInt": "user_id must be an integer",
       "isNotEmpty": "user_id cannot be empty"
@@ -261,5 +261,13 @@
     "courseId": {
       "isNumber": "Course ID must be a number"
     }
+  },
+  "chat": {
+    "chat.no_access": "You do not have access to this course chat.",
+    "chat.send_success": "Message sent successfully.",
+    "chat.load_success": "Chat history loaded successfully.",
+    "chat.message_required": "Message content must not be empty.",
+    "chat.course_not_found": "Course not found.",
+    "chat.unauthorized_user": "Invalid user or not enrolled in the course."
   }
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Req } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, Res, UseInterceptors } from '@nestjs/common';
 import { AuthDto } from 'src/validation/auth_validation/auth.validation';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from 'src/validation/class_validation/user.validation';
@@ -13,6 +13,7 @@ import { LoginResponse, RegisterResponse, UserProfileResponse } from 'src/helper
 import { ApiResponse } from 'src/helper/interface/api.interface';
 import { I18nUtils } from 'src/helper/utils/i18n-utils';
 import { ApiResponseMe } from 'src/helper/swagger/auth/me_response.decorator';
+import { SetCookieInterceptor } from 'src/helper/Interceptors/set_cookie.interceptor';
 
 @ApiTags('auths')
 @Controller('auth')
@@ -24,6 +25,7 @@ export class AuthController {
 
     @ApiResponseLogin()
     @Public()
+    @UseInterceptors(SetCookieInterceptor)
     @Post('login')
     async login(@Body() userInput: AuthDto, @Language() lang: string): Promise<ApiResponse | LoginResponse> {
         const result = await this.authService.login(userInput, lang);

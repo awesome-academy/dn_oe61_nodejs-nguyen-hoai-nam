@@ -265,5 +265,13 @@
     "courseId": {
       "isNumber": "ID khóa học phải là số"
     }
+  },
+  "chat": {
+    "chat.no_access": "Bạn không có quyền truy cập phòng chat của khóa học này.",
+    "chat.send_success": "Gửi tin nhắn thành công.",
+    "chat.load_success": "Lấy lịch sử tin nhắn thành công.",
+    "chat.message_required": "Nội dung tin nhắn không được để trống.",
+    "chat.course_not_found": "Không tìm thấy khóa học.",
+    "chat.unauthorized_user": "Người dùng không hợp lệ hoặc không nằm trong khóa học."
   }
 }
