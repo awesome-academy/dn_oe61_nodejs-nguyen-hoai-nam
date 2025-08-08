@@ -179,6 +179,7 @@
   },
   "user_course": {
     "course_not_active": "No active courses available",
+    "user_already_registered_course": "User has already registered for this course",
     "courseId": {
       "isInt": "course_id must be an integer",
       "isNotEmpty": "course_id cannot be empty"
@@ -233,6 +234,7 @@
     "user_task_not_found_date": "No data available for the task",
     "user_task_not_found": "Corresponding task not found",
     "complete_task_success": "Mission successful report",
+    "complete_task_faild": "Mission failed report",
     "userSubjectId": {
       "isInt": "user_subject_id must be an integer",
       "isNotEmpty": "user_subject_id cannot be empty"

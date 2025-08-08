@@ -9,11 +9,16 @@ import { User } from 'src/database/entities/user.entity';
 import { ApiResponse } from 'src/helper/interface/api.interface';
 import { AssignTraineeToCourseResponseDto } from 'src/helper/interface/course.iterface';
 import { traineeIdDto, userIdDto } from 'src/validation/class_validation/user.validation';
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiResponseRegisterToCourse } from 'src/helper/swagger/user_course/user_course_response.decorator';
+import { ApiResponseGetActiveCourse } from 'src/helper/swagger/user_course/course_active_response.decorator';
 
 @Controller('user_course')
 export class UserCourseController {
     constructor(private readonly userCourseSErvice: UserCourseService) { }
 
+    @ApiResponseRegisterToCourse()
+    @ApiBearerAuth('access-token')
     @AuthRoles(Role.TRAINEE)
     @Post(':courseId/trainee')
     async registerToCourse(@Param() courseId: courseIdDto, @UserDecorator() traineeId: User, @Language() lang: string): Promise<ApiResponse | AssignTraineeToCourseResponseDto> {
@@ -21,6 +26,8 @@ export class UserCourseController {
         return result;
     }
 
+    @ApiResponseGetActiveCourse()
+    @ApiBearerAuth('access-token')
     @AuthRoles(Role.TRAINEE)
     @Get('trainee/:traineeId/courses/active')
     async viewActiveCourse(@Param() traineeId: traineeIdDto, @Language() lang: string) {

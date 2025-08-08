@@ -22,14 +22,6 @@ export class UserTaskDto {
     status: UserTaskStatus;
 
     @Type(() => Date)
-    @IsDate(i18nValidationMessage('validation.user_task.assignedAt.isDate'))
-    assignedAt?: Date;
-
-    @Type(() => Date)
-    @IsDate(i18nValidationMessage('validation.user_task.dueAt.isDate'))
-    dueAt?: Date;
-
-    @Type(() => Date)
     @IsDate(i18nValidationMessage('validation.user_task.doneAt.isDate'))
     doneAt?: Date;
 }

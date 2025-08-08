@@ -13,6 +13,7 @@ export const firstUserSubjectProgress = 0;
 export const course_process_constant = 50;
 export const maxProgress = 100;
 export const endDateOfCourse = 2;
+export const millisecondsPerDay = 24 * 60 * 60 * 1000;
 export const formatDateConstant = 'dd/MM/yyyy';
 export const subjectDailySummary = '[Báo cáo tổng hợp] Hoạt động học viên trong ngày';
 export const subjectCourseReminder = `[Nhắc nhở] Khóa học sắp kết thúc`;

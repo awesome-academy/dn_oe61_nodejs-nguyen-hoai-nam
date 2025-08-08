@@ -45,8 +45,9 @@ export class UserCourseService {
             where: { course: { courseId: courseId } },
             relations: ['course', 'subject']
         });
-        if (courseSubject.length === 0) {
-            throw new NotFoundException(this.i18nUtils.translate('validation.course.not_found', {}, lang));
+
+        if (courseSubject.length !== 0) {
+            throw new NotFoundException(this.i18nUtils.translate('validation.course.trainee_has_active_course', {}, lang));
         }
         return courseSubject;
     }
@@ -68,8 +69,8 @@ export class UserCourseService {
 
             const { savedUserCourse, course } = await this.createAndNotifyUserCourse(manager, courseId, trainee.userId, trainee, lang);
 
-            if (courseSubjects[0].status === CourseSubjectStatus.START) {
-                await this.savedUserCourse(courseSubjects, trainee, manager)
+            if (courseSubjects[0] && courseSubjects[0].status === CourseSubjectStatus.START) {
+                await this.savedUserSubject(courseSubjects, trainee, manager)
             }
 
             const data: AssignTraineeToCourseResponseDto = {
@@ -88,6 +89,17 @@ export class UserCourseService {
     private async createAndNotifyUserCourse(manager: EntityManager, courseId: number, traineeId: number, user: User, lang: string) {
         const userCourseRepo = manager.getRepository(UserCourse);
         try {
+            const userCourse = await this.userCourseRepo.findOne({
+                where: {
+                    course: { courseId: courseId },
+                    user: { userId: traineeId }
+                }
+            });
+
+            if (userCourse) {
+                throw new BadRequestException(this.i18nUtils.translate('validation.user_course.user_already_registered_course', {}, lang))
+            }
+
             const data: UserCourse = userCourseRepo.create({
                 registrationDate: todayDate,
                 courseProgress: firstCourseProgress,
@@ -95,8 +107,19 @@ export class UserCourseService {
                 course: { courseId },
                 user: { userId: traineeId }
             });
-
             const savedUserCourse = await userCourseRepo.save(data);
+
+            const course = await this.notifyUserCourse(manager, savedUserCourse, user, lang);
+
+            return { savedUserCourse, course };
+        } catch (error) {
+            this.logger.error(`createAndNotifyUserCourse failed: ${error?.message || error}`, error?.stack);
+            throw new InternalServerErrorException(this.i18nUtils.translate('validation.server.internal_server_error', {}, lang));
+        }
+    }
+
+    private async notifyUserCourse(manager: EntityManager, savedUserCourse: UserCourse, user: User, lang: string): Promise<Course> {
+        try {
             const course = await this.getCourseById(manager, savedUserCourse, lang);
 
             const subject = this.i18nUtils.translate('validation.course.user_course_success', {}, lang);
@@ -110,10 +133,9 @@ export class UserCourseService {
             }
             await this.sendEmail(email, subject, template, context, lang);
 
-            return { savedUserCourse, course };
+            return course;
         } catch (error) {
-            this.logger.error(`createAndNotifyUserCourse failed: ${error?.message || error}`, error?.stack,
-            );
+            this.logger.error(`notifyUserCourse failed: ${error?.message || error}`, error?.stack);
             throw new InternalServerErrorException(this.i18nUtils.translate('validation.server.internal_server_error', {}, lang));
         }
     }
@@ -140,7 +162,7 @@ export class UserCourseService {
         return course;
     }
 
-    private async savedUserCourse(courseSubjects: CourseSubject[], trainee: User, manager: EntityManager) {
+    private async savedUserSubject(courseSubjects: CourseSubject[], trainee: User, manager: EntityManager) {
         const userSubjectRepo = manager.getRepository(UserSubject);
 
         const userSubjects = courseSubjects.map(courseSubject =>
@@ -162,7 +184,8 @@ export class UserCourseService {
                 template: template,
                 context: context
             });
-        } catch {
+        } catch (error) {
+            this.logger.error(`Gửi email thất bại: ${error?.message}`, error?.stack);
             throw new InternalServerErrorException(this.i18nUtils.translate('validation.server.internal_server_error', {}, lang));
         }
     }

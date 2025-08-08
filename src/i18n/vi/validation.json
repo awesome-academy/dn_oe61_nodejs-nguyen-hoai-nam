@@ -183,6 +183,7 @@
   },
   "user_course": {
     "course_not_active": "Không có khoá học nào đang hoạt động",
+    "user_already_registered_course": "Người dùng đã đăng ký khoá học này",
     "courseId": {
       "isInt": "course_id phải là số nguyên",
       "isNotEmpty": "course_id không được để trống"
@@ -237,6 +238,7 @@
     "user_task_not_found_date": "Không có dữ liệu cho nhiệm vụ",
     "user_task_not_found": "Không tìm thấy nhiệm vụ tương ứng",
     "complete_task_success": "Báo cáo nhiệm vụ thành công",
+    "complete_task_faild": "Báo cáo nhiệm vụ không thành công",
     "userSubjectId": {
       "isInt": "user_subject_id phải là số nguyên",
       "isNotEmpty": "user_subject_id không được để trống"
