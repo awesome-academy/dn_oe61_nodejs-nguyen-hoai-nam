@@ -1,0 +1,49 @@
+include ../layouts/admin-layout
+
++adminLayout('Trainee Details', 'trainees', 'Details for a specific trainee', 'Trainee Details')
+  div(class="max-w-4xl mx-auto")
+    //- Page Header
+    div(class="bg-white rounded-lg shadow-lg p-6 mb-6")
+      div(class="flex items-center justify-between")
+        div
+          h2(id="trainee-name-header" class="text-2xl font-bold text-gray-900 mb-2") Trainee Details
+          p(class="text-gray-600") Detailed information about the trainee.
+        div(class="flex items-center space-x-2")
+          a(href="/admin/trainees" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300")
+            i(class="fas fa-arrow-left mr-2")
+            | Back to List
+
+    //- Trainee Details Card
+    div(class="bg-white rounded-lg shadow-lg p-8")
+      div(class="grid grid-cols-1 md:grid-cols-2 gap-6")
+        //- Left Column: Basic Info
+        div(class="space-y-4")
+          div
+            h3(class="text-sm font-medium text-gray-500") User Name
+            p(id="trainee-username" class="mt-1 text-lg font-semibold text-gray-900") ...
+          div
+            h3(class="text-sm font-medium text-gray-500") Email Address
+            p(id="trainee-email" class="mt-1 text-lg text-gray-900") ...
+
+        //- Right Column: Status and Role
+        div(class="space-y-4")
+          div
+            h3(class="text-sm font-medium text-gray-500") Role
+            p(id="trainee-role" class="mt-1 text-lg text-gray-900") ...
+          div
+            h3(class="text-sm font-medium text-gray-500") Status
+            p(id="trainee-status" class="mt-1 text-lg text-gray-900") ...
+
+      //- Actions Section
+      div(class="border-t border-gray-200 mt-6 pt-6")
+        h3(class="text-lg font-medium text-gray-900 mb-4") Actions
+        div(class="flex items-center space-x-4")
+          button(id="update-trainee-btn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center")
+            i(class="fas fa-pencil-alt mr-2")
+            span Update
+          button(id="delete-trainee-btn" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center")
+            i(class="fas fa-trash-alt mr-2")
+            span Delete
+
+block scripts
+  script(src="/js/trainee-detail.js")

@@ -1,0 +1,62 @@
+include ../layouts/admin-layout
+
++adminLayout('Subject Details', 'subjects', 'Detailed view of a subject', 'Subject Details')
+  div(class="max-w-7xl mx-auto")
+    //- Back Button
+    a(href="/admin/subjects" class="inline-flex items-center text-indigo-600 hover:text-indigo-800 mb-6 group")
+      i(class="fas fa-arrow-left mr-2 transition-transform duration-200 ease-in-out group-hover:-translate-x-1")
+      span Back to Subjects
+
+    //- Main Subject Detail Card
+    div(class="bg-white rounded-2xl shadow-xl overflow-hidden")
+      //- Header with Background Image
+      div(class="h-48 bg-gradient-to-r from-teal-500 to-cyan-600 p-8 relative")
+        h1(id="subject-name-header" class="text-4xl font-bold text-white drop-shadow-lg") Loading...
+
+      //- Subject Info Body
+      div(class="p-8")
+        //- Description
+        div(class="mb-8")
+          h2(class="text-2xl font-semibold text-gray-800 mb-3 border-b-2 border-teal-200 pb-2") Subject Description
+          p(id="subject-description" class="text-gray-600 leading-relaxed") Loading description...
+
+        //- Key Details Grid
+        div(class="grid md:grid-cols-2 gap-8")
+          //- Study Duration
+          div(class="bg-gray-50 p-6 rounded-lg")
+            h3(class="text-lg font-semibold text-gray-700 mb-4") <i class="fas fa-clock mr-2 text-teal-500"></i> Study Duration
+            div(class="space-y-3")
+              div(class="flex justify-between")
+                span(class="font-medium text-gray-600") Duration:
+                span(id="study-duration" class="font-bold text-gray-800") -- hours
+
+          //- Actions
+          div(class="bg-gray-50 p-6 rounded-lg")
+            h3(class="text-lg font-semibold text-gray-700 mb-4") <i class="fas fa-cogs mr-2 text-teal-500"></i> Actions
+            div(class="flex space-x-4")
+              button(id="update-subject-btn" class="flex-1 inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors")
+                i(class="fas fa-edit mr-2")
+                span Update
+              button(id="delete-subject-btn" class="flex-1 inline-flex items-center justify-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors")
+                i(class="fas fa-trash-alt mr-2")
+                span Delete
+
+    //- Tasks Section
+    div(class="mt-8 bg-white rounded-2xl shadow-xl overflow-hidden")
+      div(class="p-8")
+        h2(class="text-2xl font-semibold text-gray-800 mb-4") Tasks
+        div(class="overflow-x-auto")
+          table(class="min-w-full divide-y divide-gray-200")
+            thead(class="bg-gray-50")
+              tr
+                th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Task Name
+                th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") File URL
+            tbody(id="task-list-body" class="bg-white divide-y divide-gray-200")
+              //- Loading State
+              tr(id="task-loading-state")
+                td(colspan="2" class="px-6 py-4 text-center text-gray-500")
+                  i(class="fas fa-spinner fa-spin mr-2")
+                  | Loading tasks...
+
+block scripts
+  script(src="/js/subject-detail.js")

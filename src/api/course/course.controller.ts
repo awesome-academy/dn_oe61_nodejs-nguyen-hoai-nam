@@ -13,21 +13,27 @@ import { CourseDetailDto, CourseListItem } from 'src/helper/interface/course.ite
 import { ApiResponse } from 'src/helper/interface/api.interface';
 import { ApiResponseGetAllCourse } from 'src/helper/swagger/course/get_all_response.decorator';
 import { ApiResponseGetByIdCourse } from 'src/helper/swagger/course/get_by_id_response.decorator';
+import { I18nUtils } from 'src/helper/utils/i18n-utils';
 
 @Controller('course')
 export class CourseController {
     constructor(
         private readonly courseService: CourseService,
+        private readonly i18nUtils: I18nUtils,
     ) { }
 
     @ApiResponseGetAllCourse()
     @ApiBearerAuth('access-token')
     @Get()
-    async getAll(@QueryParam(['page', 'pageSize']) pagination: { page: number; pageSize: number }, @UserDecorator() user: User, @Language() lang: string): Promise<ApiResponse | CourseListItem[]> {
+    async getAll(@QueryParam(['page', 'pageSize']) pagination: { page: number; pageSize: number }, @UserDecorator() user: User, @Language() lang: string): Promise<ApiResponse> {
         const { page, pageSize } = pagination;
         const { userId, role } = user;
         const result = await this.courseService.getAll(userId, role, page, pageSize, lang);
-        return result
+        return {
+            success: true,
+            message: this.i18nUtils.translate('validation.response_api.success', {}, lang),
+            data: result
+        }
     }
 
     @AuthRoles(Role.SUPERVISOR, Role.TRAINEE)

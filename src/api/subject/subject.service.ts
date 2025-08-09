@@ -193,13 +193,22 @@ export class SubjectService {
         return subject
     }
 
-    async getAll(page: number, pageSize: number, lang: string): Promise<Subject[]> {
-        const { data } = await this.paginationService.queryWithPagination(
-            this.subjectRepo,
-            { page, pageSize },
-            { order: { createdAt: 'ASC' } }
-        );
+    async getAll(page: number, pageSize: number, lang: string) {
+        const [subjects, totalItems] = await this.subjectRepo.findAndCount({
+            order: { createdAt: 'ASC' as const },
+            take: pageSize,
+            skip: (page - 1) * pageSize,
+        });
 
-        return data;
+        const totalPages = Math.ceil(totalItems / pageSize);
+
+        return {
+            items: subjects,
+            meta: {
+                totalItems,
+                totalPages,
+                currentPage: page,
+            },
+        };
     }
 }

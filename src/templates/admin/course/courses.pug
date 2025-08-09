@@ -1,0 +1,109 @@
+include ../layouts/admin-layout
+
++adminLayout('Courses Management', 'courses', 'Manage all courses in the system', 'Courses Management')
+  div(class="max-w-7xl mx-auto")
+    //- Page Header
+    div(class="bg-white rounded-lg shadow-lg p-6 mb-6")
+      div(class="flex items-center justify-between")
+        div
+          h2(class="text-2xl font-bold text-gray-900 mb-2") Courses Management
+          p(class="text-gray-600") Manage all training courses in the system
+        button(id="add-course-btn" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center")
+          i(class="fas fa-plus mr-2")
+          span Add Course
+
+    //- Stats Cards
+    div(class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6")
+      div(class="bg-white rounded-lg shadow-lg p-6")
+        div(class="flex items-center")
+          div(class="p-3 rounded-full bg-blue-100 text-blue-600")
+            i(class="fas fa-book text-xl")
+          div(class="ml-4")
+            p(class="text-sm font-medium text-gray-600") Total Courses
+            p(class="text-2xl font-bold text-gray-900" id="total-courses") 0
+      div(class="bg-white rounded-lg shadow-lg p-6")
+        div(class="flex items-center")
+          div(class="p-3 rounded-full bg-green-100 text-green-600")
+            i(class="fas fa-check-circle text-xl")
+          div(class="ml-4")
+            p(class="text-sm font-medium text-gray-600") Active Courses
+            p(class="text-2xl font-bold text-gray-900" id="active-courses") 0
+      div(class="bg-white rounded-lg shadow-lg p-6")
+        div(class="flex items-center")
+          div(class="p-3 rounded-full bg-yellow-100 text-yellow-600")
+            i(class="fas fa-clock text-xl")
+          div(class="ml-4")
+            p(class="text-sm font-medium text-gray-600") Inactive Courses
+            p(class="text-2xl font-bold text-gray-900" id="inactive-courses") 0
+
+    //- Courses Table
+    div(class="bg-white rounded-lg shadow overflow-hidden")
+      div(class="p-4")
+        h2(class="text-xl font-semibold text-gray-700") All Courses
+      div(class="overflow-x-auto")
+        table(class="min-w-full divide-y divide-gray-200")
+          thead(class="bg-gray-50")
+            tr
+              th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Course Name
+              th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Description
+              th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Status
+              th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Start Date
+              th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") End Date
+              th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Actions
+          tbody(id="courses-table-body" class="bg-white divide-y divide-gray-200")
+            //- Table rows will be inserted here by JS
+
+      //- Pagination
+      div(id="pagination-container" class="p-4 flex justify-center items-center")
+        //- Pagination will be rendered by JS
+
+  //- Modal for Add/Edit Course (Initially hidden)
+  div(id="course-modal" class="fixed inset-0 bg-gray-800 bg-opacity-60 overflow-y-auto h-full w-full hidden z-50")
+    div(class="relative top-10 mx-auto p-6 border w-full max-w-2xl shadow-lg rounded-xl bg-white")
+      //- Modal Header
+      div(class="flex justify-between items-center pb-3 border-b border-gray-200")
+        p(id="modal-title" class="text-2xl font-bold text-gray-800") Add New Course
+        button(id="modal-close-btn" class="text-gray-400 hover:text-gray-600")
+          i(class="fas fa-times text-xl")
+
+      //- Modal Body
+      div(class="mt-5")
+        form(id="course-form")
+          input(type="hidden" id="course-id")
+          div(class="grid grid-cols-1 md:grid-cols-2 gap-6")
+            //- Course Name
+            div(class="md:col-span-2")
+              label(for="course-name" class="block text-sm font-medium text-gray-700 mb-1") Course Name
+              input(type="text" id="course-name" name="name" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500")
+
+            //- Description
+            div(class="md:col-span-2")
+              label(for="course-description" class="block text-sm font-medium text-gray-700 mb-1") Description
+              textarea(id="course-description" name="description" rows="4" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500")
+
+            //- Subjects
+            div(id="subjects-container" class="md:col-span-2")
+              label(for="course-subjects" class="block text-sm font-medium text-gray-700 mb-1") Subjects
+              select(id="course-subjects" name="subjectIds" multiple class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500")
+                //- Options will be loaded by JS
+
+            //- Start Date
+            div
+              label(for="course-start" class="block text-sm font-medium text-gray-700 mb-1") Start Date
+              input(type="date" id="course-start" name="start" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500")
+
+            //- End Date
+            div
+              label(for="course-end" class="block text-sm font-medium text-gray-700 mb-1") End Date
+              input(type="date" id="course-end" name="end" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500")
+          div
+            label(for="course-status" class="block text-sm font-medium text-gray-700 mb-1") Status
+            select(id="course-status" name="status" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500")
+              option(value="ACTIVE") Active
+              option(value="DISABLE") DISABLE
+          div(class="flex justify-end space-x-3 pt-4")
+            button(type="button" id="cancel-btn" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400") Cancel
+            button(type="submit" id="save-btn" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700") Save
+
+block scripts
+  script(src="/js/courses.js")

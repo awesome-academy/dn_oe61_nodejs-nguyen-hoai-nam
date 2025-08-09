@@ -69,6 +69,7 @@
     "user_course_remove": "You have been removed from the course on S*learn!",
     "trainee_not_found": "Trainee does not exist in this course",
     "start_course_success": "Course activated successfully",
+    "subject_exists": "The subject already exists in the course",
     "name": {
       "isString": "Course name must be a string",
       "isNotEmpty": "Course name cannot be empty",

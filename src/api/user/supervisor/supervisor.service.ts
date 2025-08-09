@@ -300,18 +300,10 @@ export class SupervisorService {
         };
     }
 
-    private async findSupervisorOrFail(userId: number, lang: string): Promise<User> {
-        const supervisor = await this.userRepo.findOneBy({ userId: userId, role: Role.SUPERVISOR });
-        if (!supervisor) {
-            throw new BadRequestException(this.i18nUtils.translate('validation.crud.no_changes', {}, lang));
-        }
-        return supervisor;
-    }
-
     private async findAndUpdateSupervisor(supervisorId: number, supervisorInput: UpdateUserDto, lang: string) {
         const supervisor = await this.findSupervisorOrFail(supervisorId, lang);
 
-        const { userName, email, password, status, role } = supervisorInput;
+        const { userName, email, password, status } = supervisorInput;
 
         if (userName !== undefined) supervisor.userName = userName;
         if (email !== undefined) supervisor.email = email;
@@ -320,7 +312,6 @@ export class SupervisorService {
             supervisor.password = await this.authService.hashPassword(password, saltRounds);
         }
         if (status !== undefined) supervisor.status = status;
-        if (role !== undefined) supervisor.role = role;
 
         const savedSupervisor: User | null = await this.userRepo.save(supervisor);
 
@@ -338,10 +329,10 @@ export class SupervisorService {
     }
 
     async getById(supervisorId: number, lang: string): Promise<ApiResponse> {
-        const supervisor = await this.userRepo.findOneBy({ userId: supervisorId, role: Role.SUPERVISOR, });
+        const supervisor = await this.userRepo.findOneBy({ userId: supervisorId, role: Role.SUPERVISOR });
 
         if (!supervisor) {
-            throw new NotFoundException(this.i18nUtils.translate('validation.auth.user_notfound', {}, lang),);
+            throw new NotFoundException(this.i18nUtils.translate('validation.auth.user_notfound', {}, lang));
         }
 
         return {
@@ -355,5 +346,13 @@ export class SupervisorService {
                 role: supervisor.role,
             },
         };
+    }
+
+    private async findSupervisorOrFail(userId: number, lang: string): Promise<User> {
+        const supervisor = await this.userRepo.findOneBy({ userId: userId, role: Role.SUPERVISOR });
+        if (!supervisor) {
+            throw new NotFoundException(this.i18nUtils.translate('validation.auth.user_notfound', {}, lang));
+        }
+        return supervisor;
     }
 }

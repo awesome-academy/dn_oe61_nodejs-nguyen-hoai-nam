@@ -14,7 +14,7 @@ mixin sidebar(currentPage, userName, userAvatar)
             i(class=`fas fa-tachometer-alt mr-3 ${currentPage === 'dashboard' ? '' : 'text-gray-500'}`)
             span Dashboard
           
-          a(href="/chat" class=`${currentPage === 'chat' ? 'active-menu' : 'menu-item'} flex items-center px-4 py-3 text-sm font-medium ${currentPage === 'chat' ? '' : 'text-gray-700'}`)
+          a(href="/admin/chat" class=`${currentPage === 'chat' ? 'active-menu' : 'menu-item'} flex items-center px-4 py-3 text-sm font-medium ${currentPage === 'chat' ? '' : 'text-gray-700'}`)
             i(class=`fas fa-comment-dots mr-3 ${currentPage === 'chat' ? '' : 'text-gray-500'}`)
             span Chat
           
@@ -22,9 +22,21 @@ mixin sidebar(currentPage, userName, userAvatar)
             i(class=`fas fa-graduation-cap mr-3 ${currentPage === 'courses' ? '' : 'text-gray-500'}`)
             span Courses
           
+          a(href="/admin/subjects" class=`${currentPage === 'subjects' ? 'active-menu' : 'menu-item'} flex items-center px-4 py-3 text-sm font-medium ${currentPage === 'subjects' ? '' : 'text-gray-700'}`)
+            i(class=`fas fa-book mr-3 ${currentPage === 'subjects' ? '' : 'text-gray-500'}`)
+            span Subjects
+          
           a(href="/admin/users" class=`${currentPage === 'users' ? 'active-menu' : 'menu-item'} flex items-center px-4 py-3 text-sm font-medium ${currentPage === 'users' ? '' : 'text-gray-700'}`)
             i(class=`fas fa-users mr-3 ${currentPage === 'users' ? '' : 'text-gray-500'}`)
-            span Users
+            span All Users
+          
+          a(href="/admin/trainees" class=`${currentPage === 'trainees' ? 'active-menu' : 'menu-item'} flex items-center px-4 py-3 text-sm font-medium ${currentPage === 'trainees' ? '' : 'text-gray-700'}`)
+            i(class=`fas fa-user-graduate mr-3 ${currentPage === 'trainees' ? '' : 'text-gray-500'}`)
+            span Trainees
+          
+          a(href="/admin/supervisors" class=`${currentPage === 'supervisors' ? 'active-menu' : 'menu-item'} flex items-center px-4 py-3 text-sm font-medium ${currentPage === 'supervisors' ? '' : 'text-gray-700'}`)
+            i(class=`fas fa-user-tie mr-3 ${currentPage === 'supervisors' ? '' : 'text-gray-500'}`)
+            span Supervisors
           
           a(href="/admin/tasks" class=`${currentPage === 'tasks' ? 'active-menu' : 'menu-item'} flex items-center px-4 py-3 text-sm font-medium ${currentPage === 'tasks' ? '' : 'text-gray-700'}`)
             i(class=`fas fa-tasks mr-3 ${currentPage === 'tasks' ? '' : 'text-gray-500'}`)
@@ -41,7 +53,7 @@ mixin sidebar(currentPage, userName, userAvatar)
     div(class="p-6 border-t border-gray-200")
       div(class="flex items-center space-x-3")
         div(class="relative")
-          img(src=userAvatar || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face" alt="Admin user" class="user-avatar w-12 h-12 rounded-full")
+          img(id="user-avatar" src=userAvatar || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face" alt="Admin user" class="user-avatar w-12 h-12 rounded-full")
           div(class="online-indicator")
         div(class="flex-1")
           p(class="text-sm font-semibold text-gray-900" id="user-name")= userName || 'Admin User'

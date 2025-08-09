@@ -1,0 +1,29 @@
+//- Supervisor Modal
+div(id="supervisor-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50")
+  div(class="relative top-20 mx-auto p-5 border w-full max-w-lg shadow-lg rounded-md bg-white")
+    div(class="mt-3 text-center")
+      h3(id="modal-title" class="text-lg leading-6 font-medium text-gray-900") Add New Supervisor
+      div(class="mt-2 px-7 py-3")
+        form(id="supervisor-form")
+          div(class="space-y-4 text-left")
+            div
+              label(for="supervisor-name" class="block text-sm font-medium text-gray-700") User Name
+              input(type="text" id="supervisor-name" required class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500")
+            div
+              label(for="supervisor-email" class="block text-sm font-medium text-gray-700") Email
+              input(type="email" id="supervisor-email" required class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500")
+            div(id="password-fields")
+              div
+                label(for="supervisor-password" class="block text-sm font-medium text-gray-700") Password
+                input(type="password" id="supervisor-password" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500")
+              div.mt-4
+                label(for="supervisor-confirm-password" class="block text-sm font-medium text-gray-700") Confirm Password
+                input(type="password" id="supervisor-confirm-password" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500")
+            div(id="status-field")
+              label(for="supervisor-status" class="block text-sm font-medium text-gray-700") Status
+              select(id="supervisor-status" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500")
+                option(value="ACTIVE") Active
+                option(value="INACTIVE") Inactive
+      div(class="items-center px-4 py-3")
+        button(id="save-btn" type="submit" form="supervisor-form" class="px-4 py-2 bg-indigo-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500") Save
+        button(id="cancel-btn" type="button" class="mt-3 px-4 py-2 bg-gray-200 text-gray-800 text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300") Cancel

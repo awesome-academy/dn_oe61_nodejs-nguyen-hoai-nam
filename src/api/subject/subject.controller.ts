@@ -52,9 +52,13 @@ export class SubjectController {
     }
 
     @Get('')
-    async getAll(@QueryParam(['page', 'pageSize']) pagination: { page: number; pageSize: number }, @Language() lang: string): Promise<ApiResponse | Subject[]> {
+    async getAll(@QueryParam(['page', 'pageSize']) pagination: { page: number; pageSize: number }, @Language() lang: string): Promise<ApiResponse> {
         const { page, pageSize } = pagination;
-        const result = await this.subjectService.getAll(page, pageSize, lang);
-        return result
+        const data = await this.subjectService.getAll(page, pageSize, lang);
+        return {
+            success: true,
+            message: this.i18nUtils.translate('validation.response_api.success', {}, lang),
+            data
+        }
     }
 }

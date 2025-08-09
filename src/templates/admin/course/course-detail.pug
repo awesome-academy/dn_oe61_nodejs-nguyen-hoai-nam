@@ -1,0 +1,94 @@
+include ../layouts/admin-layout
+
++adminLayout('Course Details', 'courses', 'Detailed view of a course', 'Course Details')
+  div(class="max-w-7xl mx-auto")
+    //- Back Button
+    a(href="/admin/courses" class="inline-flex items-center text-indigo-600 hover:text-indigo-800 mb-6 group")
+      i(class="fas fa-arrow-left mr-2 transition-transform duration-200 ease-in-out group-hover:-translate-x-1")
+      span Back to Courses
+
+    //- Main Course Detail Card
+    div(class="bg-white rounded-2xl shadow-xl overflow-hidden")
+      //- Header with Background Image
+      div(class="h-48 bg-gradient-to-r from-indigo-500 to-purple-600 p-8 relative")
+        h1(id="course-name-header" class="text-4xl font-bold text-white drop-shadow-lg") Loading...
+        div(class="absolute top-6 right-6")
+          span(id="status-badge" class="px-3 py-1 rounded-full text-sm font-semibold bg-gray-100 text-gray-800") PENDING
+
+      //- Course Info Body
+      div(class="p-8")
+        //- Description
+        div(class="mb-8")
+          h2(class="text-2xl font-semibold text-gray-800 mb-3 border-b-2 border-indigo-200 pb-2") Course Description
+          p(id="course-description" class="text-gray-600 leading-relaxed") Loading description...
+
+          .mt-4
+            p.text-sm.text-gray-500.flex.items-center
+              svg.w-4.h-4.mr-2(xmlns="http://www.w3.org/2000/svg", fill="none", viewBox="0 0 24 24", stroke-width="1.5", stroke="currentColor")
+                path(stroke-linecap="round", stroke-linejoin="round", d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z")
+              span Created by:
+              span#course-creator.font-semibold.ml-1
+
+        //- Key Details Grid
+        div(class="grid md:grid-cols-2 gap-8")
+          //- Dates
+          div(class="bg-gray-50 p-6 rounded-lg")
+            h3(class="text-lg font-semibold text-gray-700 mb-4") <i class="fas fa-calendar-alt mr-2 text-indigo-500"></i> Timeline
+            div(class="space-y-3")
+              div(class="flex justify-between")
+                span(class="font-medium text-gray-600") Start Date:
+                span(id="start-date" class="font-bold text-gray-800") --/--/----
+              div(class="flex justify-between")
+                span(class="font-medium text-gray-600") End Date:
+                span(id="end-date" class="font-bold text-gray-800") --/--/----
+
+          //- Actions
+          div(class="bg-gray-50 p-6 rounded-lg")
+            h3(class="text-lg font-semibold text-gray-700 mb-4") <i class="fas fa-cogs mr-2 text-indigo-500"></i> Actions
+            div(class="flex space-x-4")
+              button(id="update-course-btn" class="flex-1 inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors")
+                i(class="fas fa-edit mr-2")
+                span Update
+              button(id="delete-course-btn" class="flex-1 inline-flex items-center justify-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors")
+                i(class="fas fa-trash-alt mr-2")
+                span Delete Course
+
+    //- Enrolled Trainees Section
+    div(class="mt-8 bg-white rounded-2xl shadow-xl overflow-hidden")
+      div(class="p-8")
+        h2(class="text-2xl font-semibold text-gray-800 mb-4") Enrolled Trainees
+        div(class="overflow-x-auto")
+          table(class="min-w-full divide-y divide-gray-200")
+            thead(class="bg-gray-50")
+              tr
+                th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Trainee Name
+                th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Registration Date
+                th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Progress
+                th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Status
+            tbody(id="trainee-list-body" class="bg-white divide-y divide-gray-200")
+              //- Loading State
+              tr(id="trainee-loading-state")
+                td(colspan="4" class="px-6 py-4 text-center text-gray-500")
+                  i(class="fas fa-spinner fa-spin mr-2")
+                  | Loading trainees...
+
+    //- Subjects Section
+    div(class="mt-8 bg-white rounded-2xl shadow-xl overflow-hidden")
+      div(class="p-8")
+        h2(class="text-2xl font-semibold text-gray-800 mb-4") Subjects
+        div(class="overflow-x-auto")
+          table(class="min-w-full divide-y divide-gray-200")
+            thead(class="bg-gray-50")
+              tr
+                th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Subject Name
+                th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Description
+                th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Study Duration (hours)
+            tbody(id="subject-list-body" class="bg-white divide-y divide-gray-200")
+              //- Loading State
+              tr(id="subject-loading-state")
+                td(colspan="3" class="px-6 py-4 text-center text-gray-500")
+                  i(class="fas fa-spinner fa-spin mr-2")
+                  | Loading subjects...
+
+block scripts
+  script(src="/js/course-detail.js")

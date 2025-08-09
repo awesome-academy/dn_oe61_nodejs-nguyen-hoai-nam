@@ -238,4 +238,23 @@ export class UserCourseService {
 
         return courses;
     }
+    
+    async getAllUserCourse(courseId: number, lang: string) {
+        const userCourses = await this.userCourseRepo.find({
+            where: { course: { courseId } },
+            relations: ['user'],
+        });
+
+        if (userCourses.length === 0) {
+            throw new BadRequestException(this.i18nUtils.translate('validation.course.trainee_not_found', {}, lang))
+        }
+
+        return userCourses.map(userCourse => ({
+            userId: userCourse.user.userId,
+            userName: userCourse.user.userName,
+            registrationDate: userCourse.registrationDate,
+            courseProgress: userCourse.courseProgress,
+            status: userCourse.status,
+        }));
+    }
 }

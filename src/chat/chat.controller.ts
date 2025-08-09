@@ -22,14 +22,4 @@ export class ChatController {
     async getChatHistory(@Param('courseId') courseId: number, @UserDecorator('userId') userId: number,@Language() lang:string) {
         return await this.chatService.getChatHistory(courseId, userId,lang);
     }
-
-    @Public()
-    @Get('')
-    @Render('chat')
-    async viewTemplate() {
-        return {
-            title: 'Chat System',
-            description: 'Real-time messaging for courses'
-        };
-    }
 }

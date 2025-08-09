@@ -45,4 +45,10 @@ export class UserCourseController {
         const result = await this.userCourseSErvice.searchCourses(input.name,lang);
         return result;
     }
+    @AuthRoles(Role.SUPERVISOR, Role.ADMIN)
+    @Get(':courseId/users')
+    async getAllUserCourse(@Param() courseId: courseIdDto, @Language() lang: string) {
+        const result = await this.userCourseSErvice.getAllUserCourse(courseId.courseId, lang);
+        return result;
+    }
 }
