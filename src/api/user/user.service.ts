@@ -78,6 +78,7 @@ export class UserService {
             userId: getUser.userId,
             userName: getUser.userName,
             email: getUser.email,
+            status: getUser.status,
             role: getUser.role,
         } as User;
 
@@ -105,5 +106,25 @@ export class UserService {
         } catch (error) {
             throw new InternalServerErrorException(this.i18nUtils.translate('validation.server.internal_server_error', {}, lang));
         }
+    }
+
+    async getAllUsers (lang:string) {
+        const users = await this.userRepo.find();
+        console.log(users);
+        if(users.length === 0){
+            throw new NotFoundException(this.i18nUtils.translate('validation.auth.user_notfound', {}, lang))
+        }
+
+        const data = users.map(user => {
+            return {
+                userId: user.userId,
+                userName: user.userName,
+                email: user.email,
+                role: user.role,
+                status: user.status,
+                createdAt: user.createdAt
+            }
+        });
+        return data;
     }
 }

@@ -1,0 +1,93 @@
+include ../layouts/admin-layout
+
++adminLayout('User Details', 'users', 'View user profile', 'User Details')
+  div(class="max-w-4xl mx-auto")
+    //- Profile Card
+    div(id="user-profile-card" class="bg-white rounded-lg shadow-lg overflow-hidden")
+      //- Loading state
+      div(id="loading-state" class="p-6 text-center")
+        p Loading user data...
+
+      //- Error state
+      div(id="error-state" class="hidden p-6 text-center text-red-500")
+        p Could not load user profile.
+
+      //- Content
+      div(id="profile-content" class="hidden")
+        div(class="h-32 bg-indigo-600")
+        div(class="px-6 py-4")
+          div(class="flex items-end -mt-16")
+            img(id="user-avatar" class="w-24 h-24 rounded-full border-4 border-white shadow-lg" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face" alt="User Avatar")
+            div(class="ml-4")
+              h2(id="user-name" class="text-2xl font-bold text-gray-900")
+              p(id="user-email" class="text-sm text-gray-600")
+
+          div(class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6")
+            div
+              h3(class="text-lg font-semibold text-gray-800 mb-2") Profile Information
+              dl(class="space-y-2")
+                div(class="flex justify-between")
+                  dt(class="text-sm font-medium text-gray-500") Role
+                  dd(id="user-role" class="text-sm text-gray-900")
+                div(class="flex justify-between")
+                  dt(class="text-sm font-medium text-gray-500") Status
+                  dd(id="user-status" class="text-sm text-gray-900")
+                div(class="flex justify-between")
+                  dt(class="text-sm font-medium text-gray-500") Joined Date
+                  dd(id="user-joined-date" class="text-sm text-gray-900")
+
+block scripts
+  script(src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js")
+  script.
+    document.addEventListener('DOMContentLoaded', async function () {
+      const userId = window.location.pathname.split('/').pop();
+      const profileCard = document.getElementById('user-profile-card');
+      const loadingState = document.getElementById('loading-state');
+      const errorState = document.getElementById('error-state');
+      const profileContent = document.getElementById('profile-content');
+
+      const userAvatar = document.getElementById('user-avatar');
+      const userName = document.getElementById('user-name');
+      const userEmail = document.getElementById('user-email');
+      const userRole = document.getElementById('user-role');
+      const userStatus = document.getElementById('user-status');
+      const userJoinedDate = document.getElementById('user-joined-date');
+
+      const roleClasses = {
+        'SUPERVISOR': 'bg-blue-500 text-white px-2 py-0.5 rounded-full text-xs',
+        'TRAINEE': 'bg-green-500 text-white px-2 py-0.5 rounded-full text-xs',
+        'ADMIN': 'bg-purple-500 text-white px-2 py-0.5 rounded-full text-xs',
+      };
+
+      const statusClasses = {
+        'ACTIVE': 'bg-green-500 text-white px-2 py-0.5 rounded-full text-xs',
+        'INACTIVE': 'bg-red-500 text-white px-2 py-0.5 rounded-full text-xs',
+      };
+
+      function getCurrentLanguage() {
+        return localStorage.getItem('language') || 'vn';
+      }
+
+      try {
+        const lang = getCurrentLanguage();
+        const response = await axios.get(`/user/${userId}?lang=${lang}`);
+        const user = response.data.data;
+
+        userAvatar.src = user.avatar || 'https://via.placeholder.com/96';
+        userName.textContent = user.userName;
+        userEmail.textContent = user.email;
+        userRole.textContent = user.role;
+        userRole.className = roleClasses[user.role] || 'bg-gray-500';
+        userStatus.textContent = user.status;
+        userStatus.className = statusClasses[user.status] || 'bg-gray-500';
+        userJoinedDate.textContent = new Date(user.createdAt).toLocaleDateString();
+
+        loadingState.classList.add('hidden');
+        profileContent.classList.remove('hidden');
+
+      } catch (error) {
+        console.error('Failed to fetch user details:', error);
+        loadingState.classList.add('hidden');
+        errorState.classList.remove('hidden');
+      }
+    });

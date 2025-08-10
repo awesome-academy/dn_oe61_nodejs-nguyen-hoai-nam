@@ -138,9 +138,9 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const renderTraineeList = (trainees) => {
+    const courseId = getCourseIdFromUrl();
         const adminModeT = isAdmin();
         const tbody = document.getElementById('trainee-list-body');
-        const loadingState = document.getElementById('trainee-loading-state');
         tbody.innerHTML = '';
 
         if (!trainees || trainees.length === 0) {
@@ -173,7 +173,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         ${trainee.status}
                     </span>
                 </td>
-                ${adminModeT ? `<td class="px-6 py-4 whitespace-nowrap"><div class="flex items-center justify-center"><button data-id="${trainee.userId}" class="remove-trainee-btn text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button></div></td>` : '<td></td>'}
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-indigo-600">
+                <a href="/admin/courses/${courseId}/trainee/${trainee.userId}/progress" class="hover:underline"><i class="fas fa-eye"></i></a>
+            </td>
+            ${adminModeT ? `<td class="px-6 py-4 whitespace-nowrap"><div class="flex items-center justify-center"><button data-id="${trainee.userId}" class="remove-trainee-btn text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button></div></td>` : '<td></td>'}
             `;
             tbody.appendChild(row);
         });

@@ -9,10 +9,28 @@ export class AdminViewController {
         return { layout: 'layouts/admin-layout' };
     }
 
-    @Get('users')
-    @Render('users')
-    usersPage() {
+    @Get('profile')
+    @Render('user/profile')
+    getProfilePage() {
         return { layout: 'layouts/admin-layout' };
+    }
+
+    @Get('users')
+    @Render('user/users')
+    getUsersPage() {
+        return { layout: 'layouts/admin-layout' };
+    }
+
+    @Get('user/:id')
+    @Render('user/user-detail')
+    getUserDetailPage() {
+        return { layout: 'layouts/admin-layout' };
+    }
+
+    @Get('users/:id')
+    @Render('user/profile')
+    getUserDetailPageById(@Param('id') id: number) {
+        return { layout: 'layouts/admin-layout', userId: id };
     }
 
     @Get('trainees')
@@ -68,6 +86,12 @@ export class AdminViewController {
     @Render('course/course-detail')
     getCourseDetailPage(@Param('id') id: number) {
         return { layout: 'layouts/admin-layout', courseId: id };
+    }
+
+    @Get('courses/:courseId/trainee/:traineeId/progress')
+    @Render('trainee/trainee-progress')
+    getTraineeProgressPage(@Param('courseId') courseId: number, @Param('traineeId') traineeId: number) {
+        return { layout: 'layouts/admin-layout', courseId: courseId, traineeId: traineeId };
     }
 
     @Get('subjects')
