@@ -3,6 +3,7 @@ export interface SubjectItem {
     name: string;
     description: string;
     studyDuration: number;
+    status: string;
 }
 
 export interface CourseItem {

@@ -19,6 +19,8 @@ import { tableName } from 'src/helper/constants/emtities.constant';
 import { templatePug } from 'src/helper/constants/template.constant';
 import { ApiResponse } from 'src/helper/interface/api.interface';
 import { AssignTraineeToCourseResponseDto, CourseDetailDto, CourseListItem } from 'src/helper/interface/course.iterface';
+import { MyProfile } from 'src/helper/interface/user.interface';
+import { MailQueueService } from 'src/helper/Queue/mail/mail_queue.service';
 import { GetCourse } from 'src/helper/shared/get_course.shared';
 import { I18nUtils } from 'src/helper/utils/i18n-utils';
 import { CreateCourseDto, UpdateCourseDto } from 'src/validation/class_validation/course.validation';
@@ -38,7 +40,7 @@ export class CourseService {
         private readonly i18nUtils: I18nUtils,
         private readonly dataSource: DataSource,
         private readonly getCourse: GetCourse,
-        private readonly mailerService: MailerService,
+        private readonly mailQueueService: MailQueueService,
         private readonly logger: Logger,
 
     ) { }
@@ -301,10 +303,27 @@ export class CourseService {
             });
 
             const result = await this.supervisorCourseRepo.save(assignment);
+
+            await this.sendEmailAssignSupervisoeCourse(courseId, user, lang);
             return result;
-        } catch {
+        } catch (error) {
+            this.logger.error('Error assigning supervisor to course', 'CourseService', 'assignSupervisorToCourse', error?.stack);
             throw new InternalServerErrorException(this.i18nUtils.translate('validation.server.internal_server_error', {}, lang));
         }
+    }
+
+    private async sendEmailAssignSupervisoeCourse(courseId: number, user: User, lang: string) {
+        const course = await this.getCourseById(courseId, lang);
+        const subject = this.i18nUtils.translate('validation.course.assign_supervisor_success', {}, lang);
+        const template = templatePug.assignSupervisorToCourse;
+        const email = user.email;
+        const context = {
+            userName: user.userName,
+            courseName: course?.name,
+            startDate: format(course?.start, 'dd/MM/yyyy', { locale: vi }),
+            endDate: format(course?.end, 'dd/MM/yyyy', { locale: vi }),
+        }
+        await this.sendEmail(email, subject, template, context, lang);
     }
 
     private async checkUserRole(supervisorId: number, userRole: Role): Promise<User | null> {
@@ -313,15 +332,24 @@ export class CourseService {
     }
 
     private async checkAssigned(courseId: number, supervisorId: number, lang: string): Promise<SupervisorCourse | null> {
-        const existing = await this.supervisorCourseRepo.findOneBy({
-            course: { courseId },
-            supervisor: { userId: supervisorId }
+        const course = await this.courseRepo.findOneBy({ courseId });
+
+        if (!course) {
+            throw new BadRequestException(this.i18nUtils.translate('validation.course.not_found', {}, lang));
+        }
+
+        const existing = await this.supervisorCourseRepo.findOne({
+            where: {
+                course: { courseId },
+                supervisor: { userId: supervisorId }
+            },
+            relations: ['course', 'supervisor']
         });
 
         return existing;
     }
 
-    async removeSupervisorFromCourse(courseId: number, supervisorId: number, lang: string): Promise<void> {
+    async removeSupervisorFromCourse(courseId: number, supervisorId: number, lang: string): Promise<ApiResponse | void> {
         const existing = await this.checkAssigned(courseId, supervisorId, lang);
         if (!existing) {
             throw new BadRequestException(this.i18nUtils.translate('validation.course.user_notfound', {}, lang));
@@ -329,7 +357,20 @@ export class CourseService {
 
         try {
             await this.supervisorCourseRepo.remove(existing);
-        } catch {
+
+            const email = existing.supervisor.email;
+            const courseName = existing.course.name;
+            const subject = this.i18nUtils.translate('validation.course.supervisor_removed', {}, lang);
+            const template = templatePug.removeSupervisorToCourse;
+            const context = {
+                userName: existing.supervisor.userName,
+                courseName,
+                subject,
+            };
+
+            await this.sendEmail(email, subject, template, context, lang);
+        } catch (error) {
+            this.logger.error('Error removing supervisor from course', 'CourseService', 'removeSupervisorFromCourse', error?.stack);
             throw new InternalServerErrorException(this.i18nUtils.translate('validation.server.internal_server_error', {}, lang));
         }
     }
@@ -368,7 +409,7 @@ export class CourseService {
             });
 
             const savedUserCourse = await this.userCourseRepo.save(data);
-            const course = await this.getCourseById(savedUserCourse, lang);
+            const course = await this.getCourseById(savedUserCourse.course.courseId, lang);
 
             const subject = this.i18nUtils.translate('validation.course.user_course_success', {}, lang);
             const template = templatePug.assignUserToCourse;
@@ -382,7 +423,8 @@ export class CourseService {
             await this.sendEmail(email, subject, template, context, lang);
 
             return { savedUserCourse, course };
-        } catch {
+        } catch (error) {
+            this.logger.error('Error creating user course', 'CourseService', 'createAndNotifyUserCourse', error?.stack);
             throw new InternalServerErrorException(this.i18nUtils.translate('validation.server.internal_server_error', {}, lang));
         }
     }
@@ -400,8 +442,8 @@ export class CourseService {
         }
     }
 
-    private async getCourseById(savedUserCourse: UserCourse, lang: string): Promise<Course> {
-        const course: Course | null = await this.courseRepo.findOneBy({ courseId: savedUserCourse.course.courseId });
+    private async getCourseById(courseId: number, lang: string): Promise<Course> {
+        const course: Course | null = await this.courseRepo.findOneBy({ courseId });
         if (!course) {
             throw new BadRequestException(this.i18nUtils.translate('validation.course.user_not_trainee', {}, lang));
         }
@@ -410,13 +452,14 @@ export class CourseService {
 
     private async sendEmail(email: string, subject: string, template: string, context: object, lang: string): Promise<void> {
         try {
-            await this.mailerService.sendMail({
+            await this.mailQueueService.enqueueMailJob({
                 to: email,
                 subject: subject,
                 template: template,
-                context: context
+                context: context,
             });
-        } catch {
+        } catch (error) {
+            this.logger.error('Error sending email', 'CourseService', 'sendEmail', error);
             throw new InternalServerErrorException(this.i18nUtils.translate('validation.server.internal_server_error', {}, lang));
         }
     }
@@ -452,7 +495,7 @@ export class CourseService {
         }
     }
 
-    async startCourse(courseId: number, lang: string): Promise<ApiResponse> {
+    async startCourse(courseId: number, lang: string): Promise<void> {
         const queryRunner = this.dataSource.createQueryRunner();
         await queryRunner.connect();
         await queryRunner.startTransaction();
@@ -462,12 +505,6 @@ export class CourseService {
             await this.assignSubjectsToUsersInCourse(courseId, lang, queryRunner.manager);
 
             await queryRunner.commitTransaction();
-
-            return {
-                success: true,
-                message: this.i18nUtils.translate('validation.course.start_course_success'),
-            };
-
         } catch (error) {
             await queryRunner.rollbackTransaction();
             this.logger.error('startCourse failed', error?.stack || error);
@@ -541,7 +578,7 @@ export class CourseService {
 
     }
 
-    async finishCourse(courseId: number, lang: string): Promise<ApiResponse> {
+    async finishCourse(courseId: number, lang: string): Promise<void> {
         const queryRunner = this.dataSource.createQueryRunner();
         await queryRunner.connect();
         await queryRunner.startTransaction();
@@ -553,11 +590,6 @@ export class CourseService {
             await this.finishUserCourses(courseId, lang, userSubjects);
 
             await queryRunner.commitTransaction();
-
-            return {
-                success: true,
-                message: this.i18nUtils.translate('validation.course.start_course_success'),
-            };
         } catch (error) {
             await queryRunner.rollbackTransaction();
             this.logger.error('startCourse failed', error?.stack || error);
@@ -639,4 +671,25 @@ export class CourseService {
         );
     }
 
+    async getSupervisorsOfCourse(courseId: number, lang: string): Promise<MyProfile[]> {
+        const result = await this.supervisorCourseRepo.find({
+            where: { course: { courseId } },
+            relations: ['supervisor'],
+        });
+
+        if (result.length === 0) {
+            throw new BadRequestException(this.i18nUtils.translate('validation.course.not_found', {}, lang));
+        }
+
+        const data = result.map(s => ({
+            userId: s.supervisor.userId,
+            userName: s.supervisor.userName,
+            email: s.supervisor.email,
+            role: s.supervisor.role,
+            status: s.supervisor.status,
+        })
+        );
+
+        return data;
+    }
 }

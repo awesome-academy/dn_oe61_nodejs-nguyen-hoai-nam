@@ -9,11 +9,13 @@ import { User } from 'src/database/entities/user.entity';
 import { AssignSupervisorDto } from 'src/validation/class_validation/supervisor_course.validation';
 import { userIdDto } from 'src/validation/class_validation/user.validation';
 import { ApiBearerAuth, ApiExcludeEndpoint } from '@nestjs/swagger';
-import { CourseDetailDto, CourseListItem } from 'src/helper/interface/course.iterface';
+import { AssignTraineeToCourseResponseDto, CourseDetailDto, CourseListItem } from 'src/helper/interface/course.iterface';
 import { ApiResponse } from 'src/helper/interface/api.interface';
 import { ApiResponseGetAllCourse } from 'src/helper/swagger/course/get_all_response.decorator';
 import { ApiResponseGetByIdCourse } from 'src/helper/swagger/course/get_by_id_response.decorator';
 import { I18nUtils } from 'src/helper/utils/i18n-utils';
+import { SupervisorCourse } from 'src/database/entities/supervisor_course.entity';
+import { MyProfile } from 'src/helper/interface/user.interface';
 
 @Controller('course')
 export class CourseController {
@@ -80,51 +82,89 @@ export class CourseController {
     @ApiExcludeEndpoint()
     @AuthRoles(Role.ADMIN)
     @Post(':courseId/supervisor')
-    async assignSupervisorToCourse(@Param() courseId: courseIdDto, @Body() supervisorId: AssignSupervisorDto, @Language() lang: string) {
+    async assignSupervisorToCourse(@Param() courseId: courseIdDto, @Body() supervisorId: AssignSupervisorDto, @Language() lang: string): Promise<ApiResponse | SupervisorCourse> {
         const result = await this.courseService.assignSupervisorToCourse(courseId.courseId, supervisorId.supervisorId, lang);
-        return result;
+        return {
+            code: 200,
+            success: true,
+            message: this.i18nUtils.translate('validation.course.assign_success', {}, lang),
+            data: result
+        };
     }
 
     @ApiExcludeEndpoint()
     @AuthRoles(Role.ADMIN)
     @Delete(':courseId/supervisor/:supervisorId')
-    async removeSupervisorFromCourse(@Param() param: { courseId: number; supervisorId: number }, @Language() lang: string) {
+    async removeSupervisorFromCourse(@Param() param: { courseId: number; supervisorId: number }, @Language() lang: string): Promise<ApiResponse> {
         const { courseId, supervisorId } = param;
-        const result = await this.courseService.removeSupervisorFromCourse(courseId, supervisorId, lang);
-        return result;
+        await this.courseService.removeSupervisorFromCourse(courseId, supervisorId, lang);
+        return {
+            code: 200,
+            success: true,
+            message: this.i18nUtils.translate('validation.course.remove_success', {}, lang),
+        };
     }
 
     @ApiExcludeEndpoint()
     @AuthRoles(Role.ADMIN, Role.SUPERVISOR)
     @Post(':courseId/trainee')
-    async assignTraineeToCourse(@Param() courseId: courseIdDto, @Body() traineeId: userIdDto, @Language() lang: string) {
+    async assignTraineeToCourse(@Param() courseId: courseIdDto, @Body() traineeId: userIdDto, @Language() lang: string): Promise<ApiResponse | AssignTraineeToCourseResponseDto> {
         const result = await this.courseService.assignTraineeToCourse(courseId.courseId, traineeId.userId, lang);
-        return result;
+        return {
+            code: 200,
+            success: true,
+            message: this.i18nUtils.translate('validation.course.assign_trainee_success', {}, lang),
+            data: result
+        };
     }
 
     @ApiExcludeEndpoint()
     @AuthRoles(Role.ADMIN, Role.SUPERVISOR)
     @Delete(':courseId/trainee/:traineeId')
-    async removeTraineeFromCourse(@Param() param: { courseId: number; traineeId: number }, @Language() lang: string) {
+    async removeTraineeFromCourse(@Param() param: { courseId: number; traineeId: number }, @Language() lang: string): Promise<ApiResponse> {
         const { courseId, traineeId } = param;
-        const result = await this.courseService.removeTraineeFromCourse(courseId, traineeId, lang)
-        return result;
+        await this.courseService.removeTraineeFromCourse(courseId, traineeId, lang)
+        return {
+            code: 200,
+            success: true,
+            message: this.i18nUtils.translate('validation.course.remove_trainee_success', {}, lang),
+        };
     }
 
     @ApiExcludeEndpoint()
     @AuthRoles(Role.ADMIN, Role.SUPERVISOR)
     @Post(':courseId/start')
-    async startCourse(@Param() courseId: courseIdDto, @Language() lang: string) {
-        const result = await this.courseService.startCourse(courseId.courseId, lang);
-        return result;
+    async startCourse(@Param() courseId: courseIdDto, @Language() lang: string): Promise<ApiResponse> {
+        await this.courseService.startCourse(courseId.courseId, lang);
+        return {
+            code: 200,
+            success: true,
+            message: this.i18nUtils.translate('validation.course.start_course_success', {}, lang),
+        };
     }
 
     @ApiExcludeEndpoint()
     @AuthRoles(Role.ADMIN, Role.SUPERVISOR)
     @Post(':courseId/finish')
-    async finishCourse(@Param() courseId: courseIdDto, @Language() lang: string) {
-        const result = await this.courseService.finishCourse(courseId.courseId, lang);
-        return result;
+    async finishCourse(@Param() courseId: courseIdDto, @Language() lang: string): Promise<ApiResponse> {
+        await this.courseService.finishCourse(courseId.courseId, lang);
+        return {
+            code: 200,
+            success: true,
+            message: this.i18nUtils.translate('validation.course.finish_course_success', {}, lang),
+        };
     }
 
+    @ApiExcludeEndpoint()
+    @AuthRoles(Role.ADMIN, Role.SUPERVISOR)
+    @Get(':courseId/supervisor')
+    async getSupervisorsOfCourse(@Param() courseId: courseIdDto, @Language() lang: string): Promise<ApiResponse | MyProfile[]> {
+        const data = await this.courseService.getSupervisorsOfCourse(courseId.courseId, lang);
+        return {
+            code: 200,
+            success: true,
+            message: this.i18nUtils.translate('validation.response_api.success', {}, lang),
+            data: data
+        }
+    }
 }

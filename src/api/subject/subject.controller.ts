@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, UploadedFile } from '@nestjs/common';
 import { SubjectService } from './subject.service';
 import { CreateSubjectDto, subjectIdDto, UpdateSubjectDto } from 'src/validation/class_validation/subject.validation';
 import { Language } from 'src/helper/decorators/language.decorator';
@@ -11,6 +11,8 @@ import { Subject } from 'src/database/entities/subject.entity';
 import { ApiResponse } from 'src/helper/interface/api.interface';
 import { I18nUtils } from 'src/helper/utils/i18n-utils';
 import { ApiExcludeController } from '@nestjs/swagger';
+import { ExcelFileUpload } from 'src/helper/decorators/excel_file_upload.decorator';
+import { MulterFile } from 'src/helper/types/type_file';
 
 @ApiExcludeController()
 @Controller('subject')
@@ -60,5 +62,13 @@ export class SubjectController {
             message: this.i18nUtils.translate('validation.response_api.success', {}, lang),
             data
         }
+    }
+
+    @AuthRoles(Role.ADMIN, Role.SUPERVISOR)
+    @Post('import')
+    @ExcelFileUpload('file')
+    async importSubject(@UploadedFile() file: MulterFile, @UserDecorator() user: User, @Language() lang: string) {
+        const result = await this.subjectService.importSubject(file, user, lang);
+        return result;
     }
 }

@@ -66,6 +66,10 @@
     "not_found": "Không tìm thấy khoá học",
     "user_duplicate": "Giám sát viên đã tồn tại trong khoá học này",
     "user_notfound": "Giám sát viên không tồn tại trong khoá học này",
+    "assign_success": "Thêm thành công giám sát viên",
+    "assign_fail": "Thêm không thành công giám sát viên",
+    "assign_trainee_success": "Thêm thành công học viên",
+    "assign_trainee_fail": "Thêm không thành công học viên",
     "user_not_supervisor": "Chỉ có giám sát viên mới được gán vào khoá học",
     "user_not_trainee": "Chỉ có học viên mới được tham gia vào khoá học",
     "trainee_has_active_course": "Học viên đang tham gia một khoá học khác.",
@@ -74,6 +78,13 @@
     "trainee_not_found": "Trainee không tồn tại trong khoá học này",
     "start_course_success": "Đã kích hoạt khoá học thành công",
     "subject_exists": "Môn học đã tồn tại trong khoá học",
+    "assign_supervisor_success": "Gán thành công giám sát viên vào khoá học",
+    "assign_supervisor_fail": "Gán không thành công giám sát viên vào khoá học",
+    "supervisor_removed": "Giám sát viên đã bị gỡ khỏi khoá học",
+    "remove_success": "Xóa thành công",
+    "remove_faild": "Xóa không thành công",
+    "remove_trainee_success": "Xóa thành công học viên",
+    "remove_trainee_fail": "Xóa không thành công học viên",
     "name": {
       "isString": "Tên khóa học phải là chuỗi",
       "isNotEmpty": "Tên khóa học không được để trống",
@@ -276,5 +287,12 @@
     "chat.message_required": "Nội dung tin nhắn không được để trống.",
     "chat.course_not_found": "Không tìm thấy khóa học.",
     "chat.unauthorized_user": "Người dùng không hợp lệ hoặc không nằm trong khóa học."
+  },
+  "file": {
+    "invalid_file": "File không hợp lệ, chỉ nhận Excel"
+  },
+  "sheet": {
+    "sheet_not_found": "Sheet không tồn tại",
+    "subject_missing_tasks": "Thiếu ràng buộc với nhiệm vụ"
   }
 }

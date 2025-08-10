@@ -41,11 +41,12 @@ export class CourseSubjectService {
             end: courseSubjects[0].course.end,
         };
 
-        const subjects = courseSubjects.map(({ subject }) => ({
-            subjectId: subject.subjectId,
-            name: subject.name,
-            description: subject.description,
-            studyDuration: subject.studyDuration,
+        const subjects = courseSubjects.map(cs => ({
+            subjectId: cs.subject.subjectId,
+            name: cs.subject.name,
+            description: cs.subject.description,
+            studyDuration: cs.subject.studyDuration,
+            status: cs.status,
         }));
 
         const datas: CreateCourseWithSubjectsDto = {

@@ -29,6 +29,20 @@ class SubjectsManager {
         document.getElementById('add-task-btn').addEventListener('click', () => {
             this.addTaskInput();
         });
+
+        // Import subjects events
+        const importBtn = document.getElementById('import-subjects-btn');
+        const importFileInput = document.getElementById('import-subjects-file');
+        if (importBtn && importFileInput) {
+            importBtn.addEventListener('click', () => importFileInput.click());
+            importFileInput.addEventListener('change', (e) => {
+                if (e.target.files.length) {
+                    this.importSubjects(e.target.files[0]);
+                    // reset input so selecting same file again triggers change
+                    e.target.value = '';
+                }
+            });
+        }
     }
 
     showModal(subject = null) {
@@ -230,6 +244,27 @@ class SubjectsManager {
             </button>`;
 
         paginationContainer.innerHTML = `<nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">${paginationHtml}</nav>`;
+    }
+
+    async importSubjects(file) {
+        const lang = getCurrentLanguage();
+        const formData = new FormData();
+        formData.append('file', file);
+        try {
+            const res = await fetch(`/subject/import?lang=${lang}`, {
+                method: 'POST',
+                body: formData,
+            });
+            const data = await res.json();
+            if (!res.ok || !data.success) {
+                throw new Error(data.message || 'Import failed');
+            }
+            showToast(data.message || 'Import successful', 'success');
+            this.loadSubjects();
+        } catch (err) {
+            console.error(err);
+            showToast(err.message || 'Import failed', 'error');
+        }
     }
 
     renderTable(subjects) {

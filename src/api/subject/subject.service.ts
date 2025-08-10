@@ -6,14 +6,15 @@ import { CourseSubject } from 'src/database/entities/course_subject.entity';
 import { Subject } from 'src/database/entities/subject.entity';
 import { Task } from 'src/database/entities/task.entity';
 import { User } from 'src/database/entities/user.entity';
-import { ApiResponse } from 'src/helper/interface/api.interface';
 import { GetCourse } from 'src/helper/shared/get_course.shared';
 import { PaginationService } from 'src/helper/shared/pagination.shared';
 import { I18nUtils } from 'src/helper/utils/i18n-utils';
 import { CreateSubjectDto, UpdateSubjectDto } from 'src/validation/class_validation/subject.validation';
 import { CreateTaskDto } from 'src/validation/class_validation/task.validation';
-import { DatabaseValidation } from 'src/validation/existence/existence.validator';
 import { DataSource, EntityManager, Repository } from 'typeorm';
+import { MulterFile } from 'src/helper/types/type_file';
+import * as XLSX from 'xlsx';
+import { SubjectRow, taskRow } from 'src/helper/interface/subject.interface';
 
 @Injectable()
 export class SubjectService {
@@ -30,15 +31,19 @@ export class SubjectService {
         private readonly paginationService: PaginationService,
     ) { }
 
-    async create(subjectInput: CreateSubjectDto, user: User, lang: string): Promise<{ subjects: Subject; tasks: Task[] }> {
-        const existing = await this.subjectRepo.findOneBy({
+    async existingSubject(subjectInput: SubjectRow, user: User, lang: string, manager: EntityManager): Promise<void> {
+        const existing = await manager.getRepository(Subject).findOneBy({
             name: subjectInput.name,
             creator: { userId: user.userId },
         });
+        console.log(!existing);
 
         if (existing) {
             throw new BadRequestException(this.i18nUtils.translate('validation.subject.subject_duplicate', {}, lang),);
         }
+    }
+
+    async create(subjectInput: CreateSubjectDto, user: User, lang: string): Promise<{ subjects: Subject; tasks: Task[] }> {
 
         const { tasks } = subjectInput;
 
@@ -50,19 +55,20 @@ export class SubjectService {
         const manager = queryRunner.manager;
 
         try {
+            await this.existingSubject(subjectInput, user, lang, manager);
             const savedSubject = await this.savedSubject(manager, subjectInput, user.userId)
             const savedTasks = await this.savedTasks(manager, tasks, savedSubject.subjectId);
             const data = {
                 subjects: savedSubject,
                 tasks: savedTasks
             }
-            
+
             await queryRunner.commitTransaction();
 
             return data;
         } catch (error) {
             await queryRunner.rollbackTransaction();
-            this.logger.error('startCourse failed', error?.stack || error);
+            this.logger.error('create subject failed', error?.stack || error);
             throw new InternalServerErrorException(this.i18nUtils.translate('validation.server.internal_server_error', {}, lang));
 
         } finally {
@@ -70,7 +76,7 @@ export class SubjectService {
         }
     }
 
-    private async savedSubject(manager: EntityManager, subjectInput: CreateSubjectDto, userId: number): Promise<Subject> {
+    private async savedSubject(manager: EntityManager, subjectInput: SubjectRow, userId: number): Promise<Subject> {
         const { name, description, studyDuration } = subjectInput;
         const subjectRepo = manager.getRepository(Subject);
 
@@ -83,7 +89,7 @@ export class SubjectService {
         return await subjectRepo.save(subject);
     }
 
-    private async savedTasks(manager: EntityManager, tasks: CreateTaskDto[], subjectId: number): Promise<Task[]> {
+    private async savedTasks(manager: EntityManager, tasks: taskRow[], subjectId: number): Promise<Task[]> {
         const taskRepo = manager.getRepository(Task);
 
         const data = tasks.map((task) => {
@@ -210,5 +216,95 @@ export class SubjectService {
                 currentPage: page,
             },
         };
+    }
+
+    async importSubject(file: MulterFile, user: User, lang: string) {
+        const dataImportSubjects = await this.readDataSubjectsFile(file, lang);
+        const dataImportTasks = await this.readDataTasksFile(file, lang);
+
+        this.validateData(dataImportSubjects, dataImportTasks, lang);
+
+        const queryRunner = this.dataSource.createQueryRunner()
+        await queryRunner.connect()
+        await queryRunner.startTransaction()
+        const manager = queryRunner.manager;
+
+        try {
+            const results = await Promise.all(dataImportSubjects.map(async (dataImportSubject) => {
+                await this.existingSubject(dataImportSubject, user, lang, manager);
+                const savedSubject = await this.savedSubject(manager, dataImportSubject, user.userId);
+
+                const tasksForSubject = dataImportTasks.filter(task => task.subCode === dataImportSubject.code);
+                const savedTasks = await this.savedTasks(manager, tasksForSubject, savedSubject.subjectId);
+
+                return {
+                    subject: savedSubject,
+                    tasks: savedTasks,
+                };
+            }));
+
+            await queryRunner.commitTransaction();
+
+            return results;
+        } catch (error) {
+            await queryRunner.rollbackTransaction();
+            this.logger.error('importSubject failed', error?.stack || error);
+            throw new InternalServerErrorException(this.i18nUtils.translate('validation.server.internal_server_error', {}, lang));
+
+        } finally {
+            await queryRunner.release();
+        }
+    }
+
+    private validateData(dataImportSubjects: SubjectRow[], dataImportTasks: taskRow[], lang: string) {
+        dataImportSubjects.forEach(sub => {
+            const tasksForSubject = dataImportTasks.filter(t => t.subCode === sub.code);
+            if (tasksForSubject.length === 0) {
+                throw new BadRequestException(this.i18nUtils.translate('validation.sheet.subject_missing_tasks', {}, lang));
+            }
+        });
+    }
+
+    private async readDataSubjectsFile(file: MulterFile, lang: string): Promise<SubjectRow[]> {
+        const workbook = XLSX.read(file.buffer, { type: 'buffer' });
+        const sheetSubject = workbook.Sheets['Subjects'];
+
+        if (!sheetSubject) {
+            throw new BadRequestException(this.i18nUtils.translate('validation.sheet_not_found', {}, lang));
+        }
+
+        const subjectDataSheets = XLSX.utils.sheet_to_json<SubjectRow>(sheetSubject);
+
+        const subjectsData = subjectDataSheets.map(row => {
+            return {
+                code: row['code'],
+                name: row['name'],
+                description: row['description'],
+                studyDuration: row['studyDuration'],
+            }
+        })
+
+        return subjectsData;
+    }
+
+    private async readDataTasksFile(file: MulterFile, lang: string): Promise<taskRow[]> {
+        const workbook = XLSX.read(file.buffer, { type: 'buffer' });
+        const sheetTask = workbook.Sheets['Tasks'];
+
+        if (!sheetTask) {
+            throw new BadRequestException(this.i18nUtils.translate('validation.sheet_not_found', {}, lang));
+        }
+
+        const taskDataSheets = XLSX.utils.sheet_to_json<taskRow>(sheetTask);
+
+        const tasksData = taskDataSheets.map(row => {
+            return {
+                subCode: row['subCode'],
+                name: row['name'],
+                fileUrl: row['fileUrl']
+            }
+        })
+
+        return tasksData;
     }
 }

@@ -274,10 +274,6 @@ export class UserSubjectService {
             relations: ['task', 'userSubject', 'userSubject.courseSubject'],
         });
 
-        if (userTasks.length === 0) {
-            throw new NotFoundException(this.i18nUtils.translate('validation.user_task.user_task_not_found', {}, lang));
-        }
-
         return userTasks;
     }
 
