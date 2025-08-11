@@ -22,8 +22,12 @@ export class AdminViewController {
     }
 
     @Get('user/:id')
-    @Render('user/user-detail')
-    getUserDetailPage() {
+    @Render('admin/user/user-detail')
+    getUserDetailPage() { }
+
+    @Get('report')
+    @Render('report')
+    getReportPage() { 
         return { layout: 'layouts/admin-layout' };
     }
 

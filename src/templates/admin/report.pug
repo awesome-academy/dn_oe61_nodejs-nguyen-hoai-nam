@@ -1,0 +1,88 @@
+include layouts/admin-layout
+
++adminLayout('Reporting', 'report', 'View system reports', 'Reporting Dashboard')
+
+  //- Filters
+  div(class="flex items-center justify-between mb-6 bg-white p-4 rounded-lg shadow")
+    div(class="flex items-center space-x-2")
+      button(id="daily-btn" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500") Daily
+      button(id="monthly-btn" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 focus:outline-none") Monthly
+    div(class="flex items-center space-x-4")
+      div
+        label(for="start-date" class="text-sm font-medium text-gray-700 mr-2") Start Date:
+        input(type="date" id="start-date" name="start-date" class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500")
+      div
+        label(for="end-date" class="text-sm font-medium text-gray-700 mr-2") End Date:
+        input(type="date" id="end-date" name="end-date" class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500")
+      button(id="filter-btn" class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 focus:outline-none") Filter
+  //- Stat Cards
+  div(class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6")
+    //- Total Subjects
+    div(class="bg-white rounded-lg shadow-lg p-6 flex items-center")
+      div(class="bg-blue-500 rounded-full p-4 mr-4")
+        i(class="fas fa-book text-white text-2xl")
+      div
+        p(class="text-sm text-gray-500") Total Subjects
+        p(id="total-subjects" class="text-3xl font-bold text-gray-900") 0
+    //- Completed Subjects
+    div(class="bg-white rounded-lg shadow-lg p-6 flex items-center")
+      div(class="bg-green-500 rounded-full p-4 mr-4")
+        i(class="fas fa-check-circle text-white text-2xl")
+      div
+        p(class="text-sm text-gray-500") Completed Subjects
+        p(id="completed-subjects" class="text-3xl font-bold text-gray-900") 0
+    //- Total Tasks
+    div(class="bg-white rounded-lg shadow-lg p-6 flex items-center")
+      div(class="bg-yellow-500 rounded-full p-4 mr-4")
+        i(class="fas fa-tasks text-white text-2xl")
+      div
+        p(class="text-sm text-gray-500") Total Tasks
+        p(id="total-tasks" class="text-3xl font-bold text-gray-900") 0
+    //- Completed Tasks
+    div(class="bg-white rounded-lg shadow-lg p-6 flex items-center")
+      div(class="bg-purple-500 rounded-full p-4 mr-4")
+        i(class="fas fa-clipboard-check text-white text-2xl")
+      div
+        p(class="text-sm text-gray-500") Completed Tasks
+        p(id="completed-tasks" class="text-3xl font-bold text-gray-900") 0
+
+  //- Charts
+  div(class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6")
+    //- Subject Progress Chart
+    div(class="bg-white rounded-lg shadow-lg p-6")
+      h3(class="text-lg font-semibold text-gray-900 mb-4") Subject Progress
+      div(class="relative h-64")
+        canvas(id="subject-progress-chart")
+    //- Task Progress Chart
+    div(class="bg-white rounded-lg shadow-lg p-6")
+      h3(class="text-lg font-semibold text-gray-900 mb-4") Task Progress
+      div(class="relative h-64")
+        canvas(id="task-progress-chart")
+
+  //- Activity Log Section (New and Separate)
+  div(class="mt-8 bg-white p-4 rounded-lg shadow")
+    h2(class="text-xl font-semibold mb-4 text-gray-800") Activity Log
+    //- Course Selector for Activity Log
+    div(class="mb-4")
+      label(for="log-course-select" class="text-sm font-medium text-gray-700 mr-2") Select Course:
+      select(id="log-course-select" class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500")
+        option(value="") -- Select a Course --
+    
+    //- Activity Log Table
+    div(class="overflow-x-auto")
+      table(class="min-w-full divide-y divide-gray-200")
+        thead(class="bg-gray-50")
+          tr
+            th(class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") User Name
+            th(class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Event Type
+            th(class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Details
+            th(class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Timestamp
+        tbody(id="activity-log-body" class="bg-white divide-y divide-gray-200")
+          tr
+            td(colspan="4" class="text-center py-4 text-gray-500") Please select a course to view logs.
+
+block scripts
+  script(src="https://cdn.jsdelivr.net/npm/chart.js")
+  script(src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js")
+  script(src="https://cdn.jsdelivr.net/npm/sweetalert2@11")
+  script(src="/js/report.js")

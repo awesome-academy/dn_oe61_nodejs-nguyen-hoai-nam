@@ -29,7 +29,11 @@ mixin sidebar(currentPage, userName, userAvatar)
           a(href="/admin/users" class=`${currentPage === 'users' ? 'active-menu' : 'menu-item'} flex items-center px-4 py-3 text-sm font-medium ${currentPage === 'users' ? '' : 'text-gray-700'}`)
             i(class=`fas fa-users mr-3 ${currentPage === 'users' ? '' : 'text-gray-500'}`)
             span All Users
-          
+
+          a(href="/admin/report" class=`${currentPage === 'report' ? 'active-menu' : 'menu-item'} flex items-center px-4 py-3 text-sm font-medium ${currentPage === 'report' ? '' : 'text-gray-700'}`)
+            i(class="fas fa-chart-pie w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white")
+            span(class="ml-3") Reporting
+
           a(href="/admin/trainees" class=`${currentPage === 'trainees' ? 'active-menu' : 'menu-item'} flex items-center px-4 py-3 text-sm font-medium ${currentPage === 'trainees' ? '' : 'text-gray-700'}`)
             i(class=`fas fa-user-graduate mr-3 ${currentPage === 'trainees' ? '' : 'text-gray-500'}`)
             span Trainees
