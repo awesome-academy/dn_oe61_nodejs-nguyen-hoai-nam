@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const lang = getCurrentLanguage();
 
         if (!supervisorId || isNaN(supervisorId)) {
-            Object.values(supervisorInfo).forEach(el => el.textContent = 'Invalid ID');
+            Object.values(supervisorInfo).forEach(el => el.textContent = tMsg('failedLoadData'));
             return;
         }
 
@@ -41,11 +41,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 supervisorInfo.role.textContent = role;
                 supervisorInfo.status.textContent = status;
             } else {
-                showToast(result.message || 'Failed to load supervisor details.', 'error');
+                showToast(result.message || tMsg('failedLoadData'), 'error');
                 Object.values(supervisorInfo).forEach(el => el.textContent = 'Error');
             }
         } catch (error) {
-            showToast('An unexpected network error occurred.', 'error');
+            showToast(tMsg('unexpectedNetworkError'), 'error');
             Object.values(supervisorInfo).forEach(el => el.textContent = 'Error');
         }
     };
@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (currentSupervisorData) {
                 supervisorsManager.showModal(currentSupervisorData);
             } else {
-                showToast('Supervisor data not available. Cannot update.', 'error');
+                showToast(tMsg('failedLoadData'), 'error');
             }
         });
     }
@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (supervisorId) {
                 supervisorsManager.deleteSupervisor(supervisorId);
             } else {
-                showToast('Supervisor ID not found. Cannot delete.', 'error');
+                showToast(tMsg('failedLoadData'), 'error');
             }
         });
     }

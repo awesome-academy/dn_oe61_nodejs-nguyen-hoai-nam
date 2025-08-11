@@ -12,47 +12,39 @@ mixin sidebar(currentPage, userName, userAvatar)
         div(class="space-y-2")
           a(href="/admin/dashboard" class=`${currentPage === 'dashboard' ? 'active-menu' : 'menu-item'} flex items-center px-4 py-3 text-sm font-medium ${currentPage === 'dashboard' ? '' : 'text-gray-700'}`)
             i(class=`fas fa-tachometer-alt mr-3 ${currentPage === 'dashboard' ? '' : 'text-gray-500'}`)
-            span Dashboard
+            span(data-i18n="sidebar.dashboard") Dashboard
           
           a(href="/admin/chat" class=`${currentPage === 'chat' ? 'active-menu' : 'menu-item'} flex items-center px-4 py-3 text-sm font-medium ${currentPage === 'chat' ? '' : 'text-gray-700'}`)
             i(class=`fas fa-comment-dots mr-3 ${currentPage === 'chat' ? '' : 'text-gray-500'}`)
-            span Chat
+            span(data-i18n="sidebar.chat") Chat
           
           a(href="/admin/courses" class=`${currentPage === 'courses' ? 'active-menu' : 'menu-item'} flex items-center px-4 py-3 text-sm font-medium ${currentPage === 'courses' ? '' : 'text-gray-700'}`)
             i(class=`fas fa-graduation-cap mr-3 ${currentPage === 'courses' ? '' : 'text-gray-500'}`)
-            span Courses
+            span(data-i18n="sidebar.courses") Courses
           
           a(href="/admin/subjects" class=`${currentPage === 'subjects' ? 'active-menu' : 'menu-item'} flex items-center px-4 py-3 text-sm font-medium ${currentPage === 'subjects' ? '' : 'text-gray-700'}`)
             i(class=`fas fa-book mr-3 ${currentPage === 'subjects' ? '' : 'text-gray-500'}`)
-            span Subjects
+            span(data-i18n="sidebar.subjects") Subjects
           
           a(href="/admin/users" class=`${currentPage === 'users' ? 'active-menu' : 'menu-item'} flex items-center px-4 py-3 text-sm font-medium ${currentPage === 'users' ? '' : 'text-gray-700'}`)
             i(class=`fas fa-users mr-3 ${currentPage === 'users' ? '' : 'text-gray-500'}`)
-            span All Users
+            span(data-i18n="sidebar.users") All Users
 
           a(href="/admin/report" class=`${currentPage === 'report' ? 'active-menu' : 'menu-item'} flex items-center px-4 py-3 text-sm font-medium ${currentPage === 'report' ? '' : 'text-gray-700'}`)
             i(class="fas fa-chart-pie w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white")
-            span(class="ml-3") Reporting
+            span(class="ml-3" data-i18n="sidebar.report") Reporting
 
           a(href="/admin/trainees" class=`${currentPage === 'trainees' ? 'active-menu' : 'menu-item'} flex items-center px-4 py-3 text-sm font-medium ${currentPage === 'trainees' ? '' : 'text-gray-700'}`)
             i(class=`fas fa-user-graduate mr-3 ${currentPage === 'trainees' ? '' : 'text-gray-500'}`)
-            span Trainees
+            span(data-i18n="sidebar.trainees") Trainees
           
           a(href="/admin/supervisors" class=`${currentPage === 'supervisors' ? 'active-menu' : 'menu-item'} flex items-center px-4 py-3 text-sm font-medium ${currentPage === 'supervisors' ? '' : 'text-gray-700'}`)
             i(class=`fas fa-user-tie mr-3 ${currentPage === 'supervisors' ? '' : 'text-gray-500'}`)
-            span Supervisors
+            span(data-i18n="sidebar.supervisors") Supervisors
           
           a(href="/admin/tasks" class=`${currentPage === 'tasks' ? 'active-menu' : 'menu-item'} flex items-center px-4 py-3 text-sm font-medium ${currentPage === 'tasks' ? '' : 'text-gray-700'}`)
             i(class=`fas fa-tasks mr-3 ${currentPage === 'tasks' ? '' : 'text-gray-500'}`)
-            span Tasks
-          
-          a(href="/admin/reports" class=`${currentPage === 'reports' ? 'active-menu' : 'menu-item'} flex items-center px-4 py-3 text-sm font-medium ${currentPage === 'reports' ? '' : 'text-gray-700'}`)
-            i(class=`fas fa-chart-bar mr-3 ${currentPage === 'reports' ? '' : 'text-gray-500'}`)
-            span Reports
-          
-          a(href="/admin/settings" class=`${currentPage === 'settings' ? 'active-menu' : 'menu-item'} flex items-center px-4 py-3 text-sm font-medium ${currentPage === 'settings' ? '' : 'text-gray-700'}`)
-            i(class=`fas fa-cog mr-3 ${currentPage === 'settings' ? '' : 'text-gray-500'}`)
-            span Settings
+            span(data-i18n="sidebar.tasks") Tasks
 
     div(class="p-6 border-t border-gray-200")
       div(class="flex items-center justify-between")

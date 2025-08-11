@@ -1,6 +1,8 @@
 import { Controller, Get, Render, Param } from '@nestjs/common';
 import { Language } from '../../helper/decorators/language.decorator';
+import { ApiExcludeController } from '@nestjs/swagger';
 
+@ApiExcludeController()
 @Controller('admin')
 export class AdminViewController {
     @Get('dashboard')
@@ -22,7 +24,7 @@ export class AdminViewController {
     }
 
     @Get('user/:id')
-    @Render('admin/user/user-detail')
+    @Render('user/user-detail')
     getUserDetailPage() { }
 
     @Get('report')

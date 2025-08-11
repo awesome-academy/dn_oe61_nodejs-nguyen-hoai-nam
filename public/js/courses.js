@@ -34,7 +34,7 @@ class CoursesManager {
         if (courseId) {
             const course = this.courses.find(c => c.id === courseId);
             if (course) {
-                modalTitle.textContent = 'Edit Course';
+                modalTitle.textContent = tMsg('editCourse');
                 this.currentCourseId = course.id;
                 document.getElementById('course-id').value = course.id;
                 document.getElementById('course-name').value = course.name;
@@ -44,11 +44,11 @@ class CoursesManager {
                 document.getElementById('course-status').value = course.status;
                 subjectsContainer.classList.add('hidden');
             } else {
-                showToast(`Course not found.`, 'error');
+                showToast(tMsg('courseNotFound'), 'error');
                 return;
             }
         } else {
-            modalTitle.textContent = 'Add New Course';
+            modalTitle.textContent = tMsg('addCourse');
         }
 
         modal.classList.remove('hidden');
@@ -57,7 +57,7 @@ class CoursesManager {
     async showAddModal() {
         document.getElementById('course-form').reset();
         document.getElementById('course-id').value = '';
-        document.getElementById('modal-title').textContent = 'Add New Course';
+        document.getElementById('modal-title').textContent = tMsg('addCourse');
         document.getElementById('subjects-container').classList.remove('hidden');
         await this.loadSubjects();
         const modal = document.getElementById('course-modal');
@@ -79,10 +79,10 @@ class CoursesManager {
                     subjectsSelect.appendChild(option);
                 });
             } else {
-                showToast(result.message || 'Failed to load subjects.', 'error');
+                showToast(result.message || tMsg('failedLoadData'), 'error');
             }
         } catch (error) {
-            showToast('An unexpected error occurred while fetching subjects.', 'error');
+            showToast(tMsg('unexpectedError'), 'error');
         }
     }
 
@@ -126,11 +126,11 @@ class CoursesManager {
             const result = await response.json();
 
             if (result.success) {
-                showToast(result.message || `Course successfully ${courseId ? 'updated' : 'created'}!`, 'success');
+                showToast(result.message || (courseId ? tMsg('courseUpdated') : tMsg('courseCreated')), 'success');
                 this.hideModal();
                 this.loadCourses(this.currentPage);
             } else {
-                showToast(result.message || 'An error occurred while saving the course.', 'error');
+                showToast(result.message || tMsg('errorSavingCourse'), 'error');
             }
         } catch (error) {
             showToast('An unexpected error occurred.', 'error');
@@ -154,7 +154,7 @@ class CoursesManager {
                 this.updateStats(this.courses, meta);
                 this.renderPagination();
             } else {
-                showToast(result.message || 'Failed to load courses.', 'error');
+                showToast(result.message || tMsg('failedLoadData'), 'error');
             }
         } catch (error) {
             showToast('An unexpected error occurred.', 'error');
@@ -208,7 +208,7 @@ class CoursesManager {
         tableBody.innerHTML = '';
 
         if (courses.length === 0) {
-            tableBody.innerHTML = '<tr><td colspan="7" class="text-center py-4">No courses found.</td></tr>';
+            tableBody.innerHTML = `<tr><td colspan="7" class="text-center py-4">${tMsg('noCourses')}</td></tr>`;
             return;
         }
 
@@ -226,9 +226,9 @@ class CoursesManager {
                     </span>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <a href="/admin/courses/${course.id}" class="p-2 text-gray-600 hover:text-gray-800" title="View Details"><i class="fas fa-eye"></i></a>
-                    <button class="p-2 text-blue-600 hover:text-blue-800" onclick="coursesManager.showModal(${course.id})" title="Edit"><i class="fas fa-edit"></i></button>
-                    <button class="p-2 text-red-600 hover:text-red-800" onclick="coursesManager.deleteCourse(${course.id})" title="Delete"><i class="fas fa-trash-alt"></i></button>
+                    <a href="/admin/courses/${course.id}" class="p-2 text-gray-600 hover:text-gray-800" title=""><i class="fas fa-eye"></i></a>
+                    <button class="p-2 text-blue-600 hover:text-blue-800" onclick="coursesManager.showModal(${course.id})" title=""><i class="fas fa-edit"></i></button>
+                    <button class="p-2 text-red-600 hover:text-red-800" onclick="coursesManager.deleteCourse(${course.id})" title=""><i class="fas fa-trash-alt"></i></button>
                 </td>
             `;
             tableBody.appendChild(row);
@@ -237,13 +237,13 @@ class CoursesManager {
 
     async deleteCourse(courseId) {
         Swal.fire({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this!",
+            title: tMsg('confirmDeleteTitle'),
+            text: tMsg('confirmDeleteText'),
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
             cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, delete it!'
+            confirmButtonText: tMsg('confirmDeleteBtn')
         }).then(async (result) => {
             if (result.isConfirmed) {
                 const lang = getCurrentLanguage();
@@ -258,7 +258,7 @@ class CoursesManager {
                         showToast(apiResult.message, 'success');
                         this.loadCourses(this.currentPage);
                     } else {
-                        showToast(apiResult.message || 'Failed to delete course.', 'error');
+                        showToast(apiResult.message || tMsg('failedDelete'), 'error');
                     }
                 } catch (error) {
                     showToast('An unexpected error occurred.', 'error');

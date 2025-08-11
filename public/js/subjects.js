@@ -55,14 +55,14 @@ class SubjectsManager {
         document.getElementById('tasks-container').innerHTML = '';
 
         if (subject) {
-            modalTitle.textContent = 'Edit Subject';
+            modalTitle.textContent = tMsg('editSubject');
             this.currentSubjectId = subject.subjectId;
             document.getElementById('subject-name').value = subject.name;
             document.getElementById('subject-description').value = subject.description;
             document.getElementById('subject-duration').value = subject.studyDuration;
             tasksSection.classList.add('hidden');
         } else {
-            modalTitle.textContent = 'Add New Subject';
+            modalTitle.textContent = tMsg('addSubject');
             tasksSection.classList.remove('hidden');
         }
 
@@ -105,7 +105,7 @@ class SubjectsManager {
         });
 
         if (!this.currentSubjectId && tasks.length === 0) {
-            showToast('Please add at least one task.', 'error');
+            showToast(tMsg('addTaskValidation'), 'error');
             return;
         }
 
@@ -154,14 +154,14 @@ class SubjectsManager {
     async deleteSubject(subjectId, subjectName) {
         const lang = getCurrentLanguage();
         const result = await Swal.fire({
-            title: 'Are you sure?',
-            text: `You are about to delete the subject: "${subjectName}". You won't be able to revert this!`,
+            title: tMsg('confirmDeleteTitle'),
+            text: `${tMsg('aboutToDeleteSubject')} "${subjectName}". ${tMsg('irreversible')}`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
             cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, delete it!',
-            cancelButtonText: 'Cancel'
+            confirmButtonText: tMsg('confirmDeleteBtn'),
+            cancelButtonText: tMsg('cancelBtn')
         });
 
         if (result.isConfirmed) {
@@ -201,11 +201,11 @@ class SubjectsManager {
                 this.updateStats(meta);
                 this.renderPagination();
             } else {
-                showToast(result.message || 'Failed to load subjects.', 'error');
+                showToast(result.message || tMsg('failedLoadData'), 'error');
             }
         } catch (error) {
             console.error('Error loading subjects:', error);
-            showToast('An unexpected error occurred while fetching subjects.', 'error');
+            showToast(tMsg('unexpectedError'), 'error');
         }
     }
 
@@ -257,13 +257,13 @@ class SubjectsManager {
             });
             const data = await res.json();
             if (!res.ok || !data.success) {
-                throw new Error(data.message || 'Import failed');
+                throw new Error(data.message || tMsg('importFailed'));
             }
-            showToast(data.message || 'Import successful', 'success');
+            showToast(data.message || tMsg('importSuccess'), 'success');
             this.loadSubjects();
         } catch (err) {
             console.error(err);
-            showToast(err.message || 'Import failed', 'error');
+            showToast(err.message || tMsg('importFailed'), 'error');
         }
     }
 
@@ -272,7 +272,7 @@ class SubjectsManager {
         tableBody.innerHTML = '';
 
         if (subjects.length === 0) {
-            tableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4">No subjects found.</td></tr>';
+            tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-4">${tMsg('noSubjects')}</td></tr>`;
             return;
         }
 

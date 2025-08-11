@@ -27,15 +27,15 @@ document.addEventListener('DOMContentLoaded', function () {
       } else {
         Swal.fire({
           icon: 'error',
-          title: 'Operation Failed',
+          title: tMsg('operationFailed'),
           text: response.data.message,
         });
       }
     } catch (error) {
-      const errorMessage = error.response?.data?.message || 'Could not fetch report data.';
+      const errorMessage = error.response?.data?.message || tMsg('failedFetchReport');
       Swal.fire({
         icon: 'error',
-        title: 'An Error Occurred',
+        title: tMsg('errorOccurred'),
         text: errorMessage,
       });
     }
@@ -127,8 +127,8 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!startDate || !endDate) {
       Swal.fire({
         icon: 'warning',
-        title: 'Missing Information',
-        text: 'Please select both start and end dates.',
+        title: tMsg('missingInfo'),
+        text: tMsg('selectDatesPrompt'),
       });
       return;
     }
@@ -188,11 +188,11 @@ document.addEventListener('DOMContentLoaded', function () {
       if (response.data.success) {
         populateLogCourseSelect(response.data.data.items);
       } else {
-        Swal.fire({ icon: 'error', title: 'Could not load courses for log', text: response.data.message });
+        Swal.fire({ icon: 'error', title: tMsg('failedLoadCourses'), text: response.data.message });
       }
     } catch (error) {
-      const errorMessage = error.response?.data?.message || 'An error occurred while fetching courses.';
-      Swal.fire({ icon: 'error', title: 'An Error Occurred', text: errorMessage });
+      const errorMessage = error.response?.data?.message || tMsg('errorFetchingCourses');
+      Swal.fire({ icon: 'error', title: tMsg('errorOccurred'), text: errorMessage });
     }
   }
 
@@ -208,7 +208,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   async function fetchActivityLogs(courseId) {
     if (!courseId) {
-      activityLogBody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-gray-500">Please select a course to view logs.</td></tr>';
+      activityLogBody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-gray-500">${tMsg('selectCoursePrompt')}</td></tr>`;
       return;
     }
     try {
@@ -220,16 +220,16 @@ document.addEventListener('DOMContentLoaded', function () {
         activityLogBody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-red-500">${response.data.message}</td></tr>`;
       }
     } catch (error) {
-      const errorMessage = error.response?.data?.message || 'An error occurred while fetching logs.';
+      const errorMessage = error.response?.data?.message || tMsg('errorFetchingLogs');
       activityLogBody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-red-500">${errorMessage}</td></tr>`;
     }
   }
 
   async function renderActivityLogs(logs) {
-    activityLogBody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-500">Loading log details...</td></tr>'; // Show loading state
+    activityLogBody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-gray-500">${tMsg('loadingLogs')}</td></tr>`; // Show loading state
 
     if (!logs || logs.length === 0) {
-      activityLogBody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-500">No activity logs found for this course.</td></tr>';
+      activityLogBody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-gray-500">${tMsg('noLogs')}</td></tr>`;
       return;
     }
 

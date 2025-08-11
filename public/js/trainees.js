@@ -44,10 +44,10 @@ class TraineesManager {
                 this.renderTrainees(result.data || []);
                 this.updateStats(result.data || []);
             } else {
-                showToast(result.message || 'Failed to load trainees.', 'error');
+                showToast(result.message || tMsg('failedLoadData'), 'error');
             }
         } catch (error) {
-            showToast('An unexpected error occurred.', 'error');
+            showToast(tMsg('unexpectedError'), 'error');
         }
     }
 
@@ -86,13 +86,13 @@ class TraineesManager {
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <a href="/admin/trainees/${trainee.userId}" class="text-blue-600 hover:text-blue-900 mr-3">
-                        <i class="fas fa-eye"></i> Details
+                        <i class="fas fa-eye"></i>
                     </a>
                     <button onclick="traineesManager.editTrainee(${trainee.userId})" class="text-indigo-600 hover:text-indigo-900 mr-3">
-                        <i class="fas fa-edit"></i> Edit
+                        <i class="fas fa-edit"></i>
                     </button>
                     <button onclick="traineesManager.deleteTrainee(${trainee.userId})" class="text-red-600 hover:text-red-900">
-                        <i class="fas fa-trash"></i> Delete
+                        <i class="fas fa-trash"></i>
                     </button>
                 </td>
             </tr>
@@ -129,13 +129,11 @@ class TraineesManager {
 
             passwordInput.required = false;
             confirmPasswordInput.required = false;
-            passwordInput.placeholder = 'Leave blank to keep current password';
         } else {
             // Add mode
             modalTitle.textContent = 'Add New Trainee';
             passwordInput.required = true;
             confirmPasswordInput.required = true;
-            passwordInput.placeholder = 'Enter password';
         }
 
         modal.classList.remove('hidden');
@@ -158,13 +156,13 @@ class TraineesManager {
 
         // When creating a new trainee, password is required.
         if (!this.currentTraineeId && !password) {
-            showToast('Password is required for new trainees.', 'error');
+            showToast(tMsg('passwordRequired'), 'error');
             return;
         }
 
         if (password || confirmPassword) {
             if (password !== confirmPassword) {
-                showToast('Passwords do not match.', 'error');
+                showToast(tMsg('passwordsMismatch'), 'error');
                 return;
             }
             if (password) {
@@ -190,9 +188,9 @@ class TraineesManager {
             if (result.success) {
                 this.hideModal();
                 this.loadTrainees();
-                showToast(result.message || 'Operation successful!');
+                showToast(result.message || tMsg('operationSuccess'));
             } else {
-                showToast(result.message || 'An error occurred.', 'error');
+                showToast(result.message || tMsg('errorOccurred'), 'error');
             }
         } catch (error) {
             showToast('An unexpected network error occurred.', 'error');
@@ -208,7 +206,7 @@ class TraineesManager {
             if (result.success) {
                 this.showModal(result.data);
             } else {
-                showToast(result.message || 'Failed to load trainee data.', 'error');
+                showToast(result.message || tMsg('failedLoadData'), 'error');
             }
         } catch (error) {
             showToast('An unexpected network error occurred.', 'error');
@@ -217,13 +215,13 @@ class TraineesManager {
 
     async deleteTrainee(userId) {
         const confirmation = await Swal.fire({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this!",
+            title: tMsg('confirmDeleteTitle'),
+            text: tMsg('confirmDeleteText'),
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, delete it!'
+            confirmButtonText: tMsg('confirmDeleteBtn')
         });
 
         if (!confirmation.isConfirmed) {
@@ -240,9 +238,9 @@ class TraineesManager {
 
             if (result.success) {
                 this.loadTrainees();
-                showToast(result.message || 'Trainee deleted successfully.');
+                showToast(result.message || tMsg('deletedSuccess'));
             } else {
-                showToast(result.message || 'Failed to delete trainee.', 'error');
+                showToast(result.message || tMsg('failedDelete'), 'error');
             }
         } catch (error) {
             showToast('An unexpected network error occurred.', 'error');

@@ -39,10 +39,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (result.success) {
                 populateCourseData(result.data);
             } else {
-                showToast(result.message || 'Failed to load course details.', 'error');
+                showToast(result.message || tMsg('failedLoadData'), 'error');
             }
         } catch (error) {
-            showToast('An unexpected error occurred. Please try again later.', 'error');
+            showToast(tMsg('unexpectedError'), 'error');
         }
     };
 
@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function fetchCourseSubjects(courseId) {
         const tbody = document.getElementById('subject-list-body');
-        tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4"><i class="fas fa-spinner fa-spin mr-2"></i>Loading subjects...</td></tr>';
+        tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4"><i class="fas fa-spinner fa-spin mr-2"></i>${tMsg('loadingSubjects')}</td></tr>`;
 
         try {
             const lang = getCurrentLanguage();
@@ -115,7 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
         tbody.innerHTML = '';
 
         if (!subjects || subjects.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-500">No subjects assigned to this course.</td></tr>';
+            tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-gray-500">${tMsg('noSubjectsCourse')}</td></tr>`;
             return;
         }
 
@@ -219,13 +219,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (deleteBtn) {
             deleteBtn.addEventListener('click', () => {
                 Swal.fire({
-                    title: 'Are you sure?',
-                    text: "You won't be able to revert this!",
+                    title: tMsg('confirmDeleteTitle'),
+                    text: tMsg('confirmDeleteText'),
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#d33',
                     cancelButtonColor: '#3085d6',
-                    confirmButtonText: 'Yes, delete it!'
+                    confirmButtonText: tMsg('confirmDeleteBtn'),
+                    cancelButtonText: tMsg('cancelBtn')
                 }).then((result) => {
                     if (result.isConfirmed) {
                         performDelete(courseId);
@@ -405,13 +406,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (btn) {
                 const traineeId = btn.dataset.id;
                 Swal.fire({
-                    title: 'Are you sure?',
-                    text: "You won't be able to revert this!",
+                    title: tMsg('confirmDeleteTitle'),
+                    text: tMsg('confirmDeleteText'),
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#d33',
                     cancelButtonColor: '#3085d6',
-                    confirmButtonText: 'Yes, remove it!'
+                    confirmButtonText: tMsg('confirmDeleteBtn'),
+                    cancelButtonText: tMsg('cancelBtn')
                 }).then((result) => {
                     if (result.isConfirmed) {
                         performRemoveTrainee(courseId, traineeId);
@@ -451,13 +453,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (btn) {
                 const supervisorId = btn.dataset.id;
                 Swal.fire({
-                    title: 'Are you sure?',
-                    text: "You won't be able to revert this!",
+                    title: tMsg('confirmDeleteTitle'),
+                    text: tMsg('confirmDeleteText'),
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#d33',
                     cancelButtonColor: '#3085d6',
-                    confirmButtonText: 'Yes, remove it!'
+                    confirmButtonText: tMsg('confirmDeleteBtn'),
+                    cancelButtonText: tMsg('cancelBtn')
                 }).then((result) => {
                     if (result.isConfirmed) {
                         performRemoveSupervisor(courseId, supervisorId);
@@ -480,7 +483,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     fetchAssignedSupervisors(courseId);
                 }, 1500);
             } else {
-                showToast(result.message || 'Failed to remove supervisor.', 'error');
+                showToast(result.message || tMsg('failedDelete'), 'error');
             }
         } catch (error) {
             console.error('Error removing supervisor:', error);
@@ -493,13 +496,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (startBtn) {
             startBtn.addEventListener('click', () => {
                 Swal.fire({
-                    title: 'Are you sure?',
-                    text: "This will start the course for all enrolled trainees.",
+                    title: tMsg('confirmDeleteTitle'),
+                    text: tMsg('startCourseText'),
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#28a745',
                     cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes, start it!'
+                    confirmButtonText: tMsg('startCourseBtn')
                 }).then((result) => {
                     if (result.isConfirmed) {
                         performStartCourse(courseId);
@@ -521,7 +524,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 showToast(result.message, 'success');
                 setTimeout(() => location.reload(), 1500);
             } else {
-                showToast(result.message || 'Failed to start the course.', 'error');
+                showToast(result.message || tMsg('failedStartCourse'), 'error');
             }
         } catch (error) {
             console.error('Error starting course:', error);
@@ -534,13 +537,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (finishBtn) {
             finishBtn.addEventListener('click', () => {
                 Swal.fire({
-                    title: 'Are you sure?',
-                    text: "This will finish the course. This action cannot be undone.",
+                    title: tMsg('confirmDeleteTitle'),
+                    text: tMsg('finishCourseText'),
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#dc3545',
                     cancelButtonColor: '#6c757d',
-                    confirmButtonText: 'Yes, finish it!'
+                    confirmButtonText: tMsg('finishCourseBtn')
                 }).then((result) => {
                     if (result.isConfirmed) {
                         performFinishCourse(courseId);
@@ -562,7 +565,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 showToast(result.message, 'success');
                 setTimeout(() => location.reload(), 1500);
             } else {
-                showToast(result.message || 'Failed to finish the course.', 'error');
+                showToast(result.message || tMsg('failedFinishCourse'), 'error');
             }
         } catch (error) {
             console.error('Error finishing course:', error);

@@ -47,10 +47,10 @@ class TasksManager {
                 this.renderPagination();
                 this.updateStats(meta);
             } else {
-                showToast(result.message || 'Failed to load tasks.', 'error');
+                showToast(result.message || tMsg('failedLoadData'), 'error');
             }
         } catch (error) {
-            showToast('An unexpected error occurred.', 'error');
+            showToast(tMsg('unexpectedError'), 'error');
         }
     }
 
@@ -59,7 +59,7 @@ class TasksManager {
         tableBody.innerHTML = '';
 
         if (tasks.length === 0) {
-            tableBody.innerHTML = '<tr><td colspan="4" class="text-center py-4">No tasks found.</td></tr>';
+            tableBody.innerHTML = `<tr><td colspan="4" class="text-center py-4">${tMsg('noTasks')}</td></tr>`;
             return;
         }
 
@@ -67,7 +67,7 @@ class TasksManager {
             const row = `
                 <tr>
                     <td class="px-6 py-4 whitespace-nowrap">${task.name}</td>
-                    <td class="px-6 py-4 whitespace-nowrap"><a href="${task.fileUrl}" target="_blank" class="text-indigo-600 hover:text-indigo-900">View File</a></td>
+                    <td class="px-6 py-4 whitespace-nowrap"><a href="${task.fileUrl}" target="_blank" class="text-indigo-600 hover:text-indigo-900">${tMsg('viewFile')}</a></td>
                     <td class="px-6 py-4 whitespace-nowrap">${new Date(task.createdAt).toLocaleDateString()}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <a href="/admin/tasks/${task.taskId}" class="p-2 text-gray-600 hover:text-gray-800" title="View Details"><i class="fas fa-eye"></i></a>
@@ -157,7 +157,7 @@ class TasksManager {
         form.reset();
 
         if (taskId) {
-            modalTitle.textContent = 'Edit Task';
+            modalTitle.textContent = tMsg('editTask');
             const lang = getCurrentLanguage();
             try {
                 const response = await fetch(`/task/${taskId}?lang=${lang}`);
@@ -169,17 +169,17 @@ class TasksManager {
                     document.getElementById('task-file-url').value = task.fileUrl;
                     await this.loadSubjects(task.subject.subjectId);
                 } else {
-                    showToast(result.message || 'Failed to load task details.', 'error');
+                    showToast(result.message || tMsg('failedLoadData'), 'error');
                     this.closeModal();
                     return;
                 }
             } catch (error) {
-                showToast('An unexpected error occurred.', 'error');
+                showToast(tMsg('unexpectedError'), 'error');
                 this.closeModal();
                 return;
             }
         } else {
-            modalTitle.textContent = 'Add New Task';
+            modalTitle.textContent = tMsg('addTask');
             await this.loadSubjects();
         }
 
@@ -199,7 +199,7 @@ class TasksManager {
         const subjectId = document.getElementById('task-subject').value;
 
         if (!subjectId) {
-            showToast('Please select a subject.', 'error');
+            showToast(tMsg('selectSubject'), 'error');
             return;
         }
 
@@ -224,22 +224,22 @@ class TasksManager {
                 this.closeModal();
                 this.loadTasks(this.currentPage);
             } else {
-                showToast(result.message || 'Failed to save task.', 'error');
+                showToast(result.message || tMsg('failedSave'), 'error');
             }
         } catch (error) {
-            showToast('An unexpected error occurred.', 'error');
+            showToast(tMsg('unexpectedError'), 'error');
         }
     }
 
     deleteTask(taskId) {
         Swal.fire({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this!",
+            title: tMsg('confirmDeleteTitle'),
+            text: tMsg('confirmDeleteText'),
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
             cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, delete it!'
+            confirmButtonText: tMsg('confirmDeleteBtn')
         }).then(async (result) => {
             if (result.isConfirmed) {
                 const lang = getCurrentLanguage();
@@ -254,10 +254,10 @@ class TasksManager {
                         showToast(apiResult.message, 'success');
                         this.loadTasks(this.currentPage);
                     } else {
-                        showToast(apiResult.message || 'Failed to delete task.', 'error');
+                        showToast(apiResult.message || tMsg('failedDelete'), 'error');
                     }
                 } catch (error) {
-                    showToast('An unexpected error occurred.', 'error');
+                    showToast(tMsg('unexpectedError'), 'error');
                 }
             }
         });

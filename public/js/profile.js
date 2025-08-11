@@ -51,8 +51,8 @@ document.addEventListener('DOMContentLoaded', function () {
       console.error('Failed to fetch profile:', error);
       Swal.fire({
         icon: 'error',
-        title: 'Oops...',
-        text: 'Could not load your profile data!',
+        title: tMsg('errorOccurred'),
+        text: tMsg('failedLoadProfile'),
       });
     }
   }
@@ -82,8 +82,8 @@ document.addEventListener('DOMContentLoaded', function () {
       console.error('Failed to update profile:', error);
       Swal.fire({
         icon: 'error',
-        title: 'Update Failed',
-        text: error.response?.data?.message || 'An unexpected error occurred.',
+        title: tMsg('updateFailed'),
+        text: error.response?.data?.message || tMsg('unexpectedError'),
       });
     }
   });

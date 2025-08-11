@@ -5,29 +5,31 @@ include ../layouts/admin-layout
     //- Back Button
     a(href="javascript:history.back()" class="inline-flex items-center text-indigo-600 hover:text-indigo-800 mb-6 group")
       i(class="fas fa-arrow-left mr-2 transition-transform duration-200 ease-in-out group-hover:-translate-x-1")
-      span Back to Course
+      span(data-i18n="traineeProgress.backCourse") Back to Course
 
     //- Header Info
     div(class="bg-white rounded-lg shadow-lg p-6 mb-6 flex items-center space-x-4")
-      img(id="trainee-avatar" class="w-20 h-20 rounded-full border-2 border-indigo-500" src="https://via.placeholder.com/80" alt="avatar")
+      img(id="trainee-avatar" class="w-20 h-20 rounded-full border-2 border-indigo-500" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face" alt="avatar")
       div
         h2(id="trainee-name" class="text-2xl font-bold text-gray-900") Loading...
         p(id="trainee-email" class="text-gray-600")
 
     //- Course Progress Card
     div(id="course-progress-card" class="bg-white rounded-lg shadow-lg p-8")
-      h3(class="text-xl font-semibold mb-4") Course: 
+      h3(class="text-xl font-semibold mb-4")
+        span(data-i18n="traineeProgress.courseLabel") Course:
+        |  
         span(id="course-name") Loading...
       //- Summary
       div(class="grid grid-cols-3 gap-4 text-center mb-4 py-4 border-t border-b border-gray-200")
         div
-          p(class="text-gray-600") Total Tasks
+          p(class="text-gray-600" data-i18n="traineeProgress.totalTasks") Total Tasks
           p(id="total-tasks" class="text-2xl font-bold text-gray-900") 0
         div
-          p(class="text-gray-600") Completed Tasks
+          p(class="text-gray-600" data-i18n="traineeProgress.completedTasks") Completed Tasks
           p(id="completed-tasks" class="text-2xl font-bold text-green-600") 0
         div
-          p(class="text-gray-600") Progress Course
+          p(class="text-gray-600" data-i18n="traineeProgress.progressCourse") Progress Course
           p(class="text-2xl font-bold text-indigo-600")
             span(id="course-progress-percent") 0
             span %
@@ -41,12 +43,12 @@ include ../layouts/admin-layout
         table(class="min-w-full divide-y divide-gray-200")
           thead(class="bg-gray-50")
             tr
-              th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Subject
-              th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Status
-              th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Tasks
-              th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Progress Tasks
-              th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Started At
-              th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Finished At
+              th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-i18n="traineeProgress.table.subject") Subject
+              th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-i18n="traineeProgress.table.status") Status
+              th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-i18n="traineeProgress.table.tasks") Tasks
+              th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-i18n="traineeProgress.table.progressTasks") Progress Tasks
+              th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-i18n="traineeProgress.table.startedAt") Started At
+              th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-i18n="traineeProgress.table.finishedAt") Finished At
           tbody(id="subjects-body" class="bg-white divide-y divide-gray-200")
 
 block scripts

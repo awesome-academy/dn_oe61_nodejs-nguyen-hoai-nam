@@ -1,6 +1,8 @@
 import { Controller, Get, Render } from '@nestjs/common';
 import { Public } from 'src/helper/decorators/metadata.decorator';
+import { ApiExcludeController } from '@nestjs/swagger';
 
+@ApiExcludeController()
 @Controller('auth')
 export class AuthViewController {
     @Public()
@@ -14,6 +16,7 @@ export class AuthViewController {
     }
 }
 
+@ApiExcludeController()
 @Controller('admin/dashboard')
 export class DashboardViewController {
     @Public()

@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 showToast(result.message, 'error');
             }
         } catch (error) {
-            showToast('An unexpected error occurred. Please try again later.', 'error');
+            showToast(tMsg('unexpectedError'), 'error');
         }
     };
 
@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
         tbody.innerHTML = '';
 
         if (!tasks || tasks.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="2" class="px-6 py-4 text-center text-gray-500">No tasks found for this subject.</td></tr>';
+            tbody.innerHTML = `<tr><td colspan="2" class="px-6 py-4 text-center text-gray-500">${tMsg('noTasks')}</td></tr>`;
             return;
         }
 
@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="text-sm font-medium text-gray-900">${task.name}</div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    <a href="${task.fileUrl}" target="_blank" class="text-indigo-600 hover:text-indigo-900">View File</a>
+                    <a href="${task.fileUrl}" target="_blank" class="text-indigo-600 hover:text-indigo-900">${tMsg('viewFile')}</a>
                 </td>
             `;
             tbody.appendChild(row);
@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const showUpdateModal = (subject) => {
         Swal.fire({
-            title: 'Update Subject',
+            title: tMsg('updateSubject'),
             html: `
                 <div class="space-y-4">
                     <div>
@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </div>
             `,
-            confirmButtonText: 'Save Changes',
+            confirmButtonText: tMsg('saveChanges'),
             showCancelButton: true,
             focusConfirm: false,
             preConfirm: () => {
@@ -119,13 +119,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const showDeleteConfirmation = (subjectId) => {
         Swal.fire({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this!",
+            title: tMsg('confirmDeleteTitle'),
+            text: tMsg('confirmDeleteText'),
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, delete it!'
+            confirmButtonText: tMsg('confirmDeleteBtn')
         }).then((result) => {
             if (result.isConfirmed) {
                 performDelete(subjectId);
@@ -159,7 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (currentSubjectData) {
                 showUpdateModal(currentSubjectData);
             } else {
-                showToast('Subject data is not available for update.', 'error');
+                showToast(tMsg('failedLoadData'), 'error');
             }
         });
 

@@ -40,12 +40,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch(`/supervisor?lang=${lang}`);
             const result = await response.json();
             if (!result.success) {
-                showToast(result.message || 'Failed to load supervisors', 'error');
+                showToast(result.message || tMsg('failedLoadSupervisors'), 'error');
                 return;
             }
             const supervisors = result.data;
             if (!Array.isArray(supervisors) || supervisors.length === 0) {
-                showToast('No supervisors available.', 'warning');
+                showToast(tMsg('noSupervisors'), 'warning');
                 return;
             }
 
@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span class="ml-auto text-gray-500 text-sm">${s.email}</span>
                 </label>`).join('');
             const { value: supervisorId } = await Swal.fire({
-                title: 'Assign Supervisor',
+                title: tMsg('selectSupervisor'),
                 width: '32rem',
                 customClass: {
                     popup: 'p-6 rounded-lg',
@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 html: `<div id="supervisor-list" class="space-y-3 max-h-60 overflow-y-auto">${optionsHtml}</div>`,
                 focusConfirm: false,
                 showCancelButton: true,
-                confirmButtonText: 'Assign',
+                confirmButtonText: tMsg('assignBtn'),
                 preConfirm: () => {
                     const checked = document.querySelector('input[name="supervisorRadio"]:checked');
                     return checked ? parseInt(checked.value, 10) : null;
@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (error) {
             console.error(error);
-            showToast('Unexpected error when loading supervisors', 'error');
+            showToast(tMsg('unexpectedError'), 'error');
         }
     }
 
@@ -94,11 +94,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 showToast(result.message, 'success');
                 setTimeout(() => location.reload(), 1500);
             } else {
-                showToast(result.message || 'Failed to assign supervisor', 'error');
+                showToast(result.message || tMsg('failedAssignSupervisor'), 'error');
             }
         } catch (error) {
             console.error(error);
-            showToast('Unexpected error occurred.', 'error');
+            showToast(tMsg('unexpectedError'), 'error');
         }
     }
 });

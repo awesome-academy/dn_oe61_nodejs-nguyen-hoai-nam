@@ -7,7 +7,7 @@ export class GetActivityHistorySuccessDto {
     @ApiProperty({ example: true })
     success: boolean;
 
-    @ApiProperty({ example: "Kết thúc chủ đề thành công" })
+    @ApiProperty({ example: "Thành công" })
     message: string;
 
     @ApiProperty({

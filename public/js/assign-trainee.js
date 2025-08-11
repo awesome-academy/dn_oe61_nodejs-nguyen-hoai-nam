@@ -41,12 +41,12 @@ async function showAssignTraineeModal(courseId) {
         const response = await fetch(`/trainee?lang=${lang}`);
         const result = await response.json();
         if (!result.success) {
-            showToast(result.message || 'Failed to load trainees', 'error');
+            showToast(result.message || tMsg('failedLoadTrainees'), 'error');
             return;
         }
         const trainees = result.data;
         if (!Array.isArray(trainees) || trainees.length === 0) {
-            showToast('No trainees available.', 'warning');
+            showToast(tMsg('noTrainees'), 'warning');
             return;
         }
         const html = `
@@ -58,12 +58,12 @@ async function showAssignTraineeModal(courseId) {
                     </div>`).join('')}
             </div>`;
         const { value: traineeId } = await Swal.fire({
-            title: 'Select Trainee',
+            title: tMsg('selectTrainee'),
             html,
             width: '30rem',
             focusConfirm: false,
             showCancelButton: true,
-            confirmButtonText: 'Assign',
+            confirmButtonText: tMsg('assignBtn'),
             preConfirm: () => {
                 const checked = document.querySelector('input[name="traineeRadio"]:checked');
                 return checked ? parseInt(checked.value, 10) : null;
@@ -74,7 +74,7 @@ async function showAssignTraineeModal(courseId) {
         }
     } catch (err) {
         console.error(err);
-        showToast('Unexpected error when loading trainees', 'error');
+        showToast(tMsg('unexpectedError'), 'error');
     }
 }
 
@@ -90,10 +90,10 @@ async function performAssignTrainee(courseId, traineeId, lang) {
             showToast(result.message, 'success');
             setTimeout(() => location.reload(), 1500);
         } else {
-            showToast(result.message || 'Failed to assign trainee', 'error');
+            showToast(result.message || tMsg('failedAssignTrainee'), 'error');
         }
     } catch (err) {
         console.error(err);
-        showToast('Unexpected error occurred.', 'error');
+        showToast(tMsg('unexpectedError'), 'error');
     }
 }

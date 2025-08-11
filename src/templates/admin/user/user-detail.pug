@@ -6,11 +6,11 @@ include ../layouts/admin-layout
     div(id="user-profile-card" class="bg-white rounded-lg shadow-lg overflow-hidden")
       //- Loading state
       div(id="loading-state" class="p-6 text-center")
-        p Loading user data...
+        p(data-i18n="userDetail.loading") Loading user data...
 
       //- Error state
       div(id="error-state" class="hidden p-6 text-center text-red-500")
-        p Could not load user profile.
+        p(data-i18n="userDetail.error") Could not load user profile.
 
       //- Content
       div(id="profile-content" class="hidden")
@@ -24,16 +24,16 @@ include ../layouts/admin-layout
 
           div(class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6")
             div
-              h3(class="text-lg font-semibold text-gray-800 mb-2") Profile Information
+              h3(class="text-lg font-semibold text-gray-800 mb-2" data-i18n="userDetail.profileInfo") Profile Information
               dl(class="space-y-2")
                 div(class="flex justify-between")
-                  dt(class="text-sm font-medium text-gray-500") Role
+                  dt(class="text-sm font-medium text-gray-500" data-i18n="userDetail.role") Role
                   dd(id="user-role" class="text-sm text-gray-900")
                 div(class="flex justify-between")
-                  dt(class="text-sm font-medium text-gray-500") Status
+                  dt(class="text-sm font-medium text-gray-500" data-i18n="userDetail.status") Status
                   dd(id="user-status" class="text-sm text-gray-900")
                 div(class="flex justify-between")
-                  dt(class="text-sm font-medium text-gray-500") Joined Date
+                  dt(class="text-sm font-medium text-gray-500" data-i18n="userDetail.joinedDate") Joined Date
                   dd(id="user-joined-date" class="text-sm text-gray-900")
 
 block scripts

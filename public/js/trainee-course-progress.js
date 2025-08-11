@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const buildSubjectRow = (s) => {
-        const formatDate = (dateString) => dateString ? new Date(dateString).toLocaleDateString() : '---';
+        const formatDate = (dateString) => dateString ? new Date(dateString).toLocaleDateString() : tMsg('notAvailable');
         const { traineeId } = getParams();
         return `
           <tr class="hover:bg-gray-50">
@@ -38,8 +38,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const populateTraineeInfo = (trainee) => {
         const el = (id) => document.getElementById(id);
         if (el('trainee-avatar')) el('trainee-avatar').src = trainee.avatar || 'https://via.placeholder.com/80';
-        if (el('trainee-name')) el('trainee-name').textContent = trainee.userName || trainee.name || '---';
-        if (el('trainee-email')) el('trainee-email').textContent = trainee.email || '--';
+        if (el('trainee-name')) el('trainee-name').textContent = trainee.userName || trainee.name || tMsg('notAvailable');
+        if (el('trainee-email')) el('trainee-email').textContent = trainee.email || tMsg('notAvailable');
     };
 
     const populateCourseProgress = (data) => {
@@ -71,18 +71,18 @@ document.addEventListener('DOMContentLoaded', () => {
             if (progressResult.success) {
                 populateCourseProgress(progressResult.data);
             } else {
-                showToast(progressResult.message || 'Failed to load progress', 'error');
+                showToast(progressResult.message || tMsg('failedLoadData'), 'error');
             }
 
             if (traineeResult.success) {
                 populateTraineeInfo(traineeResult.data);
             } else {
-                showToast(traineeResult.message || 'Failed to load trainee info', 'error');
+                showToast(traineeResult.message || tMsg('failedLoadData'), 'error');
             }
 
         } catch (err) {
             console.error(err);
-            showToast('Unexpected error', 'error');
+            showToast(tMsg('unexpectedError'), 'error');
         }
     };
 

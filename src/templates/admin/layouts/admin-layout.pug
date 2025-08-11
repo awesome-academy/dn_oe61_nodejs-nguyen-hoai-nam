@@ -35,8 +35,8 @@ mixin adminLayout(title, currentPage, description, pageTitle)
             button(class="md:hidden p-2 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100" id="sidebarToggle")
               i(class="fas fa-bars")
             div
-              h1(class="text-xl font-semibold text-gray-900")= pageTitle || 'Admin Dashboard'
-              p(class="text-sm text-gray-500")= description || 'Training System'
+              h1(class="text-xl font-semibold text-gray-900" data-i18n="header.adminDashboard")= pageTitle || 'Admin Dashboard'
+              p(class="text-sm text-gray-500" data-i18n="header.trainingSystem")= description || 'Training System'
           div(class="flex items-center space-x-4")
             //- Language Switcher Dropdown
             div(class="relative")
@@ -61,6 +61,10 @@ mixin adminLayout(title, currentPage, description, pageTitle)
       //- SweetAlert2
       script(src="https://cdn.jsdelivr.net/npm/sweetalert2@11")
 
+      //- translations dictionary
+      script(src="/js/i18n-data.js")
+      //- i18n helper
+      script(src="/js/i18n.js")
       //- Custom script for admin layout logic
       script(src="/js/admin_layout.js")
       block scripts

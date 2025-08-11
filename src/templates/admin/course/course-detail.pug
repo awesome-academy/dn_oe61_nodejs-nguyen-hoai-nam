@@ -5,7 +5,7 @@ include ../layouts/admin-layout
     //- Back Button
     a(href="/admin/courses" class="inline-flex items-center text-indigo-600 hover:text-indigo-800 mb-6 group")
       i(class="fas fa-arrow-left mr-2 transition-transform duration-200 ease-in-out group-hover:-translate-x-1")
-      span Back to Courses
+      span(data-i18n="courseDetail.back") Back to Courses
 
     //- Main Course Detail Card
     div(class="bg-white rounded-2xl shadow-xl overflow-hidden")
@@ -19,7 +19,7 @@ include ../layouts/admin-layout
       div(class="p-8")
         //- Description
         div(class="mb-8")
-          h2(class="text-2xl font-semibold text-gray-800 mb-3 border-b-2 border-indigo-200 pb-2") Course Description
+          h2(class="text-2xl font-semibold text-gray-800 mb-3 border-b-2 border-indigo-200 pb-2" data-i18n="courseDetail.description") Course Description
           p(id="course-description" class="text-gray-600 leading-relaxed") Loading description...
 
           .mt-4
@@ -33,100 +33,100 @@ include ../layouts/admin-layout
         div(class="grid md:grid-cols-2 gap-8")
           //- Dates
           div(class="bg-gray-50 p-6 rounded-lg")
-            h3(class="text-lg font-semibold text-gray-700 mb-4") <i class="fas fa-calendar-alt mr-2 text-indigo-500"></i> Timeline
+            h3(class="text-lg font-semibold text-gray-700 mb-4") <i class="fas fa-calendar-alt mr-2 text-indigo-500"></i> #[span(data-i18n="courseDetail.timeline") Timeline]
             div(class="space-y-3")
               div(class="flex justify-between")
-                span(class="font-medium text-gray-600") Start Date:
+                span(class="font-medium text-gray-600" data-i18n="courseDetail.startDate") Start Date:
                 span(id="start-date" class="font-bold text-gray-800") --/--/----
               div(class="flex justify-between")
-                span(class="font-medium text-gray-600") End Date:
+                span(class="font-medium text-gray-600" data-i18n="courseDetail.endDate") End Date:
                 span(id="end-date" class="font-bold text-gray-800") --/--/----
 
           //- Actions
           div(class="bg-gray-50 p-6 rounded-lg")
-            h3(class="text-lg font-semibold text-gray-700 mb-4") <i class="fas fa-cogs mr-2 text-indigo-500"></i> Actions
+            h3(class="text-lg font-semibold text-gray-700 mb-4") <i class="fas fa-cogs mr-2 text-indigo-500"></i> #[span(data-i18n="courseDetail.actions") Actions]
             div(class="flex space-x-4")
-              button(id="update-course-btn" class="flex-1 inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors")
+              button(id="update-course-btn" class="flex-1 inline-flex items-center justify-center px-3 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors")
                 i(class="fas fa-edit mr-2")
-                span Update
+                span(data-i18n="common.update") Update
 
-              button(id="start-course-btn" class="flex-1 inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors hidden")
+              button(id="start-course-btn" class="flex-1 inline-flex items-center justify-center px-3 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors hidden")
                 i(class="fas fa-play mr-2")
-                span Start
-              button(id="finish-course-btn" class="flex-1 inline-flex items-center justify-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors hidden")
+                span(data-i18n="common.start") Start
+              button(id="finish-course-btn" class="flex-1 inline-flex items-center justify-center px-3 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors hidden")
                 i(class="fas fa-flag-checkered mr-2")
-                span Finish
-              button(id="delete-course-btn" class="flex-1 inline-flex items-center justify-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors")
+                span(data-i18n="common.finish") Finish
+              button(id="delete-course-btn" class="flex-1 inline-flex items-center justify-center px-3 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition-colors")
                 i(class="fas fa-trash-alt mr-2")
-                span Delete Course
+                span(data-i18n="common.deleteCourse") Delete Course
 
     //- Assigned Supervisors Section
     div(class="mt-8 bg-white rounded-2xl shadow-xl overflow-hidden")
       div(class="p-8")
         div(class="flex items-center justify-between mb-4")
-          h2(class="text-2xl font-semibold text-gray-800") Assigned Supervisors
+          h2(class="text-2xl font-semibold text-gray-800" data-i18n="courseDetail.assignedSup") Assigned Supervisors
           button(id="assign-supervisor-btn" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm")
             i(class="fas fa-user-plus mr-2")
-            span Assign Supervisor
+            span(data-i18n="courseDetail.assignSupervisor") Assign Supervisor
         div(class="overflow-x-auto")
           table(class="min-w-full divide-y divide-gray-200")
             thead(class="bg-gray-50")
               tr
-                th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Name
-                th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Email
-                th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Status
-                th(scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider") Actions
+                th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-i18n="common.name") Name
+                th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-i18n="common.email") Email
+                th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-i18n="common.status") Status
+                th(scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" data-i18n="common.actions") Actions
             tbody(id="supervisor-list-body" class="bg-white divide-y divide-gray-200")
               //- Loading State
               tr(id="supervisor-loading-state")
                 td(colspan="4" class="px-6 py-4 text-center text-gray-500")
                   i(class="fas fa-spinner fa-spin mr-2")
-                  | Loading supervisors...
+                  | | #[span(data-i18n="common.loadingSup") Loading supervisors...]
 
     //- Enrolled Trainees Section
     div(class="mt-8 bg-white rounded-2xl shadow-xl overflow-hidden")
       div(class="p-8")
         div(class="flex items-center justify-between mb-4")
-          h2(class="text-2xl font-semibold text-gray-800") Enrolled Trainees
+          h2(class="text-2xl font-semibold text-gray-800" data-i18n="courseDetail.enrolledTrainee") Enrolled Trainees
           button(id="assign-trainee-btn" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm")
             i(class="fas fa-user-plus mr-2")
-            span Assign Trainee
+            span(data-i18n="courseDetail.assignTrainee") Assign Trainee
         div(class="overflow-x-auto")
           table(class="min-w-full divide-y divide-gray-200")
             thead(class="bg-gray-50")
               tr
-                th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Trainee Name
-                th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Registration Date
-                th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Progress
-                th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Status
+                th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-i18n="courseDetail.traineeName") Trainee Name
+                th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-i18n="courseDetail.regDate") Registration Date
+                th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-i18n="courseDetail.progress") Progress
+                th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-i18n="common.status") Status
                 th(scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider")
                   i(class="fas fa-eye" title="Progress")
-                th(scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider") Actions
+                th(scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" data-i18n="common.actions") Actions
             tbody(id="trainee-list-body" class="bg-white divide-y divide-gray-200")
               //- Loading State
               tr(id="trainee-loading-state")
                 td(colspan="5" class="px-6 py-4 text-center text-gray-500")
                   i(class="fas fa-spinner fa-spin mr-2")
-                  | Loading trainees...
+                  | | #[span(data-i18n="common.loadingTrainee") Loading trainees...]
 
     //- Subjects Section
     div(class="mt-8 bg-white rounded-2xl shadow-xl overflow-hidden")
       div(class="p-8")
-        h2(class="text-2xl font-semibold text-gray-800 mb-4") Subjects
+        h2(class="text-2xl font-semibold text-gray-800 mb-4" data-i18n="courseDetail.subjects") Subjects
         div(class="overflow-x-auto")
           table(class="min-w-full divide-y divide-gray-200")
             thead(class="bg-gray-50")
               tr
-                th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Subject Name
-                th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Description
-                th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Study Duration (hours)
-                th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Status
+                th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-i18n="courseDetail.subjectName") Subject Name
+                th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-i18n="common.description") Description
+                th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-i18n="courseDetail.duration") Study Duration (hours)
+                th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-i18n="common.status") Status
             tbody(id="subject-list-body" class="bg-white divide-y divide-gray-200")
               //- Loading State
               tr(id="subject-loading-state")
                 td(colspan="4" class="px-6 py-4 text-center text-gray-500")
                   i(class="fas fa-spinner fa-spin mr-2")
-                  | Loading subjects...
+                  | | #[span(data-i18n="common.loadingSubjects") Loading subjects...]
 
 block scripts
   script(src="/js/course-detail.js")

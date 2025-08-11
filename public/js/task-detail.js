@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const lang = document.documentElement.lang || 'en';
 
     if (!taskId) {
-        console.error('Task ID is missing from the URL');
+        console.error(tMsg('failedLoadData'));
         return;
     }
 
@@ -24,11 +24,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 updateUI(result.data);
             } else {
                 console.error('Failed to load task details:', result.message);
-                showToast('Failed to load task details.', 'error');
+                showToast(tMsg('failedLoadData'), 'error');
             }
         } catch (error) {
             console.error('Error fetching task details:', error);
-            showToast('An error occurred while fetching task details.', 'error');
+            showToast(tMsg('unexpectedError'), 'error');
         }
     };
 
@@ -48,9 +48,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const durationElement = document.getElementById('subject-duration');
             durationElement.innerHTML = `<i class="fas fa-clock mr-2"></i> ${task.subject.studyDuration} hours`;
         } else {
-            document.getElementById('subject-name').textContent = 'N/A';
-            document.getElementById('subject-description').textContent = 'No associated subject found.';
-            document.getElementById('subject-duration').textContent = 'N/A';
+            document.getElementById('subject-name').textContent = tMsg('notAvailable');
+            document.getElementById('subject-description').textContent = tMsg('noSubjectFound');
+            document.getElementById('subject-duration').textContent = tMsg('notAvailable');
         }
     };
 
@@ -68,13 +68,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (deleteBtn) {
             deleteBtn.addEventListener('click', () => {
                 Swal.fire({
-                    title: 'Are you sure?',
-                    text: "You won't be able to revert this!",
+                    title: tMsg('confirmDeleteTitle'),
+                    text: tMsg('confirmDeleteText'),
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#d33',
                     cancelButtonColor: '#3085d6',
-                    confirmButtonText: 'Yes, delete it!'
+                    confirmButtonText: tMsg('confirmDeleteBtn')
                 }).then(async (result) => {
                     if (result.isConfirmed) {
                         deleteTask();
@@ -91,14 +91,14 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             const result = await response.json();
             if (result.success) {
-                showToast('Task deleted successfully!', 'success');
+                showToast(tMsg('deletedSuccess'), 'success');
                 window.location.href = '/admin/tasks';
             } else {
-                showToast(result.message || 'Failed to delete task.', 'error');
+                showToast(result.message || tMsg('failedDelete'), 'error');
             }
         } catch (error) {
             console.error('Error deleting task:', error);
-            showToast('An error occurred while deleting the task.', 'error');
+            showToast(tMsg('unexpectedError'), 'error');
         }
     };
 

@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function () {
   function renderUsers(users) {
     usersTableBody.innerHTML = '';
     if (!users || users.length === 0) {
-      usersTableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4">No users found.</td></tr>';
+      usersTableBody.innerHTML = `<tr><td colspan="5" class="text-center py-4">${tMsg('noUsers')}</td></tr>`;
       return;
     }
     users.forEach(user => {
@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function () {
             </span>
           </td>
           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-            ${new Date(user.joinedDate).toLocaleDateString()}
+            ${new Date(user.createdAt).toLocaleDateString()}
           </td>
           <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
             <a href="/admin/user/${user.userId}" class="text-indigo-600 hover:text-indigo-900"><i class="fas fa-eye"></i></a>
@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     } catch (error) {
       console.error('An error occurred while fetching users:', error);
-      usersTableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-red-500">Error loading users.</td></tr>';
+      usersTableBody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-red-500">${tMsg('failedLoadData')}</td></tr>`;
     }
   }
 

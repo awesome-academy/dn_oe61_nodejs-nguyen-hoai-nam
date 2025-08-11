@@ -53,10 +53,10 @@ class SupervisorsManager {
                 this.renderSupervisors(result.data || []);
                 this.updateStats(result.data || []);
             } else {
-                showToast(result.message || 'Failed to load supervisors.', 'error');
+                showToast(result.message || tMsg('failedLoadData'), 'error');
             }
         } catch (error) {
-            showToast('An unexpected error occurred.', 'error');
+            showToast(tMsg('unexpectedError'), 'error');
         }
     }
 
@@ -95,13 +95,13 @@ class SupervisorsManager {
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <a href="/admin/supervisors/${supervisor.userId}" class="text-blue-600 hover:text-blue-900 mr-3">
-                        <i class="fas fa-eye"></i> Details
+                        <i class="fas fa-eye"></i>
                     </a>
                     <button onclick="supervisorsManager.editSupervisor(${supervisor.userId})" class="text-indigo-600 hover:text-indigo-900 mr-3">
-                        <i class="fas fa-edit"></i> Edit
+                        <i class="fas fa-edit"></i>
                     </button>
                     <button onclick="supervisorsManager.deleteSupervisor(${supervisor.userId})" class="text-red-600 hover:text-red-900">
-                        <i class="fas fa-trash"></i> Delete
+                        <i class="fas fa-trash"></i>
                     </button>
                 </td>
             </tr>
@@ -176,7 +176,7 @@ class SupervisorsManager {
 
         if (!this.currentSupervisorId) {
             if (!password || !confirmPassword) {
-                showToast('Password and confirmation are required.', 'error');
+                showToast(tMsg('passwordRequired'), 'error');
                 return;
             }
             if (password !== confirmPassword) {
@@ -212,9 +212,9 @@ class SupervisorsManager {
             if (result.success) {
                 this.hideModal();
                 this.loadSupervisors();
-                showToast(result.message || 'Operation successful!');
+                showToast(result.message || tMsg('operationSuccess'));
             } else {
-                showToast(result.message || 'An error occurred.', 'error');
+                showToast(result.message || tMsg('errorOccurred'), 'error');
             }
         } catch (error) {
             showToast('An unexpected network error occurred.', 'error');
@@ -230,7 +230,7 @@ class SupervisorsManager {
             if (result.success) {
                 this.showModal(result.data);
             } else {
-                showToast(result.message || 'Failed to load supervisor data.', 'error');
+                showToast(result.message || tMsg('failedLoadData'), 'error');
             }
         } catch (error) {
             showToast('An unexpected network error occurred.', 'error');
@@ -239,13 +239,13 @@ class SupervisorsManager {
 
     async deleteSupervisor(userId) {
         const confirmation = await Swal.fire({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this!",
+            title: tMsg('confirmDeleteTitle'),
+            text: tMsg('confirmDeleteText'),
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, delete it!'
+            confirmButtonText: tMsg('confirmDeleteBtn')
         });
 
         if (!confirmation.isConfirmed) {
@@ -262,9 +262,9 @@ class SupervisorsManager {
 
             if (result.success) {
                 this.loadSupervisors();
-                showToast(result.message || 'Supervisor deleted successfully.');
+                showToast(result.message || tMsg('deletedSuccess'));
             } else {
-                showToast(result.message || 'Failed to delete supervisor.', 'error');
+                showToast(result.message || tMsg('failedDelete'), 'error');
             }
         } catch (error) {
             showToast('An unexpected network error occurred.', 'error');
