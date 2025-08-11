@@ -96,7 +96,7 @@ export class UserService {
                 .where('user.userId = :userId', { userId });
 
             if (userRole === Role.SUPERVISOR) {
-                query.andWhere('user.role = :role', { role: Role.TRAINEE });
+                query.andWhere('user.role IN (:...roles)', { roles: [Role.TRAINEE, Role.SUPERVISOR] });
             } else if (userRole !== Role.ADMIN) {
                 query.andWhere('1 = 0');
             }
@@ -110,7 +110,6 @@ export class UserService {
 
     async getAllUsers (lang:string) {
         const users = await this.userRepo.find();
-        console.log(users);
         if(users.length === 0){
             throw new NotFoundException(this.i18nUtils.translate('validation.auth.user_notfound', {}, lang))
         }

@@ -33,6 +33,24 @@ export class UserSubjectService {
         private readonly logger: Logger,
     ) { }
 
+    async getTraineeSubjectProgress(userSubjectId: number, lang: string): Promise<UserSubject> {
+        const userSubject = await this.userSubjectRepo.findOne({
+            where: { userSubjectId },
+            relations: [
+                'user',
+                'courseSubject.subject',
+                'userTasks',
+                'userTasks.task',
+            ],
+        });
+
+        if (!userSubject) {
+            throw new NotFoundException(this.i18nUtils.translate('validation.user_subject.not_found', {}, lang));
+        }
+
+        return userSubject;
+    }
+
     async startSubject(userSubjectId: number, supervisorId: number, lang: string): Promise<void> {
         try {
             const userSubject = await this.validateUserSubjectForSupervisor(userSubjectId, supervisorId, lang);

@@ -94,6 +94,12 @@ export class AdminViewController {
         return { layout: 'layouts/admin-layout', courseId: courseId, traineeId: traineeId };
     }
 
+    @Get('trainees/:traineeId/subjects/:userSubjectId/progress')
+    @Render('trainee/trainee-subject-progress')
+    getTraineeSubjectProgressPage(@Param('traineeId') traineeId: number, @Param('userSubjectId') userSubjectId: number) {
+        return { layout: 'layouts/admin-layout', traineeId: traineeId, userSubjectId: userSubjectId };
+    }
+
     @Get('subjects')
     @Render('subject/subjects')
     subjectsPage() {

@@ -7,9 +7,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const buildSubjectRow = (s) => {
         const formatDate = (dateString) => dateString ? new Date(dateString).toLocaleDateString() : '---';
+        const { traineeId } = getParams();
         return `
           <tr class="hover:bg-gray-50">
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${s.subjectName}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+              <a href="/admin/trainees/${traineeId}/subjects/${s.userSubjectId}/progress" class="text-indigo-600 hover:text-indigo-900 hover:underline">${s.subjectName}</a>
+            </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm">
               <span class="${statusBadge[s.status] || 'bg-gray-500'} text-white px-2 py-1 rounded-full text-xs font-semibold">${s.status.replace('_', ' ')}</span>
             </td>
