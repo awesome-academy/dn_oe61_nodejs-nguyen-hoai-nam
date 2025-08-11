@@ -17,7 +17,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function handleAssignBtnVisibility() {
         if (assignBtn) {
-            if (isAdmin()) {
+            const adminMode = isAdmin();
+            const supervisorMode = isSupervisor();
+            if (adminMode || supervisorMode) {
                 assignBtn.classList.remove('hidden');
             } else {
                 assignBtn.classList.add('hidden');

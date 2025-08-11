@@ -362,6 +362,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         const adminMode = isAdmin();
+        const supervisorMode = isSupervisor();
         supervisors.forEach(sp => {
             const row = document.createElement('tr');
             const statusClasses = {
@@ -375,7 +376,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${sp.email}</td>
                 <td class="px-6 py-4 whitespace-nowrap"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClasses[sp.status] || 'bg-gray-100 text-gray-800'}">${sp.status}</span></td>
-                ${adminMode ? `<td class="px-6 py-4 whitespace-nowrap"><div class="flex items-center justify-center"><button data-id="${sp.userId}" class="remove-sup-btn text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button></div></td>` : '<td></td>'}
+                ${adminMode || supervisorMode ? `<td class="px-6 py-4 whitespace-nowrap"><div class="flex items-center justify-center"><button data-id="${sp.userId}" class="remove-sup-btn text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button></div></td>` : '<td></td>'}
             `;
             tbody.appendChild(row);
         });
