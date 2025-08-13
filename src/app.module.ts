@@ -40,6 +40,7 @@ import { BullModule } from '@nestjs/bull';
 import { ChatModule } from './chat/chat.module';
 import { ChatMessage } from './database/entities/chat_message.entity';
 import { ViewsModule } from './views/views.module';
+import { GoogleStrategy } from './api/auth/strategies/google.strategy';
 dotenv.config();
 
 @Module({
@@ -137,6 +138,7 @@ dotenv.config();
       provide: APP_GUARD,
       useClass: AuthGuard
     },
+    GoogleStrategy
   ],
   exports: [I18nUtils],
 })

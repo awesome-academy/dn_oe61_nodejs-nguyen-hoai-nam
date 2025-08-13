@@ -9,11 +9,12 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { payLoadDataType } from 'src/helper/interface/pay_load.interface';
 import { CreateUserDto } from 'src/validation/class_validation/user.validation';
-import { Role } from 'src/database/dto/user.dto';
+import { Role, UserStatus } from 'src/database/dto/user.dto';
 import { AuthErrors } from 'src/helper/constants/error.constant';
 import { I18nUtils } from 'src/helper/utils/i18n-utils';
-import { Request } from 'express';
 import { LoginResponse, RegisterResponse, UserProfileResponse } from 'src/helper/interface/auth.interface';
+import { NestResponse } from 'src/helper/interface/response.interface';
+import { redirectAdmin, redirectTrainee } from 'src/helper/constants/link.constant';
 
 @Injectable()
 export class AuthService {
@@ -131,5 +132,49 @@ export class AuthService {
   private async generateToken(payload: payLoadDataType) {
     const accessToken = await this.jwtToken.signAsync(payload);
     return accessToken;
+  }
+
+
+  async googleAuthRedirect(userAuth: User, lang: string, res: NestResponse) {
+
+    let user = await this.databaseValidation.checkEmailExists(this.userRepo, userAuth.email);
+
+    if (!user) {
+      user = this.userRepo.create({
+        userName: userAuth.userName,
+        email: userAuth.email,
+        role: Role.TRAINEE,
+        status: UserStatus.ACTIVE,
+      });
+      await this.userRepo.save(user);
+    }
+
+    const payload = {
+      userId: user.userId,
+      userName: user.userName,
+      email: user.email,
+      role: user.role,
+    };
+
+    const accessToken = await this.generateToken(payload);
+
+    if (!accessToken) {
+      throw new UnauthorizedException(this.i18nUtils.translate('validation.auth.login_fail', {}, lang));
+    }
+
+    this.setCookieOnly(res, accessToken);
+
+    const redirectUrl = user.role === Role.TRAINEE ? redirectTrainee : redirectAdmin;
+    return redirectUrl;
+  }
+
+  private setCookieOnly(res: NestResponse, accessToken: string) {
+    res.cookie('token', accessToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
   }
 }

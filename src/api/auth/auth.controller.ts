@@ -1,11 +1,13 @@
-import { Body, Controller, Get, Post, Req, Res, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Post, Redirect, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthDto } from 'src/validation/auth_validation/auth.validation';
 import { AuthService } from './auth.service';
+import { UseInterceptors } from '@nestjs/common';
+import { SetCookieInterceptor } from 'src/helper/Interceptors/set_cookie.interceptor';
 import { CreateUserDto } from 'src/validation/class_validation/user.validation';
 import { Language } from 'src/helper/decorators/language.decorator';
 import { Public } from 'src/helper/decorators/metadata.decorator';
 import { User } from 'src/database/entities/user.entity';
-import { UserDecorator } from 'src/helper/decorators/user.decorator';
+import { ResponseDecorator, UserDecorator } from 'src/helper/decorators/user.decorator';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ApiResponseLogin } from 'src/helper/swagger/auth/login_response.decorator';
 import { ApiResponseRegister } from 'src/helper/swagger/auth/response_regiser.decorator';
@@ -13,7 +15,8 @@ import { LoginResponse, RegisterResponse, UserProfileResponse } from 'src/helper
 import { ApiResponse } from 'src/helper/interface/api.interface';
 import { I18nUtils } from 'src/helper/utils/i18n-utils';
 import { ApiResponseMe } from 'src/helper/swagger/auth/me_response.decorator';
-import { SetCookieInterceptor } from 'src/helper/Interceptors/set_cookie.interceptor';
+import { AuthGuard } from '@nestjs/passport';
+import { NestResponse } from 'src/helper/interface/response.interface';
 
 @ApiTags('auths')
 @Controller('auth')
@@ -58,5 +61,18 @@ export class AuthController {
             message: this.i18nUtils.translate('validation.response_api.success', {}, lang),
             data: result
         }
+    }
+
+    @Public()
+    @Get('google')
+    @UseGuards(AuthGuard('google'))
+    async googleAuth() { }
+
+    @Public()
+    @UseGuards(AuthGuard('google'))
+    @Get('google/callback')
+    async googleAuthRedirect(@UserDecorator() user: User, @Language() lang: string, @ResponseDecorator() res: NestResponse) {
+        const redirectUrl = await this.authService.googleAuthRedirect(user, lang, res);
+        return res.redirect(302, redirectUrl);
     }
 }
