@@ -20,38 +20,38 @@ export class GetCourse {
         private readonly paginationService: PaginationService,
     ) { }
 
-    async getCoursesByAdmin(page: number, pageSize: number): Promise<Course[]> {
-        const { data } = await this.paginationService.queryWithPagination(
-            this.courseRepo,
-            { page, pageSize },
-            { order: { createdAt: 'ASC' } }
-        );
-        return data;
+    async getCoursesByAdmin(page: number | null, pageSize: number | null): Promise<[Course[], number]> {
+        const options = {
+            order: { createdAt: 'ASC' as const },
+            ...(page && pageSize && { take: pageSize, skip: (page - 1) * pageSize })
+        };
+        const [data, total] = await this.courseRepo.findAndCount(options);
+        return [data, total];
     }
 
-    async getCoursesBySupervisor(userId: number, page: number, pageSize: number): Promise<Course[]> {
-        const { data } = await this.paginationService.queryWithPagination(
-            this.SupervisorCourseRepo,
-            { page, pageSize },
-            {
-                where: { supervisor: { userId } },
-                relations: ['course'],
-                order: { supervisorCourseId: 'ASC' },
-            }
-        );
-        return data.map(sc => sc.course);
+    async getCoursesBySupervisor(userId: number, page: number | null, pageSize: number | null): Promise<[Course[], number]> {
+        const options = {
+            where: { supervisor: { userId } },
+            relations: ['course'],
+            order: { supervisorCourseId: 'ASC' as const },
+            ...(page && pageSize && { take: pageSize, skip: (page - 1) * pageSize })
+        };
+
+        const [supervisorCourses, total] = await this.SupervisorCourseRepo.findAndCount(options);
+        const courses = supervisorCourses.map(sc => sc.course);
+        return [courses, total];
     }
 
-    async getCoursesByTrainee(userId: number, page: number, pageSize: number): Promise<Course[]> {
-        const { data } = await this.paginationService.queryWithPagination(
-            this.UserCourseRepo,
-            { page, pageSize },
-            {
-                where: { user: { userId } },
-                relations: ['course'],
-                order: { userCourseId: 'ASC' },
-            }
-        );
-        return data.map(uc => uc.course);
+    async getCoursesByTrainee(userId: number, page: number | null, pageSize: number | null): Promise<[Course[], number]> {
+        const options = {
+            where: { user: { userId } },
+            relations: ['course'],
+            order: { userCourseId: 'ASC' as const },
+            ...(page && pageSize && { take: pageSize, skip: (page - 1) * pageSize })
+        };
+
+        const [userCourses, total] = await this.UserCourseRepo.findAndCount(options);
+        const courses = userCourses.map(uc => uc.course);
+        return [courses, total];
     }
 }

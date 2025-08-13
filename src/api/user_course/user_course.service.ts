@@ -45,8 +45,8 @@ export class UserCourseService {
             where: { course: { courseId: courseId } },
             relations: ['course', 'subject']
         });
-
-        if (courseSubject.length !== 0) {
+        
+        if (courseSubject.length === 0) {
             throw new NotFoundException(this.i18nUtils.translate('validation.course.trainee_has_active_course', {}, lang));
         }
         return courseSubject;
@@ -95,7 +95,8 @@ export class UserCourseService {
                     user: { userId: traineeId }
                 }
             });
-
+            console.log(userCourse);
+            
             if (userCourse) {
                 throw new BadRequestException(this.i18nUtils.translate('validation.user_course.user_already_registered_course', {}, lang))
             }
@@ -147,7 +148,8 @@ export class UserCourseService {
             .andWhere(`${relationField}.status = :status`, { status: CourseStatus.ACTIVE })
             .andWhere(`CURRENT_DATE BETWEEN ${relationField}.start AND ${relationField}.end`)
             .getCount();
-
+        console.log(count > 0);
+        
         if (count > 0) {
             throw new BadRequestException(this.i18nUtils.translate('validation.course.trainee_has_active_course', {}, lang));
         }
@@ -237,5 +239,24 @@ export class UserCourseService {
         }
 
         return courses;
+    }
+    
+    async getAllUserCourse(courseId: number, lang: string) {
+        const userCourses = await this.userCourseRepo.find({
+            where: { course: { courseId } },
+            relations: ['user'],
+        });
+
+        if (userCourses.length === 0) {
+            throw new BadRequestException(this.i18nUtils.translate('validation.course.trainee_not_found', {}, lang))
+        }
+
+        return userCourses.map(userCourse => ({
+            userId: userCourse.user.userId,
+            userName: userCourse.user.userName,
+            registrationDate: userCourse.registrationDate,
+            courseProgress: userCourse.courseProgress,
+            status: userCourse.status,
+        }));
     }
 }

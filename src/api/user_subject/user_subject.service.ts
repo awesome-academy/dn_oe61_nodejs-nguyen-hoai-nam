@@ -33,6 +33,24 @@ export class UserSubjectService {
         private readonly logger: Logger,
     ) { }
 
+    async getTraineeSubjectProgress(userSubjectId: number, lang: string): Promise<UserSubject> {
+        const userSubject = await this.userSubjectRepo.findOne({
+            where: { userSubjectId },
+            relations: [
+                'user',
+                'courseSubject.subject',
+                'userTasks',
+                'userTasks.task',
+            ],
+        });
+
+        if (!userSubject) {
+            throw new NotFoundException(this.i18nUtils.translate('validation.user_subject.not_found', {}, lang));
+        }
+
+        return userSubject;
+    }
+
     async startSubject(userSubjectId: number, supervisorId: number, lang: string): Promise<void> {
         try {
             const userSubject = await this.validateUserSubjectForSupervisor(userSubjectId, supervisorId, lang);
@@ -169,12 +187,14 @@ export class UserSubjectService {
 
             const subject = userSubject.courseSubject.subject;
             return {
+                subjectId: subject.subjectId,
                 name: subject.name,
                 description: subject.description,
                 studyDuration: subject.studyDuration,
                 status: userSubject.status,
                 subjectProgress: userSubject.subjectProgress,
                 tasks: subject.tasks.map((task) => ({
+                    taskId: task.taskId,
                     name: task.name,
                     fileUrl: task.fileUrl,
                 })),
@@ -273,10 +293,6 @@ export class UserSubjectService {
             },
             relations: ['task', 'userSubject', 'userSubject.courseSubject'],
         });
-
-        if (userTasks.length === 0) {
-            throw new NotFoundException(this.i18nUtils.translate('validation.user_task.user_task_not_found', {}, lang));
-        }
 
         return userTasks;
     }

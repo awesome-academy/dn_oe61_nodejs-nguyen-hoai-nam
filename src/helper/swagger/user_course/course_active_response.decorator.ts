@@ -11,14 +11,6 @@ export function ApiResponseGetActiveCourse() {
             description: "Cho phép người dùng xem được thông tin chi tiết khoá học đang hoạt động của mình."
         }),
 
-        ApiParam({
-            name: 'traineeId',
-            description: "Nhập id người dùng",
-            type: Number,
-            example: 14,
-            required: true
-        }),
-
         ApiResponse({
             status: 200,
             description: 'Thành công',

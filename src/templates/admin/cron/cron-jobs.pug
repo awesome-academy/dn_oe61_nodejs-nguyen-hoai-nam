@@ -1,0 +1,30 @@
+include ../layouts/admin-layout
+
++adminLayout('Cron Jobs', 'cron-jobs', 'Manage application scheduled tasks', 'Cron Jobs')
+  div(class="max-w-7xl mx-auto")
+    //- Header
+    div(class="bg-white rounded-lg shadow-lg p-6 mb-6")
+      div(class="flex items-center justify-between")
+        div
+          h2(class="text-2xl font-bold text-gray-900 mb-2" data-i18n="cron.pageTitle") Cron Jobs
+          p(class="text-gray-600" data-i18n="cron.pageDesc") Monitor and control scheduled tasks
+
+    //- Cron Job Table
+    div(class="bg-white rounded-lg shadow overflow-hidden")
+      div(class="p-4")
+        h2(class="text-xl font-semibold text-gray-700" data-i18n="cron.allJobs") All Jobs
+      div(class="overflow-x-auto")
+        table(class="min-w-full divide-y divide-gray-200")
+          thead(class="bg-gray-50")
+            tr
+              th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-i18n="cron.table.name") Name
+              th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-i18n="cron.table.schedule") Schedule
+
+              th(scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-i18n="cron.table.actions") Actions
+          tbody(id="cron-table-body" class="bg-white divide-y divide-gray-200")
+            //- Rows injected by JS
+
+  //- Modals etc can be added later
+
+block scripts
+  script(src="/js/cron-jobs.js")

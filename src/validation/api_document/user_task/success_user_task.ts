@@ -64,13 +64,15 @@ export class ViewTaskSuccessDto {
     @ApiProperty({
         example: [
             {
-                t_name: "Bài tập Toán 1",
-                file_url: "https://example.com/task1.pdf"
+                taskId: 1,
+                name: "Bài tập Toán 1",
+                fileUrl: "https://example.com/task1.pdf"
             }
         ]
     })
     data: {
-        t_name: "Bài tập Toán 1",
-        file_url: "https://example.com/task1.pdf"
+        taskId: 1,
+        name: "Bài tập Toán 1",
+        fileUrl: "https://example.com/task1.pdf"
     }
 }

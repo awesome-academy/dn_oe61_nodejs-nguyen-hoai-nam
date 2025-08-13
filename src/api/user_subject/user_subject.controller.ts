@@ -7,7 +7,6 @@ import { Language } from 'src/helper/decorators/language.decorator';
 import { UserSubjectIdDto } from 'src/validation/class_validation/user_subject.validation';
 import { AuthRoles } from 'src/helper/decorators/auth_roles.decorator';
 import { Role } from 'src/database/dto/user.dto';
-import { traineeIdDto } from 'src/validation/class_validation/user.validation';
 import { ApiResponse } from 'src/helper/interface/api.interface';
 import { ActivityHistoryDto, SubjectWithTasksDto, TraineeCourseProgressDto, TraineeInCourseDto } from 'src/helper/interface/user_subject.interface';
 import { ApiBearerAuth, ApiExcludeEndpoint } from '@nestjs/swagger';
@@ -21,6 +20,13 @@ export class UserSubjectController {
         private readonly userSubjectService: UserSubjectService,
         private readonly i18nUtils: I18nUtils
     ) { }
+
+    @ApiExcludeEndpoint()
+    @AuthRoles(Role.SUPERVISOR, Role.ADMIN)
+    @Get(':userSubjectId/progress')
+    async getTraineeSubjectProgress(@Param() userSubjectId: UserSubjectIdDto, @Language() lang: string): Promise<any> {
+        return this.userSubjectService.getTraineeSubjectProgress(userSubjectId.userSubjectId, lang);
+    }
 
     @ApiExcludeEndpoint()
     @AuthRoles(Role.SUPERVISOR)

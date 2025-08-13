@@ -23,7 +23,7 @@ export class CourseReminderService {
 
     ) { }
 
-    @Cron(CronExpression.DAILY)
+    @Cron(CronExpression.DAILY, { name: 'course-reminder' })
     async handleReminder() {
         await this.sendEndingSoonCourseReminders();
     }
@@ -34,6 +34,7 @@ export class CourseReminderService {
 
         for (const course of endingCourses) {
             const supervisors = this.extractSupervisors(course);
+
             if (supervisors.length === 0) {
                 this.logger.warn(`Course [${course.courseId}] has no supervisors.`);
                 continue;
@@ -43,11 +44,6 @@ export class CourseReminderService {
                 this.countUsersInCourse(course.courseId),
                 this.countCompletedSubjects(course.courseId)
             ]);
-
-            if (totalUsers === 0 || totalSubjectsDone === 0) {
-                this.logger.warn(`Course [${course.courseId}]`);
-                continue;
-            }
 
             for (const supervisor of supervisors) {
                 sendTasks.push(this.sendCourseReminderEmail(supervisor, course, totalUsers, totalSubjectsDone));
@@ -60,7 +56,7 @@ export class CourseReminderService {
     private async getCoursesEndingSoon(): Promise<Course[]> {
         const targetDate = addDays(new Date(), endDateOfCourse);
 
-        return await this.courseRepo
+        const data =  await this.courseRepo
             .createQueryBuilder('course')
             .leftJoinAndSelect('course.supervisorCourses', 'sc')
             .leftJoinAndSelect('sc.supervisor', 'supervisor')
@@ -70,6 +66,9 @@ export class CourseReminderService {
                 end: endOfDay(targetDate),
             })
             .getMany();
+            console.log(data);
+            return data;
+            
     }
 
     private extractSupervisors(course: Course): User[] {

@@ -5,5 +5,7 @@ export const templatePug = {
     removeUserCourse: "remove_user_course",
     traineeRegisterSuccess: "trainee_register_success",
     courseEndingReport: "course_ending_report",
-    dailySummaryReport: "daily_summary_report"
+    dailySummaryReport: "daily_summary_report",
+    assignSupervisorToCourse: "assign_supervisor_to_course",
+    removeSupervisorToCourse: "remove_supervisor_to_course"
 }

@@ -45,9 +45,16 @@ export class TaskController {
     }
 
     @Get('')
-    async getAll(@QueryParam(['page', 'pageSize']) pagination: { page: number; pageSize: number }, @Language() lang: string): Promise<ApiResponse | Task[]> {
+    async getAll(@QueryParam(['page', 'pageSize']) pagination: { page: number; pageSize: number }, @Language() lang: string): Promise<ApiResponse> {
         const { page, pageSize } = pagination;
-        const result = await this.taskService.getAll(page, pageSize, lang);
-        return result
+        const { data, meta } = await this.taskService.getAll(page, pageSize, lang);
+        return {
+            success: true,
+            message: this.i18nUtils.translate('validation.response_api.success', {}, lang),
+            data: {
+                items: data,
+                meta: meta,
+            },
+        };
     }
 }

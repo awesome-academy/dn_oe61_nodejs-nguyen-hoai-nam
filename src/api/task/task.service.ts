@@ -121,13 +121,13 @@ export class TaskService {
         return task;
     }
 
-    async getAll(page: number, pageSize: number, lang: string): Promise<Task[]> {
-        const { data } = await this.paginationService.queryWithPagination(
+    async getAll(page: number, pageSize: number, lang: string) {
+        const result = await this.paginationService.queryWithPagination(
             this.taskRepo,
             { page, pageSize },
-            { order: { createdAt: 'ASC' } }
+            { order: { createdAt: 'ASC' }, relations: ['subject'] }
         );
 
-        return data;
+        return result;
     }
 }

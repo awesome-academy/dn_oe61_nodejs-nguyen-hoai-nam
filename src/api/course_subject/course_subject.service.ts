@@ -29,7 +29,7 @@ export class CourseSubjectService {
         });
 
         if (courseSubjects.length === 0) {
-            throw new BadRequestException(this.i18nUtils.translate('validation.course_subject.subject_not_found'));
+            throw new BadRequestException(this.i18nUtils.translate('validation.course_subject.subject_not_found', {}, lang));
         }
 
         const course = {
@@ -41,11 +41,12 @@ export class CourseSubjectService {
             end: courseSubjects[0].course.end,
         };
 
-        const subjects = courseSubjects.map(({ subject }) => ({
-            subjectId: subject.subjectId,
-            name: subject.name,
-            description: subject.description,
-            studyDuration: subject.studyDuration,
+        const subjects = courseSubjects.map(cs => ({
+            subjectId: cs.subject.subjectId,
+            name: cs.subject.name,
+            description: cs.subject.description,
+            studyDuration: cs.subject.studyDuration,
+            status: cs.status,
         }));
 
         const datas: CreateCourseWithSubjectsDto = {
@@ -150,10 +151,8 @@ export class CourseSubjectService {
                     },
                 });
 
-                if (courseSubjects.length === 0) {
-                    throw new BadRequestException(
-                        this.i18nUtils.translate('validation.course_subject.course_subject_not_found', {}, lang)
-                    );
+                if (courseSubjects) {
+                    throw new BadRequestException(this.i18nUtils.translate('validation.course_subject.already_exists', {}, lang));
                 }
 
                 await manager.getRepository(CourseSubject).remove(courseSubjects);

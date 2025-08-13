@@ -48,8 +48,9 @@ const socket = io();
             
             if (result.success && result.data) {
               const user = result.data;
-              currentUserId = user.id;
+              currentUserId = user.userId || user.id;
               updateUserInfo(user);
+               hideMenusIfTrainee(user.role);
               loadUserCourses();
             }
           }
@@ -59,6 +60,16 @@ const socket = io();
       }
 
       // Update user info in UI
+      function hideMenusIfTrainee(role) {
+        if (role === 'TRAINEE') {
+          document.querySelectorAll('.sidebar nav a').forEach(a => {
+            if (!a.getAttribute('href').includes('/admin/chat')) {
+              a.classList.add('hidden');
+            }
+          });
+        }
+      }
+
       function updateUserInfo(user) {
         const selectors = [
           '.sidebar .flex-1 p.text-sm.font-semibold',
@@ -187,9 +198,20 @@ const socket = io();
 
         currentRoom = courseId;
         socket.emit('join', { courseId: parseInt(courseId), userId: currentUserId });
-        
         this.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i><span>Joining...</span>';
         this.disabled = true;
+      });
+
+      // Hide menus for trainee if not already hidden
+      document.addEventListener('userInfoLoaded', () => {
+        const role = window.currentUser?.data?.role;
+        if (role === 'TRAINEE') {
+          document.querySelectorAll('.sidebar nav a').forEach(a => {
+            if (!a.getAttribute('href').includes('/admin/chat')) {
+              a.classList.add('hidden');
+            }
+          });
+        }
       });
 
       // Handle form submission
@@ -281,7 +303,7 @@ const socket = io();
         messageDiv.className = `flex items-end space-x-3 ${isSender ? 'justify-end' : 'justify-start'}`;
 
         const avatarUrl = isSender
-          ? 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face'
+          ? '\/img\/avatar.png'
           : 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=40&h=40&fit=crop&crop=face';
 
         const senderName = isSender ? 'You' : (msg.sender?.userName || 'User');
@@ -411,7 +433,7 @@ function displayMessage(msg, autoScroll = true) {
   const messageDiv = document.createElement('div');
   messageDiv.className = `flex items-end space-x-3 ${isSender ? 'justify-end' : 'justify-start'}`;
   const avatarUrl = isSender
-    ? 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face'
+    ? '\/img\/avatar.png'
     : 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=40&h=40&fit=crop&crop=face';
   const senderName = isSender ? 'You' : (msg.sender?.userName || 'User');
   const bubbleClass = isSender ? 'sent' : 'received';

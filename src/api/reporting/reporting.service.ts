@@ -15,7 +15,7 @@ import { ActivityLogDto, ReportResponseDto } from 'src/helper/interface/reportin
 import { GetCourse } from 'src/helper/shared/get_course.shared';
 import { I18nUtils } from 'src/helper/utils/i18n-utils';
 import { ReportFilterDto } from 'src/validation/class_validation/report_filter.validation';
-import { Between, DataSource, In, Not, Repository } from 'typeorm';
+import { DataSource, Repository, In } from "typeorm";
 
 @Injectable()
 export class ReportingService {
@@ -40,9 +40,11 @@ export class ReportingService {
             .getRepository(UserTask)
             .createQueryBuilder('userTask')
             .innerJoinAndSelect('userTask.userSubject', 'userSubject')
-            .innerJoin('userSubject.courseSubject', 'courseSubject')
+            .innerJoinAndSelect('userSubject.courseSubject', 'courseSubject')
+            .innerJoinAndSelect('courseSubject.subject', 'subject')
             .innerJoin('courseSubject.course', 'course')
-            .where('userSubject.startedAt BETWEEN :start AND :end', {
+            .where('userSubject.startedAt <= :end', { end: endDate })
+            .andWhere('userTask.doneAt >= :start AND userTask.doneAt < :end', {
                 start: startDate,
                 end: endDate,
             });
@@ -52,32 +54,34 @@ export class ReportingService {
         }
 
         if (user.role === Role.SUPERVISOR) {
-            query
-                .innerJoin('course.supervisorCourses', 'supervisorCourse')
+            query.innerJoin('course.supervisorCourses', 'supervisorCourse')
                 .andWhere('supervisorCourse.supervisor_id = :supervisorId', {
                     supervisorId: user.userId,
                 });
         }
 
         const tasks = await query
-            .select([
-                'userTask.userTaskId',
+            .addSelect([
+                'subject.subjectId',
                 'userTask.status',
-                'userSubject.userSubjectId',
-                'userSubject.subjectProgress',
+                'userSubject.subjectProgress'
             ])
             .getMany();
 
+        const subjectIds = Array.from(new Set(tasks.map(t => t.userSubject.courseSubject.subject.subjectId)));
+        const totalOriginalTasks = subjectIds.length > 0 ? await this.taskRepo.count({ where: { subject: { subjectId: In(subjectIds) } } }) : 0;
+
         if (tasks.length === 0) {
-            throw new NotFoundException(this.i18nUtils.translate('validation.report.not_found',{},lang));
+            throw new NotFoundException(this.i18nUtils.translate('validation.report.not_found', {}, lang));
         }
 
-        return this.buildReportData(tasks);
+        return this.buildReportData(tasks, totalOriginalTasks);
     }
 
-    private buildReportData(tasks: UserTask[]): ReportResponseDto {
-        const totalTasks = tasks.length;
-        const completedTasks = tasks.filter(t => t.status === UserTaskStatus.DONE).length;
+    private buildReportData(tasks: UserTask[], totalOriginalTasks: number): ReportResponseDto {
+        const completedTasks = tasks.length;
+        const totalTasks = totalOriginalTasks;
+
         const uncompletedTasks = totalTasks - completedTasks;
         const averageTaskCompletionRate =
             totalTasks > 0 ? Math.round((completedTasks / totalTasks) * maxProgress) : 0;

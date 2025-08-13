@@ -1,51 +1,190 @@
-function checkAuth() {
-    // Gọi API /auth/me để kiểm tra đăng nhập
-    // Nếu không hợp lệ, chuyển hướng về trang login
-    return fetch('/auth/me', { credentials: 'include' })
-      .then(res => {
-        if (res.status !== 200) {
-          window.location.href = '/auth/login';
-          return false;
-        }
-        return true;
-      })
-      .catch(() => {
-        window.location.href = '/auth/login';
-        return false;
-      });
+window.currentUser = null;
+
+function updateSidebarUserInfo() {
+
+  const userNameElement = document.getElementById('user-name');
+  const userAvatarElement = document.getElementById('user-avatar');
+
+  if (window.currentUser && window.currentUser.data) {
+
+    if (userNameElement) {
+      userNameElement.textContent = window.currentUser.data.userName || 'Admin User';
+    }
+
+    if (userAvatarElement) {
+      userAvatarElement.src = window.currentUser.data.avatar || '\/img\/avatar.png';
+    }
+  } else {
+    if (userNameElement) {
+      userNameElement.textContent = 'Admin User';
+    }
+    if (userAvatarElement) {
+      userAvatarElement.src = '/img/avatar.png';
+    }
+  }
 }
 
-  function logout() {
-    // Gọi API logout nếu có, hoặc chỉ chuyển hướng
-    window.location.href = '/auth/login';
-  }
-
-  // Mobile sidebar toggle
-  const toggleButton = document.getElementById('sidebarToggle');
-  const sidebar = document.querySelector('.sidebar');
-
-  if (toggleButton && sidebar) {
-    toggleButton.addEventListener('click', function () {
-      sidebar.classList.toggle('open');
+async function getUserInfo() {
+  try {
+    const response = await fetch('/auth/me', {
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json'
+      }
     });
+
+    if (response.ok) {
+      const userData = await response.json();
+      window.currentUser = userData;
+      return userData;
+    } else {
+      return null;
+    }
+  } catch (error) {
+    return null;
   }
+}
 
-  // Close sidebar when clicking outside on mobile
-  document.addEventListener('click', function(e) {
-    const sidebar = document.querySelector('.sidebar');
-    const toggle = document.getElementById('sidebarToggle');
-    
-    if (window.innerWidth <= 768 && 
-        !sidebar.contains(e.target) && 
-        !toggle.contains(e.target) && 
-        sidebar.classList.contains('open')) {
-      sidebar.classList.remove('open');
+async function checkAuth() {
+  return fetch('/auth/me', { credentials: 'include' })
+    .then(res => {
+      if (res.status !== 200) {
+        window.location.href = '/auth/login';
+        return false;
+      }
+      return true;
+    })
+    .catch(() => {
+      window.location.href = '/auth/login';
+      return false;
+    });
+}
+
+function logout() {
+  window.location.href = '/auth/login';
+}
+
+function filterSidebarByRole(role) {
+  const links = document.querySelectorAll('.sidebar nav a');
+  if (!links) return;
+
+  if (role === 'TRAINEE') {
+    links.forEach(a => {
+      if (!a.getAttribute('href').includes('/admin/chat')) {
+        a.classList.add('hidden');
+      } else {
+        a.classList.remove('hidden');
+      }
+    });
+  } else {
+    links.forEach(a => a.classList.remove('hidden'));
+  }
+}
+
+const toggleButton = document.getElementById('sidebarToggle');
+const sidebar = document.querySelector('.sidebar');
+
+if (toggleButton && sidebar) {
+  toggleButton.addEventListener('click', function () {
+    sidebar.classList.toggle('open');
+  });
+}
+
+document.addEventListener('click', function (e) {
+  const sidebar = document.querySelector('.sidebar');
+  const toggle = document.getElementById('sidebarToggle');
+
+  if (window.innerWidth <= 768 &&
+    !sidebar.contains(e.target) &&
+    !toggle.contains(e.target) &&
+    sidebar.classList.contains('open')) {
+    sidebar.classList.remove('open');
+  }
+});
+
+document.addEventListener('DOMContentLoaded', async function () {
+  initializeLanguageSwitcher();
+
+  const isAuthenticated = await checkAuth();
+  if (isAuthenticated) {
+    await getUserInfo();
+    updateSidebarUserInfo();
+
+    // Role-based sidebar filtering
+    const role = window.currentUser?.data?.role;
+    filterSidebarByRole(role);
+
+    const event = new Event('userInfoLoaded');
+    document.dispatchEvent(event);
+  }
+});
+
+function setCurrentLanguage(lang) {
+  localStorage.setItem('language', lang);
+}
+
+function getCurrentLanguage() {
+  return localStorage.getItem('language') || 'vn';
+}
+
+function initializeLanguageSwitcher() {
+  const langButton = document.getElementById('language-switcher-button');
+  const langMenu = document.getElementById('language-switcher-menu');
+  const currentLangSpan = document.getElementById('current-lang');
+
+  if (!langButton || !langMenu || !currentLangSpan) return;
+
+  const currentLang = getCurrentLanguage();
+  currentLangSpan.textContent = currentLang.toUpperCase();
+
+  langButton.addEventListener('click', (e) => {
+    e.stopPropagation();
+    langMenu.classList.toggle('hidden');
+  });
+
+  langMenu.addEventListener('click', (e) => {
+    if (e.target.tagName === 'A') {
+      const selectedLang = e.target.getAttribute('data-lang');
+      if (selectedLang && selectedLang !== getCurrentLanguage()) {
+        setCurrentLanguage(selectedLang);
+        currentLangSpan.textContent = selectedLang.toUpperCase();
+        if (typeof window.applyTranslations === 'function') {
+          window.applyTranslations();
+        }
+        const langEvent = new CustomEvent('languageChanged', { detail: { lang: selectedLang } });
+        document.dispatchEvent(langEvent);
+      }
     }
   });
 
-  // Initialize
-  document.addEventListener('DOMContentLoaded', function() {
-    if (checkAuth()) {
-      // Page-specific initialization can be added here
+  document.addEventListener('click', () => {
+    if (!langMenu.classList.contains('hidden')) {
+      langMenu.classList.add('hidden');
     }
   });
+}
+
+function tMsg(key) {
+  const lang = getCurrentLanguage();
+  if (STATIC_I18N[lang] && STATIC_I18N[lang][key]) return STATIC_I18N[lang][key];
+  return STATIC_I18N['en'][key] || key;
+}
+
+function showToast(message, type = 'success') {
+  const Toast = Swal.mixin({
+    toast: true,
+    position: 'top-end',
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+    didOpen: (toast) => {
+      toast.addEventListener('mouseenter', Swal.stopTimer);
+      toast.addEventListener('mouseleave', Swal.resumeTimer);
+    }
+  });
+
+  Toast.fire({
+    icon: type,
+    title: message
+  });
+}

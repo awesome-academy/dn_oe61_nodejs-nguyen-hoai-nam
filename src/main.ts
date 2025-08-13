@@ -29,8 +29,13 @@ async function bootstrap() {
 
   const expressApp = app.getHttpAdapter().getInstance();
   expressApp.set('views', [
-    path.join(__dirname, '..', 'src', 'templates', 'admin','chat'),
     path.join(__dirname, '..', 'src', 'templates', 'admin'),
+    path.join(__dirname, '..', 'src', 'templates', 'admin','chat'),
+    path.join(__dirname, '..', 'src', 'templates', 'admin','course'),
+    path.join(__dirname, '..', 'src', 'templates', 'admin','trainee'),
+    path.join(__dirname, '..', 'src', 'templates', 'admin','supervisor'),
+    path.join(__dirname, '..', 'src', 'templates', 'admin','subject'),
+    path.join(__dirname, '..', 'src', 'templates', 'admin','task'),
     path.join(__dirname, '..', 'src', 'templates', 'email')
   ]);
   app.useStaticAssets(join(__dirname,'..','public'));
