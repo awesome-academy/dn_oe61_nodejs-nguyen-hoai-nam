@@ -8,6 +8,7 @@ import { Role } from 'src/database/dto/user.dto';
 import { ReportingService } from './reporting.service';
 import { ReportFilterDto } from 'src/validation/class_validation/report_filter.validation';
 import { ActivityLogDto, ReportResponseDto } from 'src/helper/interface/reporting.interface';
+import { ApiExcludeEndpoint } from '@nestjs/swagger';
 
 @Controller('reporting')
 export class ReportingController {
@@ -15,15 +16,17 @@ export class ReportingController {
         private readonly reportingService: ReportingService,
     ) { }
 
+    @ApiExcludeEndpoint()
     @AuthRoles(Role.SUPERVISOR, Role.ADMIN)
     @Get('')
     async getReport(@Query() filter: ReportFilterDto, @UserDecorator() user: User, @Language() lang: string): Promise<ReportResponseDto> {
         return this.reportingService.getReportData(filter, user, lang);
     }
 
+    @ApiExcludeEndpoint()
     @AuthRoles(Role.ADMIN, Role.SUPERVISOR)
     @Get(':courseId/logs')
-    async getActivityLogs(@Param('courseId', ParseIntPipe) courseId: number,@Language() lang: string, @Query('userId') userId: number, @UserDecorator() user: User): Promise<ActivityLogDto[]> {
-        return this.reportingService.getActivityLogs(courseId,lang, user, userId);
+    async getActivityLogs(@Param('courseId', ParseIntPipe) courseId: number, @Language() lang: string, @Query('userId') userId: number, @UserDecorator() user: User): Promise<ActivityLogDto[]> {
+        return this.reportingService.getActivityLogs(courseId, lang, user, userId);
     }
 }

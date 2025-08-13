@@ -149,12 +149,11 @@ export class UserSubjectService {
         });
 
         if (remainingTasks > 0) {
-            throw new BadRequestException(this.i18nUtils.translate('validation.user_task.not_all_done', {}, lang));
+            throw new BadRequestException(this.i18nUtils.translate('validation.user_subject.not_all_done', {}, lang));
         }
     }
 
     async getUserSubjectDetail(userSubjectId: number, traineeId: number, lang: string): Promise<SubjectWithTasksDto> {
-        try {
             const userSubject = await this.userSubjectRepo.findOne({
                 where: { userSubjectId },
                 relations: ['user', 'courseSubject', 'courseSubject.subject', 'courseSubject.subject.tasks',],
@@ -173,16 +172,13 @@ export class UserSubjectService {
                 name: subject.name,
                 description: subject.description,
                 studyDuration: subject.studyDuration,
+                status: userSubject.status,
+                subjectProgress: userSubject.subjectProgress,
                 tasks: subject.tasks.map((task) => ({
                     name: task.name,
                     fileUrl: task.fileUrl,
                 })),
             };
-        } catch (error) {
-            this.logger.error(`startSubject: ${error}`);
-            throw new InternalServerErrorException(this.i18nUtils.translate('validation.server.internal_server_error', {}, lang))
-        }
-
     }
 
     async getMyActivityHistory(traineeId: number, lang: string): Promise<ActivityHistoryDto[]> {
