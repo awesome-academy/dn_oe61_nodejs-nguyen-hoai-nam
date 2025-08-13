@@ -7,12 +7,12 @@ import { DatabaseValidation } from 'src/validation/existence/existence.validator
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { hashPassword } from 'src/helper/shared/hash_password.shared';
+import { PaginationService } from 'src/helper/shared/pagination.shared';
 import { Role, UserStatus } from 'src/database/dto/user.dto';
 import { ApiResponse } from 'src/helper/interface/api.interface';
 import { UserCourse } from 'src/database/entities/user_course.entity';
 import { UserSubject } from 'src/database/entities/user_subject.entity';
 import { tableName, userCourse, userSubject } from 'src/helper/constants/emtities.constant';
-import { KeyObject } from 'crypto';
 
 @Injectable()
 export class TraineeService {
@@ -22,31 +22,37 @@ export class TraineeService {
         @InjectRepository(UserSubject) private readonly userSubjectRepo: Repository<UserSubject>,
         private readonly databaseValidation: DatabaseValidation,
         private readonly i18nUtils: I18nUtils,
-        private readonly hashPassword: hashPassword
+        private readonly hashPassword: hashPassword,
+        private readonly paginationService: PaginationService,
     ) { }
 
-    async getAll(lang: string): Promise<ApiResponse> {
-        const trainee: User[] | null = await this.userRepo.findBy({ role: Role.TRAINEE });
+    async getAll(lang: string, page?: number, pageSize?: number): Promise<ApiResponse> {
+        const { data, meta } = await this.paginationService.queryWithPagination(
+            this.userRepo,
+            { page, pageSize },
+            { where: { role: Role.TRAINEE }, order: { userName: 'ASC' as const } }
+        );
 
-        if (trainee.length === 0) {
-            throw new NotFoundException(this.i18nUtils.translate('validation.auth.user_notfound', {}, lang))
+        if (data.length === 0) {
+            throw new NotFoundException(this.i18nUtils.translate('validation.auth.user_notfound', {}, lang));
         }
 
-        const datas = trainee.map(trainee => {
-            return {
-                userId: trainee.userId,
-                userName: trainee.userName,
-                email: trainee.email,
-                role: trainee.role,
-                status: trainee.status
-            }
-        });
+        const datas = data.map(trainee => ({
+            userId: trainee.userId,
+            userName: trainee.userName,
+            email: trainee.email,
+            role: trainee.role,
+            status: trainee.status
+        }));
 
         return {
             success: true,
             message: this.i18nUtils.translate('validation.response_api.success', {}, lang),
-            data: datas
-        }
+            data: {
+                items: datas,
+                meta
+            }
+        };
     }
 
     async getById(traineeId: number, lang: string): Promise<ApiResponse> {
@@ -156,10 +162,10 @@ export class TraineeService {
         return trainee;
     }
 
-    private async findAndUpdateTrainee(supervisorId: number, supervisorInput: UpdateUserDto, lang: string) {
-        const trainee = await this.findTraineeOrFail(supervisorId, lang);
+    private async findAndUpdateTrainee(traineeId: number, traineeInput: UpdateUserDto, lang: string) {
+        const trainee = await this.findTraineeOrFail(traineeId, lang);
 
-        const { userName, email, password, status, role } = supervisorInput;
+        const { userName, email, password, status, role } = traineeInput;
 
         if (userName !== undefined) trainee.userName = userName;
         if (email !== undefined) trainee.email = email;
@@ -169,6 +175,12 @@ export class TraineeService {
         }
         if (status !== undefined) trainee.status = status;
         if (role !== undefined) trainee.role = role;
+
+        const isEmailExists = await this.databaseValidation.checkEmailExists(this.userRepo, trainee.email);
+
+        if (isEmailExists) {
+            throw new BadRequestException(this.i18nUtils.translate('validation.auth.email_exists', {}, lang));
+        }
 
         const savedTrainee: User | null = await this.userRepo.save(trainee);
 
