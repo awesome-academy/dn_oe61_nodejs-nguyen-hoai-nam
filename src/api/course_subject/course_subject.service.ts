@@ -151,8 +151,8 @@ export class CourseSubjectService {
                     },
                 });
 
-                if (courseSubjects) {
-                    throw new BadRequestException(this.i18nUtils.translate('validation.course_subject.already_exists', {}, lang));
+                if (courseSubjects.length === 0) {
+                    throw new BadRequestException(this.i18nUtils.translate('validation.course_subject.not_found', {}, lang),);
                 }
 
                 await manager.getRepository(CourseSubject).remove(courseSubjects);
@@ -165,6 +165,4 @@ export class CourseSubjectService {
             totalDeleted: deletedSubjectIds.length,
         };
     }
-
-
 }

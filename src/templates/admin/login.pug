@@ -67,11 +67,28 @@ html(lang="en")
           i(class="fas fa-sign-in-alt mr-2")
           span Sign In
 
+      // Google login separator
+      div(class="my-6 flex items-center")
+        hr(class="flex-grow border-gray-300")
+        span(class="mx-3 text-sm text-gray-400") or
+        hr(class="flex-grow border-gray-300")
+
+      a(id="google-login" class="w-full border border-gray-300 rounded-lg py-3 flex items-center justify-center hover:bg-gray-50 transition")
+        img(src="https://developers.google.com/identity/images/g-logo.png" alt="Google" class="w-5 h-5 mr-3")
+        span(class="font-medium text-gray-700") Sign in with Google
+
       div(class="mt-6 text-center")
         p(class="text-sm text-gray-600") Don't have an account? 
           a(href="/auth/register" class="text-indigo-600 hover:text-indigo-500 font-medium") Contact Admin
 
     script.
+      // set google href with current language param
+      const googleBtn = document.getElementById('google-login');
+      if (googleBtn) {
+        const lang = localStorage.getItem('language') || 'vn';
+        googleBtn.href = `/auth/google?lang=${lang}`;
+      }
+
       document.getElementById('login-form').addEventListener('submit', async function(e) {
         e.preventDefault();
         

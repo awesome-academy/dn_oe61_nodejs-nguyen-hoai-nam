@@ -8,11 +8,12 @@ import { UserSubjectIdDto } from 'src/validation/class_validation/user_subject.v
 import { AuthRoles } from 'src/helper/decorators/auth_roles.decorator';
 import { Role } from 'src/database/dto/user.dto';
 import { ApiResponse } from 'src/helper/interface/api.interface';
-import { ActivityHistoryDto, SubjectWithTasksDto, TraineeCourseProgressDto, TraineeInCourseDto } from 'src/helper/interface/user_subject.interface';
+import { ActivityHistoryDto, MySubjectDto, SubjectWithTasksDto, TraineeCourseProgressDto, TraineeInCourseDto } from 'src/helper/interface/user_subject.interface';
 import { ApiBearerAuth, ApiExcludeEndpoint } from '@nestjs/swagger';
 import { ApiResponseViewSubject } from 'src/helper/swagger/user_subject/view_subject.decorator';
 import { ApiResponseFinishSubject } from 'src/helper/swagger/user_subject/finish_subject.decorator';
 import { ApiResponseGetActivityHistory } from 'src/helper/swagger/user_subject/get_activity_history';
+import { ApiResponseListMySubjects } from 'src/helper/swagger/user_subject/list_my_subjects.decorator';
 
 @Controller('user_subject')
 export class UserSubjectController {
@@ -83,6 +84,14 @@ export class UserSubjectController {
     @Get(':courseId/trainees')
     async listTraineesInCourse(@Param('courseId') courseId: number, @UserDecorator() user: User, @Language() lang: string): Promise<ApiResponse | TraineeInCourseDto[]> {
         return await this.userSubjectService.getTraineesInCourse(courseId, user, lang);
+    }
+
+    @ApiResponseListMySubjects()
+    @AuthRoles(Role.TRAINEE)
+    @Get('')
+    async listMySubjects(@UserDecorator() user: User, @Language() lang: string): Promise<ApiResponse | MySubjectDto[]> {
+        const result = await this.userSubjectService.listMySubjects(user.userId, lang);
+        return result;
     }
 }
 

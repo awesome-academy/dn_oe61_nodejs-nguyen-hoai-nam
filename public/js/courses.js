@@ -209,11 +209,12 @@ class CoursesManager {
         const selectEl = event.target;
         const selectedValue = selectEl.value;
         if(!selectedValue) return;
-        // reset select
+        // capture selected text BEFORE resetting the select value
+        const selectedText = selectEl.options[selectEl.selectedIndex]?.textContent || '';
+        // reset select afterwards so placeholder reappears
         selectEl.value = '';
         // check if already added
         if(document.querySelector(`#selected-subjects span[data-id="${selectedValue}"]`)) return;
-        const selectedText = selectEl.options[selectEl.selectedIndex]?.textContent || '';
         const tag = document.createElement('span');
         tag.className = 'bg-indigo-100 text-indigo-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded flex items-center gap-1';
         tag.setAttribute('data-id', selectedValue);

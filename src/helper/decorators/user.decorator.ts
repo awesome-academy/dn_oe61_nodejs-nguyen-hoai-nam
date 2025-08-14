@@ -1,10 +1,23 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+import { NestResponse } from '../interface/response.interface';
 
 export const UserDecorator = createParamDecorator(
   (data: string, ctx: ExecutionContext) => {
     const request = ctx.switchToHttp().getRequest();
     const user = request.user;
     return data ? user?.[data] : user;
+  },
+);
+
+export const RequestDecorator = createParamDecorator(
+  (_: unknown, ctx: ExecutionContext) => {
+    return ctx.switchToHttp().getRequest();
+  },
+);
+
+export const ResponseDecorator = createParamDecorator(
+  (_: unknown, ctx: ExecutionContext): NestResponse => {
+    return ctx.switchToHttp().getResponse() as unknown as NestResponse;
   },
 );
 

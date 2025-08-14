@@ -12,10 +12,10 @@ import { User } from 'src/database/entities/user.entity';
 import { UserCourse } from 'src/database/entities/user_course.entity';
 import { UserSubject } from 'src/database/entities/user_subject.entity';
 import { UserTask } from 'src/database/entities/user_task.entity';
-import { ActivityHistoryDto, SubjectWithTasksDto, TraineeCourseProgressDto, TraineeInCourseDto } from 'src/helper/interface/user_subject.interface';
+import { ActivityHistoryDto, SubjectWithTasksDto, TraineeCourseProgressDto, TraineeInCourseDto, MySubjectDto } from 'src/helper/interface/user_subject.interface';
 import { GetCourse } from 'src/helper/shared/get_course.shared';
 import { I18nUtils } from 'src/helper/utils/i18n-utils';
-import { DataSource, Not, Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 
 @Injectable()
 export class UserSubjectService {
@@ -159,14 +159,25 @@ export class UserSubjectService {
     }
 
     private async ensureAllTasksDone(userSubjectId: number, lang: string): Promise<void> {
-        const remainingTasks = await this.userTaskRepo.count({
+        const userSubject = await this.userSubjectRepo.findOne({
+            where: { userSubjectId },
+            relations: ['courseSubject', 'courseSubject.subject', 'courseSubject.subject.tasks'],
+        });
+
+        if (!userSubject) {
+            throw new NotFoundException(this.i18nUtils.translate('validation.user_subject.not_found', {}, lang));
+        }
+
+        const totalTasks = userSubject?.courseSubject?.subject?.tasks?.length;
+
+        const completedTasks = await this.userTaskRepo.count({
             where: {
                 userSubject: { userSubjectId },
-                status: Not(UserTaskStatus.DONE),
+                status: UserTaskStatus.DONE,
             },
         });
 
-        if (remainingTasks > 0) {
+        if (completedTasks < totalTasks) {
             throw new BadRequestException(this.i18nUtils.translate('validation.user_subject.not_all_done', {}, lang));
         }
     }
@@ -339,6 +350,27 @@ export class UserSubjectService {
             courseProgress,
             subjects: subjectsProgress,
         };
+    }
+
+    async listMySubjects(traineeId: number, lang: string): Promise<MySubjectDto[]> {
+        const userSubjects = await this.userSubjectRepo.find({
+            where: { user: { userId: traineeId } },
+            relations: ['courseSubject', 'courseSubject.course', 'courseSubject.subject'],
+            order: { userSubjectId: 'ASC' }
+        });
+
+        if (userSubjects.length === 0) {
+            throw new NotFoundException(this.i18nUtils.translate('validation.user_subject.not_found', {}, lang));
+        }
+
+        return userSubjects.map((us) => ({
+            userSubjectId: us.userSubjectId,
+            subjectId: us.courseSubject.subject.subjectId,
+            subjectName: us.courseSubject.subject.name,
+            courseName: us.courseSubject.course.name,
+            status: us.status,
+            subjectProgress: us.subjectProgress,
+        }));
     }
 
     async getTraineesInCourse(courseId: number, user: User, lang: string): Promise<TraineeInCourseDto[]> {

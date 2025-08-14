@@ -47,6 +47,15 @@ export class SubjectProgressDto {
   progress: number;
 }
 
+export interface MySubjectDto {
+  userSubjectId: number;
+  subjectId: number;
+  subjectName: string;
+  courseName: string;
+  status: UserSubjectStatus;
+  subjectProgress: number;
+}
+
 export class TraineeInCourseDto {
   userId: number;
   name: string;

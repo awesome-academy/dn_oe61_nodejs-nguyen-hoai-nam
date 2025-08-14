@@ -142,6 +142,10 @@ export class UserTaskService {
             const subjectId = task.subject.subjectId;
             const userSubject = await this.findUserSubjectBySubject(subjectId, userId, lang, manager);
 
+            if (userSubject.status !== UserSubjectStatus.IN_PROGRESS) {
+                throw new BadRequestException(this.i18nUtils.translate('validation.user_subject.not_in_progress', {}, lang));
+            }
+
             await this.ensureUserTaskNotExists(userSubject.userSubjectId, taskId, lang, manager);
 
             const newUserTask = manager.getRepository(UserTask).create({
