@@ -1,0 +1,14 @@
+export const missingRequiredFieldsError = new Error('Missing required fields');
+export const userNotFoundError = new Error('User not found');
+export const updateFailedError = new Error('Update failed');
+export const emailExistsError = new Error('Email already exists');
+export const deleteNotAllowedError = new Error('Delete not allowed');
+export const deleteFailedError = new Error('Delete failed');
+export const createFailedError = new Error('Create failed');
+export const noTraineeError = new Error('No trainee found');
+export const traineeNotFoundError = new Error('Trainee not found');
+export const noTraineeIdError = new Error('No trainee id found');
+export const noTraineeEmailError = new Error('No trainee email found');
+export const databaseConnectionLostError = new Error('Database connection lost');
+export const noTraineesError = new Error('No trainees');
+export const noTraineesFoundError = new Error('No trainees found');
