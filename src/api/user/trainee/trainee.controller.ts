@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { TraineeService } from './trainee.service';
 import { CreateUserDto, UpdateUserDto, userIdDto } from 'src/validation/class_validation/user.validation';
 import { Language } from 'src/helper/decorators/language.decorator';
@@ -15,8 +15,8 @@ export class TraineeController {
 
     @AuthRoles(Role.ADMIN,Role.SUPERVISOR)
     @Get()
-    async getAll (@Language() lang: string) {
-        const result = await this.traineeService.getAll(lang);
+    async getAll (@Language() lang: string, @Query() query: { page?: number, pageSize?: number }) {
+        const result = await this.traineeService.getAll(lang, query.page, query.pageSize);
         return result;
     }
 
